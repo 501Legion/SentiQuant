@@ -1,0 +1,14 @@
+massive>=1.0.0
+newsapi-python>=0.2.7
+textblob>=0.17.1
+pandas>=2.0.0
+numpy>=1.24.0
+APScheduler>=3.10.0
+pandas_market_calendars>=4.3.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+pytz>=2024.1
+transformers>=4.40.0
+optimum[onnxruntime]>=1.18.0
+onnxruntime>=1.18.0
+torch>=2.2.0
