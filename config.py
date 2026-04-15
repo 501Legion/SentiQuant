@@ -6,28 +6,31 @@ load_dotenv()
 
 # --- API 키 ---
 POLYGON_API_KEY: str = os.getenv("POLYGON_API_KEY", "")
-NEWS_API_KEY: str = os.getenv("NEWS_API_KEY", "")
+NEWS_API_KEY: str = os.getenv("NEWS_API_KEY", "")       # 레거시 — Finnhub 전환 후 미사용
+FINNHUB_API_KEY: str = os.getenv("FINNHUB_API_KEY", "")
 
 # --- 대상 종목 (Plan SC-05: .env 또는 여기서 변경) ---
-SYMBOLS: list[str] = ["AAPL", "PLTR", "NVDA"]
+SYMBOLS: list[str] = ["NVDA", "TSLA"]
 
 # 종목별 검색에 사용할 회사명 (NewsAPI 검색 품질 향상)
 COMPANY_NAMES: dict[str, str] = {
-    "AAPL": "Apple",
-    "MSFT": "Microsoft",
-    "NVDA": "NVIDIA",
-    "PLTR": "Palantir",
+    "NVDA": "Nvidia",
+    "": "TQQQ"
 }
 
 # --- API 엔드포인트 ---
 POLYGON_BASE_URL = "https://api.massive.com"
-NEWSAPI_BASE_URL = "https://newsapi.org/v2"
+NEWSAPI_BASE_URL = "https://newsapi.org/v2"             # 레거시 — 미사용
+FINNHUB_BASE_URL = "https://finnhub.io/api/v1"
+FINNHUB_REQUEST_DELAY = 1.0                             # 초 (60 req/min → 1초 간격)
 
 # --- 지표 파라미터 ---
 RSI_PERIOD = 14
 RSI_MA_PERIOD = 7
 OHLCV_LOOKBACK_DAYS = 70       # RSI 계산용 (~60거래일 + 버퍼)
 NEWS_LOOKBACK_DAYS = 7
+NEWS_MAX_ARTICLES = 100        # Finnhub 수집 최대 기사 수
+VOLUME_MA_PERIOD = 20          # Volume MA 계산 기간
 
 # --- 신호 임계값 ---
 SENTIMENT_STRONG_BUY = 70.0
@@ -61,6 +64,23 @@ PORTFOLIO_FILE = "data/portfolio.json"
 TRADES_FILE = "data/trades.csv"
 SIGNALS_FILE = "data/signals.json"
 LOG_FILE = "data/trading.log"
+
+# --- Signal V2: Neutral 필터 ---
+NEUTRAL_FILTER_THRESHOLD = 0.80      # FinBERT neutral 확률 이상이면 제외
+NEUTRAL_FILTER_MIN_ARTICLES = 10     # 필터 후 최소 유효 기사 수 (미달 시 폴백)
+
+# --- Signal V2: Volume Spike ---
+VOLUME_SPIKE_MULTIPLIER = 2.0        # 20일 평균 대비 급증 배수
+VOLUME_SPIKE_RSI_MAX = 40.0          # Volume Spike 발동 시 RSI 상한
+
+# --- Signal V2: 감성 Provider ---
+SENTIMENT_PROVIDERS: list[str] = ["finbert", "textblob"]  # 활성 Provider 목록
+
+# --- 백테스팅 ---
+BACKTEST_START = "2026-02-01"
+BACKTEST_END   = "2026-04-01"
+BACKTEST_CACHE_FILE = "data/backtest_cache.json"
+ARTICLES_DETAIL_FILE = "data/articles_detail.json"
 
 # --- Market RSI Filter (Design Ref: §2.3) ---
 MARKET_SYMBOL = "QQQ"              # 나스닥 100 추종 ETF

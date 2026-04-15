@@ -23,6 +23,7 @@
 | **Function UX Effect** | 시장 과열 시 로그에 "Market Filter 적용" 표시, signals.json에 두 감성 모델 점수 모두 기록되어 비교 분석 가능 |
 | **Core Value** | 최소 코드 변경(기존 로직 유지)으로 시장 맥락 인식과 NLP 정확도를 동시에 향상 |
 
+
 ---
 
 ## Context Anchor
