@@ -51,16 +51,22 @@ class BacktestResult:
 class BacktestEngine:
     """
     고정 기간(BACKTEST_START ~ BACKTEST_END) 백테스팅 엔진.
+    # Design Ref: §2.7 — BacktestEngine + commission 공제
 
     모델 선택:
       "textblob"  → TextBlobProvider만 사용
       "finbert"   → FinBERTProvider(neutral 필터 포함)만 사용
-      "combined"  → 두 Provider 평균
+      "combined"  → FinBERT + TextBlob 평균
+      "gpt4"      → GPTProvider (Plan SC FR-14: 뉴스 3종 비교)
     """
 
+    _VALID_MODELS = ("textblob", "finbert", "combined", "gpt4")
+
     def __init__(self, model: str):
-        if model not in ("textblob", "finbert", "combined"):
-            raise ValueError(f"model은 textblob/finbert/combined 중 하나여야 합니다: {model}")
+        if model not in self._VALID_MODELS:
+            raise ValueError(
+                f"model은 {self._VALID_MODELS} 중 하나여야 합니다: {model}"
+            )
         self.model = model
         self._cache: dict = _load_backtest_cache()
         self._providers = self._build_providers()
@@ -70,6 +76,8 @@ class BacktestEngine:
             return [sp.TextBlobProvider()]
         if self.model == "finbert":
             return [sp.FinBERTProvider()]
+        if self.model == "gpt4":
+            return [sp.GPTProvider()]
         return [sp.FinBERTProvider(), sp.TextBlobProvider()]  # combined
 
     def run(self, symbols: list[str]) -> BacktestResult:
@@ -242,15 +250,17 @@ class BacktestEngine:
 
                 if should_exit:
                     exit_price = current_close
-                    pnl_final = (exit_price - position["entry_price"]) / position["entry_price"] * 100
+                    gross_pnl = (exit_price - position["entry_price"]) / position["entry_price"] * 100
+                    # Plan SC NFR-07: 수수료 공제 (한국투자증권 0.25%, 최소 $2)
+                    net_pnl = gross_pnl - _calc_commission_pct(position["entry_price"])
                     trades.append(TradeRecord(
                         symbol=symbol,
                         entry_date=position["entry_date"],
                         entry_price=position["entry_price"],
                         exit_date=date_str,
                         exit_price=exit_price,
-                        pnl_pct=round(pnl_final, 2),
-                        is_win=pnl_final > 0,
+                        pnl_pct=round(net_pnl, 2),
+                        is_win=net_pnl > 0,
                     ))
                     position = None
 
@@ -268,15 +278,16 @@ class BacktestEngine:
             last_ohlcv = ohlcv_by_date.get(last_date)
             if last_ohlcv is not None:
                 exit_price = float(last_ohlcv["close"])
-                pnl_final = (exit_price - position["entry_price"]) / position["entry_price"] * 100
+                gross_pnl = (exit_price - position["entry_price"]) / position["entry_price"] * 100
+                net_pnl = gross_pnl - _calc_commission_pct(position["entry_price"])
                 trades.append(TradeRecord(
                     symbol=symbol,
                     entry_date=position["entry_date"],
                     entry_price=position["entry_price"],
                     exit_date=last_date,
                     exit_price=exit_price,
-                    pnl_pct=round(pnl_final, 2),
-                    is_win=pnl_final > 0,
+                    pnl_pct=round(net_pnl, 2),
+                    is_win=net_pnl > 0,
                 ))
 
         return trades
@@ -286,13 +297,22 @@ class BacktestEngine:
 # 유틸리티 함수
 # ---------------------------------------------------------------------------
 
-def run_all_models(symbols: list[str]) -> dict[str, BacktestResult]:
+def run_all_models(
+    symbols: list[str],
+    models: tuple[str, ...] = ("textblob", "finbert", "combined"),
+) -> dict[str, BacktestResult]:
     """
-    textblob, finbert, combined 3개 모델 순차 실행.
-    Returns: {"textblob": BacktestResult, "finbert": ..., "combined": ...}
+    지정 모델 목록 순차 실행.
+    # Plan SC FR-14: --model gpt4 추가로 뉴스 3종 비교 가능
+
+    Args:
+        symbols: 백테스팅 대상 종목 리스트
+        models: 실행할 모델 튜플 (기본: textblob/finbert/combined)
+
+    Returns: {model_name: BacktestResult}
     """
     results = {}
-    for model in ("textblob", "finbert", "combined"):
+    for model in models:
         logger.info(f"[Backtest] 모델 {model} 시작...")
         engine = BacktestEngine(model)
         results[model] = engine.run(symbols)
@@ -354,6 +374,18 @@ def print_comparison(results: dict[str, BacktestResult]) -> None:
     print(f"\n  * Threshold 조정 후 재실행: python main.py --backtest --model finbert")
     print(f"  * config.py에서 SENTIMENT_BUY, RSI_OVERSOLD 값을 변경하세요")
     print(f"{'='*55}\n")
+
+
+def _calc_commission_pct(entry_price: float) -> float:
+    """
+    뉴스 백테스팅용 수수료 퍼센트 계산 (매수+매도 합산).
+    # Plan SC NFR-07: 한국투자증권 0.25%, 최소 $2 per leg
+    포지션 크기: INITIAL_CASH × POSITION_SIZE_PCT
+    """
+    position_value = config.INITIAL_CASH * config.POSITION_SIZE_PCT
+    buy_comm = max(position_value * config.COMMISSION_RATE, config.COMMISSION_MIN_USD)
+    sell_comm = max(position_value * config.COMMISSION_RATE, config.COMMISSION_MIN_USD)
+    return (buy_comm + sell_comm) / position_value * 100
 
 
 def _get_trading_days(start: str, end: str) -> list[str]:

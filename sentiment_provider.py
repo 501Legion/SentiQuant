@@ -1,6 +1,9 @@
-# Design Ref: §2 — SentimentProvider ABC + TextBlobProvider + FinBERTProvider
+# Design Ref: §2 — SentimentProvider ABC + TextBlobProvider + FinBERTProvider + GPTProvider
 # Plan SC: WSB/GPT 확장 시 이 파일에 신규 Provider 추가만으로 완성 (signals.py 수정 불필요)
+import hashlib
+import json
 import logging
+import os
 from abc import ABC, abstractmethod
 
 from textblob import TextBlob
@@ -186,12 +189,152 @@ class FinBERTProvider(SentimentProvider):
         return round(score, 2), article_details
 
 
+class GPTProvider(SentimentProvider):
+    """
+    OpenAI GPT-4o 기반 감성 분석.
+    # Design Ref: §2.1 — GPTProvider (batch 10, gpt_cache.json)
+    # Plan SC FR-01: GPTProvider OpenAI gpt-4o 구현
+    # Plan SC FR-02: 배치 처리(10건/호출) + gpt_cache.json 캐시
+
+    알고리즘:
+    1. 각 텍스트를 sha256[:16]으로 캐시 키 생성
+    2. 캐시 미스 항목만 GPT-4o 배치 호출 (10건/호출)
+    3. bullish/bearish/neutral 분류 → pos/(pos+neg)*100 공식
+    4. neutral은 score에 포함하지 않음 (FinBERT와 동일 방식)
+
+    입력 article 형태:
+      뉴스:   {"title": str, "description": str}
+      Reddit: {"title": str, "body_excerpt": str, "top_comments": list[str]}
+    """
+
+    _SYSTEM_PROMPT = (
+        "You are a financial sentiment classifier. "
+        "For each numbered item, classify the sentiment as exactly one of: "
+        "bullish, bearish, or neutral. "
+        "Return a JSON array of labels in the same order, e.g. [\"bullish\",\"neutral\",\"bearish\"]. "
+        "Do not include any other text."
+    )
+
+    def score(self, articles: list[dict]) -> tuple[float, list[dict]]:
+        if not articles:
+            logger.warning("GPT: 기사 없음 — 기본값 50.0 반환")
+            return 50.0, []
+
+        cache = self._load_cache()
+        texts = [self._build_text(a) for a in articles]
+        keys = [self._text_key(t) for t in texts]
+
+        # 캐시 미스 항목 수집
+        miss_indices = [i for i, k in enumerate(keys) if k not in cache]
+        if miss_indices:
+            miss_texts = [texts[i] for i in miss_indices]
+            labels = self._batch_call_all(miss_texts)
+            for idx, label in zip(miss_indices, labels):
+                cache[keys[idx]] = {"label": label, "cached_at": _today()}
+            self._save_cache(cache)
+
+        article_details = []
+        pos_count = neg_count = 0
+        for i, article in enumerate(articles):
+            label = cache[keys[i]]["label"]
+            included = label != "neutral"
+            if label == "bullish":
+                pos_count += 1
+            elif label == "bearish":
+                neg_count += 1
+            article_details.append({
+                "title": article.get("title", ""),
+                "label": label,
+                "included": included,
+                "cached": keys[i] in cache,
+            })
+
+        if pos_count + neg_count == 0:
+            logger.warning("GPT: bullish/bearish 없음 — 기본값 50.0 반환")
+            return 50.0, article_details
+
+        score = pos_count / (pos_count + neg_count) * 100
+        logger.info(
+            f"GPT 감성 점수: pos={pos_count}, neg={neg_count} → score={score:.2f}"
+            f" (neutral 제외, cached={len(keys) - len(miss_indices)}/{len(keys)})"
+        )
+        return round(score, 2), article_details
+
+    def _build_text(self, article: dict) -> str:
+        """뉴스/Reddit 공통 텍스트 구성. 길이 제한 적용."""
+        title = article.get("title", "")[:config.GPT_POST_TITLE_MAX]
+        # Reddit
+        if "body_excerpt" in article:
+            body = article.get("body_excerpt", "")[:config.GPT_POST_BODY_MAX]
+            comments = article.get("top_comments", [])[:config.GPT_TOP_COMMENTS]
+            comment_str = " | ".join(c[:config.GPT_COMMENT_MAX] for c in comments)
+            return f"{title} {body} {comment_str}".strip()
+        # 뉴스
+        desc = article.get("description", "")
+        return f"{title} {desc}".strip()
+
+    def _batch_call_all(self, texts: list[str]) -> list[str]:
+        """texts를 GPT_BATCH_SIZE 단위로 나눠 GPT-4o 호출."""
+        results = []
+        for i in range(0, len(texts), config.GPT_BATCH_SIZE):
+            batch = texts[i: i + config.GPT_BATCH_SIZE]
+            results.extend(self._batch_call(batch))
+        return results
+
+    def _batch_call(self, texts: list[str]) -> list[str]:
+        """GPT-4o에 배치 호출. 응답 파싱 실패 시 "neutral" 폴백."""
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=config.OPENAI_API_KEY)
+            numbered = "\n".join(f"[{i+1}] {t}" for i, t in enumerate(texts))
+            response = client.chat.completions.create(
+                model=config.GPT_MODEL,
+                messages=[
+                    {"role": "system", "content": self._SYSTEM_PROMPT},
+                    {"role": "user", "content": numbered},
+                ],
+                temperature=0,
+            )
+            raw = response.choices[0].message.content.strip()
+            labels = json.loads(raw)
+            if isinstance(labels, list) and len(labels) == len(texts):
+                return [str(l).lower() for l in labels]
+            logger.warning(f"GPT 응답 길이 불일치 ({len(labels)} vs {len(texts)}) — neutral 폴백")
+        except Exception as e:
+            logger.error(f"GPT 배치 호출 실패: {e} — neutral 폴백")
+        return ["neutral"] * len(texts)
+
+    def _text_key(self, text: str) -> str:
+        """sha256(text)[:16] → 캐시 키"""
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+    def _load_cache(self) -> dict:
+        if os.path.exists(config.GPT_CACHE_FILE):
+            try:
+                with open(config.GPT_CACHE_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
+
+    def _save_cache(self, cache: dict) -> None:
+        os.makedirs(os.path.dirname(config.GPT_CACHE_FILE), exist_ok=True)
+        with open(config.GPT_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=2)
+
+
+def _today() -> str:
+    from datetime import date
+    return date.today().isoformat()
+
+
 def get_provider(name: str) -> SentimentProvider:
     """
     이름으로 Provider 인스턴스를 반환한다.
+    # Plan SC FR-03: get_provider("gpt4") 분기 추가
 
     Args:
-        name: "textblob" | "finbert"
+        name: "textblob" | "finbert" | "gpt4"
 
     Returns:
         SentimentProvider 인스턴스
@@ -203,4 +346,6 @@ def get_provider(name: str) -> SentimentProvider:
         return TextBlobProvider()
     if name == "finbert":
         return FinBERTProvider()
-    raise ValueError(f"알 수 없는 SentimentProvider: '{name}'. 사용 가능: textblob, finbert")
+    if name == "gpt4":
+        return GPTProvider()
+    raise ValueError(f"알 수 없는 SentimentProvider: '{name}'. 사용 가능: textblob, finbert, gpt4")

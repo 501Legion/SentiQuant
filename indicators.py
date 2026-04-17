@@ -119,6 +119,59 @@ def _get_finbert_pipeline():
 
 
 
+def get_ma(ohlcv_df: pd.DataFrame, period: int) -> float | None:
+    """
+    단순이동평균(SMA) 계산. 30MA 진입 필터 및 청산 조건에 사용.
+    # Design Ref: §2.2 — 30MA 필터 (WSBSignalEngine._filter_ma30)
+
+    Args:
+        ohlcv_df: Polygon OHLCV DataFrame (close 컬럼 필요)
+        period: MA 기간 (예: 30)
+
+    Returns:
+        최신 MA 값. 데이터 부족(rows < period) 시 None.
+    """
+    if ohlcv_df.empty or len(ohlcv_df) < period:
+        return None
+    return float(ohlcv_df["close"].tail(period).mean())
+
+
+def get_atr(ohlcv_df: pd.DataFrame, period: int = 14) -> float | None:
+    """
+    Average True Range (ATR) 계산. Wilder's smoothing 방식.
+    # Design Ref: §2.3 — VolatilitySizer (position_sizer.py)
+    # Plan SC: Volatility-Weighted sizing ATR 기반 포지션 크기 결정
+
+    True Range = max(H-L, |H-prevC|, |L-prevC|)
+    ATR = EWM(TR, alpha=1/period)
+
+    Args:
+        ohlcv_df: Polygon OHLCV DataFrame (high, low, close 컬럼 필요)
+        period: ATR 기간 (기본값: config.ATR_PERIOD = 14)
+
+    Returns:
+        최신 ATR 값. 데이터 부족(rows < period+1) 시 None.
+    """
+    if ohlcv_df.empty or len(ohlcv_df) < period + 1:
+        return None
+
+    high = ohlcv_df["high"].astype(float)
+    low = ohlcv_df["low"].astype(float)
+    close = ohlcv_df["close"].astype(float)
+    prev_close = close.shift(1)
+
+    tr = pd.concat([
+        high - low,
+        (high - prev_close).abs(),
+        (low - prev_close).abs(),
+    ], axis=1).max(axis=1)
+
+    # Wilder's smoothing: alpha = 1/period
+    atr_series = tr.ewm(alpha=1 / period, adjust=False).mean()
+    result = atr_series.dropna()
+    return float(result.iloc[-1]) if not result.empty else None
+
+
 def get_latest_rsi(symbol: str, ohlcv_df: pd.DataFrame) -> tuple[float | None, float | None]:
     """
     OHLCV DataFrame에서 최신 RSI와 RSI MA를 계산해 반환한다.

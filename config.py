@@ -9,6 +9,56 @@ POLYGON_API_KEY: str = os.getenv("POLYGON_API_KEY", "")
 NEWS_API_KEY: str = os.getenv("NEWS_API_KEY", "")       # 레거시 — Finnhub 전환 후 미사용
 FINNHUB_API_KEY: str = os.getenv("FINNHUB_API_KEY", "")
 
+# --- OpenAI (Design Ref: §2.1 GPTProvider) ---
+OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+GPT_MODEL = "gpt-4o"
+GPT_BATCH_SIZE = 10                 # 호출당 처리 기사 수
+GPT_CACHE_FILE = "data/gpt_cache.json"
+GPT_POST_TITLE_MAX = 200            # Reddit 제목 최대 200자
+GPT_POST_BODY_MAX = 300             # Reddit 본문 최대 300자
+GPT_TOP_COMMENTS = 3                # Top 댓글 수
+GPT_COMMENT_MAX = 100               # 댓글당 최대 100자
+
+# --- Reddit (Design Ref: §2.4 RedditCollector) ---
+REDDIT_CLIENT_ID: str = os.getenv("REDDIT_CLIENT_ID", "")
+REDDIT_CLIENT_SECRET: str = os.getenv("REDDIT_CLIENT_SECRET", "")
+REDDIT_USER_AGENT = "trading-bot/1.0"
+REDDIT_SUBREDDITS = ["wallstreetbets", "investing", "stocks"]
+REDDIT_ALLOWED_FLAIRS = ["DD", "Discussion", "Fundamentals", "Daily Discussion", "Earnings"]
+REDDIT_LOOKBACK_HOURS = 24          # 최근 24시간 게시글 수집
+REDDIT_DATA_DIR = "data/reddit"     # data/reddit/YYYY-MM-DD/ 루트
+REDDIT_MODE = False                 # True: Reddit 실시간 모드 활성화
+REDDIT_BACKTEST_MIN_DAYS = 14       # 최소 거래일 미만 시 경고
+
+# --- Reddit 신호 파라미터 (Design Ref: §2.5 WSBSignalEngine) ---
+WSB_CONSENSUS_RATIO = 1.5           # bullish/bearish 진입 기준
+WSB_SELL_RATIO = 1.5                # bearish/bullish 청산 기준
+TOP_N = 3                           # 매일 선정 최대 종목 수
+MAX_POSITIONS = 10                  # 최대 동시 보유 포지션 수
+MA_ENTRY_PERIOD = 30                # 진입 30MA 기준
+MA_BREAKDOWN_GRACE_DAYS = 5         # 30MA 청산 유예 기간 (보유 5일↑)
+ATR_PERIOD = 14
+
+# --- 손절매 / 익절 (Design Ref: §3.2) ---
+STOP_LOSS_PCT = -7.0                # 손절: 진입가 대비 -7% → 즉시 SELL
+TRAILING_STOP_PCT = -5.0            # 트레일링 익절: 최고점 대비 -5% (수익 중일 때만)
+
+# --- Position Sizing (Design Ref: §2.3 PositionSizer) ---
+POSITION_SIZING = "equal"           # "equal" | "sentiment" | "volatility"
+EQUAL_POSITION_PCT = 0.10           # Equal: 10% 고정
+SENTIMENT_SIZE_HIGH_THRESHOLD = 0.80
+SENTIMENT_SIZE_MID_THRESHOLD = 0.65
+SENTIMENT_SIZE_HIGH = 0.15          # bullish ratio >= 80% → 15%
+SENTIMENT_SIZE_MID = 0.10           # bullish ratio >= 65% → 10%
+SENTIMENT_SIZE_LOW = 0.05           # 나머지 → 5%
+VOLATILITY_TARGET_RISK = 0.01       # 포지션당 1% 리스크
+VOLATILITY_MIN_PCT = 0.05           # 최소 5%
+VOLATILITY_MAX_PCT = 0.15           # 최대 15%
+
+# --- 수수료 (한국투자증권 미국주식 위탁매매, Design Ref: §2.6) ---
+COMMISSION_RATE = 0.0025            # 0.25% (매수/매도 각각)
+COMMISSION_MIN_USD = 2.0            # 최소 $2.0 per leg
+
 # --- 대상 종목 (Plan SC-05: .env 또는 여기서 변경) ---
 SYMBOLS: list[str] = ["NVDA", "TSLA"]
 
