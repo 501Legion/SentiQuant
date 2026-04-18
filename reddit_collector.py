@@ -1,9 +1,9 @@
-# Design Ref: §2.4 — RedditCollector (PRAW 3 subreddits + ticker extract + daily storage)
+# Design Ref: §2.4 -RedditCollector (PRAW 3 subreddits + ticker extract + daily storage)
 # Plan SC FR-04: PRAW 3개 서브레딧 (wsb/investing/stocks) 수집
 # Plan SC FR-05: Flair 필터 (DD/Discussion/Fundamentals/Daily Discussion/Earnings)
 # Plan SC FR-06: 티커 추출 + Polygon OHLCV 유효성 검사
 # Plan SC FR-07: 날짜별 저장 data/reddit/YYYY-MM-DD/wsb_posts.json
-# Plan SC FR-19: Market Cap/Short Interest 필터 없음 — Polygon 조회 성공 = 유효
+# Plan SC FR-19: Market Cap/Short Interest 필터 없음 -Polygon 조회 성공 = 유효
 # Plan SC FR-20: GPT-4 텍스트 최적화 (title 200자 + body 300자 + top comments 3개×100자)
 import json
 import logging
@@ -16,17 +16,60 @@ import config
 
 logger = logging.getLogger(__name__)
 
-# 알려진 비-티커 단어 (너무 흔한 대문자 약어 제외)
+# 비-티커 단어 (대문자이지만 종목이 아닌 것들)
 _COMMON_WORDS = frozenset({
-    "I", "A", "AI", "IT", "GO", "BE", "DO", "DD", "SO", "US", "AM",
-    "PM", "OP", "EV", "IPO", "IMO", "TBH", "YOLO", "WSB", "CEO", "CFO",
-    "CTO", "SEC", "ETF", "FED", "GDP", "CPI", "ATH", "ATL", "EPS",
-    "PE", "PB", "ROE", "ROI", "YTD", "QOQ", "YOY",
+    # 기본 영어
+    "I", "A", "AN", "THE", "AND", "BUT", "FOR", "OR", "NOR", "SO", "YET",
+    "IF", "IN", "ON", "AT", "TO", "BY", "OF", "UP", "AS", "IS", "IT",
+    "BE", "DO", "GO", "HE", "HI", "ME", "MY", "NO", "OK", "WE",
+    # 일반 대문자 약어
+    "AM", "PM", "US", "UK", "EU", "UN", "NY", "LA", "DC",
+    # 금융/투자 일반 용어
+    "AI", "EV", "OP", "DD", "PE", "PB", "PG", "VC",
+    "IPO", "IMO", "TBH", "IRA", "ETF", "FED", "GDP", "CPI",
+    "ATH", "ATL", "EPS", "ROE", "ROI", "YTD", "QOQ", "YOY",
+    "SEC", "NYSE", "FOMC", "FDIC", "REIT", "SPAC", "MACD", "VWAP",
+    "RSI", "ATR", "EMA", "SMA", "DJIA", "SPX", "SPY", "QQQ", "VIX",
+    # 매매 행위
+    "BUY", "SELL", "HOLD", "LONG", "SHORT", "PUTS", "CALL", "CALLS",
+    "DIP", "DIPS", "BULL", "BEAR", "MOON", "PUMP", "DUMP", "HODL",
+    "YOLO", "FOMO", "REKT",
+    # 수식어/일반어
+    "NOW", "NEW", "OLD", "TOP", "BIG", "BAD", "LOW", "HIGH",
+    "BEST", "JUST", "EVEN", "ALSO", "NEXT", "LAST", "LATE",
+    "MORE", "LESS", "VERY", "GOOD", "REAL", "FAKE",
+    "HUGE", "DROP", "GAIN", "LOSS", "RISK", "HELP", "DEAL",
+    # Reddit 용어
+    "WSB", "CEO", "CFO", "CTO", "COO", "CMO",
+    "EDIT", "TLDR", "INFO", "POST", "NEWS", "MEME",
+    "BRRR", "HODL", "IMHO",
+    # 옵션 용어
+    "ATM", "ITM", "OTM", "DTE", "IV", "HV", "PNL",
+    "THETA", "DELTA", "GAMMA", "VEGA", "RHO",
+    # 암호화폐 (주식 아님)
+    "BTC", "ETH", "SOL", "XRP", "DOGE", "SHIB",
+    # 기타 일반 ETF/인덱스 (이미 SPY/QQQ 있음)
+    "VTI", "VOO", "VT", "VTV", "GLD", "SLV",
+    "IWM", "TLT", "HYG", "LQD", "XLF", "XLE",
+    # 원자재/지표 (주식 아님)
+    "WTI", "NDX", "USD", "EUR", "JPY", "DXY",
+    # 옵션 전략 용어
+    "PUT", "CSP", "PMC", "LEAPS", "PMCC",
+    # 국가/지역 (주식 아님)
+    "IRAN", "IRAQ", "CHINA", "KOREA", "INDIA",
+    # 분명한 비티커
+    "DCA", "LOL", "SAY", "MAY", "OPEN",
+    "CASH", "SABER", "AXIOS", "ADAS",
+    "CTA", "BTO", "XSP",
+    # 시제/연결
+    "THIS", "THAT", "THEN", "THEM", "THEY", "WHEN", "WILL",
+    "BEEN", "HAVE", "FROM", "WITH", "WHAT", "WELL", "WERE",
+    "INTO", "OVER", "SOME", "SUCH", "BOTH", "EACH",
 })
 
-# $TICKER 패턴
+# $TICKER 명시 패턴 ($NVDA, $AAPL 등)
 _TICKER_PATTERN = re.compile(r'\$([A-Z]{1,5})\b')
-# 단순 대문자 단어 패턴 (2~5자)
+# 대문자 단어 패턴 (2-post 등장 조건으로만 사용)
 _WORD_TICKER_PATTERN = re.compile(r'\b([A-Z]{2,5})\b')
 
 
@@ -64,18 +107,22 @@ class RedditCollector:
             date_str = date.today().isoformat()
 
         if self._reddit is None:
-            logger.error("PRAW 미초기화 — 빈 결과 반환")
+            logger.error("PRAW 미초기화 -빈 결과 반환")
             return {}
 
         all_posts = []
         for sub_name in config.REDDIT_SUBREDDITS:
             posts = self._fetch_subreddit(sub_name)
+            daily = self._fetch_daily_thread(sub_name)
             all_posts.extend(posts)
-            logger.info(f"r/{sub_name}: {len(posts)}개 게시글 수집")
+            all_posts.extend(daily)
+            logger.info(
+                f"r/{sub_name}: 게시글 {len(posts)}개 + Daily Thread {len(daily)}개"
+            )
 
         posts_by_symbol = self._extract_tickers(all_posts)
         if not posts_by_symbol:
-            logger.warning("유효 종목 없음 — 저장 건너뜀")
+            logger.warning("유효 종목 없음 -저장 건너뜀")
             return {}
 
         valid_symbols = self._validate_polygon(list(posts_by_symbol.keys()))
@@ -83,44 +130,40 @@ class RedditCollector:
 
         logger.info(
             f"유효 종목: {len(filtered)}/{len(posts_by_symbol)}개"
-            f" — {list(filtered.keys())}"
+            f" -{list(filtered.keys())}"
         )
         self._save_posts(date_str, filtered)
         return filtered
 
     def _fetch_subreddit(self, name: str) -> list[dict]:
         """
-        단일 서브레딧 최근 게시글 수집.
-        Flair 필터: REDDIT_ALLOWED_FLAIRS. 제외: Gain/Loss/Meme/YOLO.
+        단일 서브레딧 new + hot 피드 병행 수집 (중복 제거).
+        Flair 필터: denylist 방식 - Gain/Loss/Meme/YOLO/Screenshot만 제외.
         24시간 이내 게시글만.
         """
-        excluded_flairs = {"Gain", "Loss", "Meme", "YOLO", "Daily Discussion - Meme"}
+        excluded_flairs = {
+            "Gain", "Loss", "Meme", "YOLO",
+            "Daily Discussion - Meme", "Screenshot",
+        }
         cutoff_utc = datetime.now(timezone.utc).timestamp() - (
             config.REDDIT_LOOKBACK_HOURS * 3600
         )
 
+        seen_ids: set[str] = set()
         posts = []
-        try:
-            subreddit = self._reddit.subreddit(name)
-            for submission in subreddit.new(limit=200):
-                # 시간 필터
-                if submission.created_utc < cutoff_utc:
-                    continue
 
-                # Flair 필터
-                flair = submission.link_flair_text or ""
-                flair_clean = flair.strip()
+        def _process_feed(feed):
+            for submission in feed:
+                if submission.created_utc < cutoff_utc:
+                    break  # new/hot 모두 시간 역순 — 이후는 전부 오래된 것
+                if submission.id in seen_ids:
+                    continue
+                seen_ids.add(submission.id)
+
+                flair_clean = (submission.link_flair_text or "").strip()
                 if flair_clean in excluded_flairs:
                     continue
-                if not any(
-                    allowed.lower() in flair_clean.lower()
-                    for allowed in config.REDDIT_ALLOWED_FLAIRS
-                ):
-                    # flair 없는 게시글도 수집 (flair 없이 올라오는 경우 있음)
-                    if flair_clean:
-                        continue
 
-                # 댓글 상위 3개 수집
                 top_comments = []
                 try:
                     submission.comments.replace_more(limit=0)
@@ -138,23 +181,104 @@ class RedditCollector:
                     "top_comments": top_comments,
                     "subreddit": name,
                     "created_utc": int(submission.created_utc),
-                    "bullish": None,  # 감성 분석 후 채워짐
+                    "bullish": None,
                 })
 
-            # rate limit 방지
+        try:
+            subreddit = self._reddit.subreddit(name)
+            _process_feed(subreddit.new(limit=1000))
             time.sleep(1.0)
-
+            _process_feed(subreddit.hot(limit=100))  # hot은 100개면 충분
+            time.sleep(1.0)
         except Exception as e:
-            logger.warning(f"r/{name} 수집 실패: {e} — 빈 리스트 반환")
+            logger.warning(f"r/{name} 수집 실패: {e} -빈 리스트 반환")
 
+        return posts
+
+    def _fetch_daily_thread(self, name: str) -> list[dict]:
+        """
+        Daily Discussion Thread 댓글 수집.
+        sticky → hot 순서로 탐색. 댓글 상위 N개(config.REDDIT_DAILY_THREAD_COMMENTS).
+        댓글 1개 = post 1개로 취급하여 ticker 추출에 활용.
+        """
+        patterns = config.REDDIT_DAILY_PATTERNS.get(name, [])
+        if not patterns:
+            return []
+
+        thread = None
+        subreddit = self._reddit.subreddit(name)
+
+        # 1. sticky 탐색
+        for n in [1, 2]:
+            try:
+                s = subreddit.sticky(number=n)
+                if any(p in s.title.lower() for p in patterns):
+                    thread = s
+                    break
+            except Exception:
+                pass
+
+        # 2. hot fallback (sticky 없거나 패턴 미일치)
+        if thread is None:
+            try:
+                for s in subreddit.hot(limit=20):
+                    if any(p in s.title.lower() for p in patterns):
+                        thread = s
+                        break
+            except Exception:
+                pass
+
+        if thread is None:
+            logger.debug(f"r/{name}: Daily Discussion Thread 없음")
+            return []
+
+        logger.info(
+            f"r/{name}: Daily Thread '{thread.title[:50]}' "
+            f"({thread.num_comments} comments) - top {config.REDDIT_DAILY_THREAD_COMMENTS}개 수집"
+        )
+
+        posts = []
+        try:
+            thread.comments.replace_more(limit=0)
+            # top 댓글 순 정렬 (score 내림차순)
+            top_comments = sorted(
+                [c for c in thread.comments if hasattr(c, "body")],
+                key=lambda c: getattr(c, "score", 0),
+                reverse=True,
+            )[:config.REDDIT_DAILY_THREAD_COMMENTS]
+
+            for comment in top_comments:
+                body = comment.body.strip()
+                if not body or body == "[deleted]" or body == "[removed]":
+                    continue
+                posts.append({
+                    "title": "",  # 댓글은 제목 없음
+                    "body_excerpt": body[:config.GPT_POST_BODY_MAX],
+                    "top_comments": [],
+                    "subreddit": name,
+                    "created_utc": int(comment.created_utc),
+                    "bullish": None,
+                    "source": "daily_thread",
+                })
+        except Exception as e:
+            logger.warning(f"r/{name} Daily Thread 댓글 수집 실패: {e}")
+
+        time.sleep(1.0)
         return posts
 
     def _extract_tickers(self, posts: list[dict]) -> dict[str, list[dict]]:
         """
-        게시글에서 $TICKER 패턴 + config.COMPANY_NAMES 매칭으로 종목 추출.
+        게시글에서 3단계 전략으로 종목 추출.
         결과: {"NVDA": [post1, post2, ...], ...}
+
+        신호 품질 전략:
+          - Stage 1: $TICKER 명시 패턴 (1건 이상)
+          - Stage 2: 회사명 키워드 config.COMPANY_NAMES (1건 이상)
+          - Stage 3: 대문자 단어 패턴 (2건 이상 등장 시에만 수집)
         """
-        ticker_posts: dict[str, list[dict]] = {}
+        high_conf_posts: dict[str, list[dict]] = {}  # Stage 1+2
+        word_posts: dict[str, list[dict]] = {}        # Stage 3 후보
+
         company_map = {
             name.upper(): symbol
             for symbol, name in config.COMPANY_NAMES.items()
@@ -163,55 +287,123 @@ class RedditCollector:
 
         for post in posts:
             text = f"{post['title']} {post['body_excerpt']}"
-            found: set[str] = set()
 
-            # $TICKER 패턴
+            # Stage 1: $TICKER 명시 패턴 -가장 신뢰도 높음
             for match in _TICKER_PATTERN.finditer(text):
                 ticker = match.group(1)
                 if ticker not in _COMMON_WORDS:
-                    found.add(ticker)
+                    high_conf_posts.setdefault(ticker, []).append(post)
 
-            # 회사명 키워드 매칭
+            # Stage 2: 회사명 키워드 매칭
             for name_upper, symbol in company_map.items():
                 if name_upper in text.upper():
-                    found.add(symbol)
+                    high_conf_posts.setdefault(symbol, []).append(post)
 
-            # 일반 대문자 단어 패턴 (보조)
+            # Stage 3: 대문자 단어 (3자 이상, 후보 수집)
             for match in _WORD_TICKER_PATTERN.finditer(text):
                 word = match.group(1)
                 if word not in _COMMON_WORDS and len(word) >= 3:
-                    found.add(word)
+                    word_posts.setdefault(word, []).append(post)
 
-            for ticker in found:
-                ticker_posts.setdefault(ticker, []).append(post)
+        # Stage 3: 2개 이상 게시글에 등장 + Stage 1/2 미수집 종목만 추가
+        MIN_WORD_POSTS = 2
+        for ticker, post_list in word_posts.items():
+            if ticker not in high_conf_posts and len(post_list) >= MIN_WORD_POSTS:
+                high_conf_posts[ticker] = post_list
 
-        return ticker_posts
+        return high_conf_posts
+
+    _TICKER_CACHE_FILE = os.path.join(config.REDDIT_DATA_DIR, "ticker_cache.json")
+    _TICKER_CACHE_TTL_DAYS = 7  # 7일간 캐시 유지
+
+    def _load_ticker_cache(self) -> dict[str, bool]:
+        """파일에서 티커 캐시 로드. TTL 만료된 항목 제거."""
+        if not os.path.exists(self._TICKER_CACHE_FILE):
+            return {}
+        try:
+            with open(self._TICKER_CACHE_FILE, "r", encoding="utf-8") as f:
+                raw: dict = json.load(f)
+            cutoff = (
+                datetime.now(timezone.utc)
+                .replace(tzinfo=None)
+                .date()
+            )
+            from datetime import timedelta
+            min_date_str = (
+                datetime.now(timezone.utc).date()
+                - timedelta(days=self._TICKER_CACHE_TTL_DAYS)
+            ).isoformat()
+            # 형식: {"NVDA": {"valid": true, "checked": "2026-04-18"}}
+            return {
+                ticker: entry["valid"]
+                for ticker, entry in raw.items()
+                if isinstance(entry, dict) and entry.get("checked", "") >= min_date_str
+            }
+        except Exception:
+            return {}
+
+    def _save_ticker_cache(self, cache: dict[str, bool]) -> None:
+        """티커 캐시를 파일에 저장."""
+        today = date.today().isoformat()
+        # 기존 파일 로드 후 병합 (기존 항목 보존)
+        raw: dict = {}
+        if os.path.exists(self._TICKER_CACHE_FILE):
+            try:
+                with open(self._TICKER_CACHE_FILE, "r", encoding="utf-8") as f:
+                    raw = json.load(f)
+            except Exception:
+                raw = {}
+        for ticker, valid in cache.items():
+            raw[ticker] = {"valid": valid, "checked": today}
+        os.makedirs(os.path.dirname(self._TICKER_CACHE_FILE), exist_ok=True)
+        with open(self._TICKER_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(raw, f, ensure_ascii=False, indent=2)
 
     def _validate_polygon(self, symbols: list[str]) -> list[str]:
         """
         Polygon.io OHLCV 조회 성공 = 유효 종목.
+        파일 캐시(7일 TTL) 사용 - 검증된 티커는 재호출 없이 재사용.
         Market Cap/Short Interest 필터 없음 (FR-19).
         """
-        # collector 모듈 임포트 (Polygon API 재사용)
-        try:
-            import collector
-        except ImportError:
-            logger.warning("collector 모듈 없음 — 유효성 검사 건너뜀, 전체 허용")
-            return symbols
+        cache = self._load_ticker_cache()
 
-        valid = []
-        for symbol in symbols:
+        cached_valid = [s for s in symbols if cache.get(s) is True]
+        cached_invalid = {s for s in symbols if cache.get(s) is False}
+        unknown = [s for s in symbols if s not in cache]
+
+        if unknown:
             try:
-                df = collector.get_ohlcv(symbol, lookback_days=5)
-                if df is not None and not df.empty:
-                    valid.append(symbol)
-                else:
-                    logger.debug(f"[{symbol}] Polygon OHLCV 없음 — 제외")
-            except Exception as e:
-                logger.debug(f"[{symbol}] Polygon 조회 실패: {e} — 제외")
-            time.sleep(0.1)  # Polygon rate limit 방지
+                import collector
+            except ImportError:
+                logger.warning("collector 모듈 없음 -유효성 검사 건너뜀, 전체 허용")
+                return symbols
 
-        return valid
+            logger.info(
+                f"Polygon 검증: 신규 {len(unknown)}개 "
+                f"(캐시 유효 {len(cached_valid)}개 / 캐시 제외 {len(cached_invalid)}개)"
+            )
+            new_results: dict[str, bool] = {}
+            for symbol in unknown:
+                try:
+                    df = collector.get_ohlcv(symbol, days=5)
+                    ok = df is not None and not df.empty
+                    new_results[symbol] = ok
+                    if ok:
+                        cached_valid.append(symbol)
+                    else:
+                        logger.debug(f"[{symbol}] Polygon OHLCV 없음 -제외")
+                except Exception as e:
+                    new_results[symbol] = False
+                    logger.debug(f"[{symbol}] Polygon 조회 실패: {e} -제외")
+                time.sleep(12.0)  # Polygon 무료 플랜 5 req/min = 12초 간격
+            self._save_ticker_cache(new_results)
+        else:
+            logger.info(
+                f"Polygon 검증: 전체 캐시 히트 "
+                f"(유효 {len(cached_valid)}개 / 제외 {len(cached_invalid)}개)"
+            )
+
+        return cached_valid
 
     def _save_posts(self, date_str: str, posts_by_symbol: dict) -> None:
         """

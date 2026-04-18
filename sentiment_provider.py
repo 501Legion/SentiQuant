@@ -92,12 +92,58 @@ class FinBERTProvider(SentimentProvider):
     4. 신규 공식: pos_count / (pos_count + neg_count) * 100
 
     indicators._get_finbert_pipeline() 재사용 → ONNX 로컬 캐시 그대로 유지
+
+    use_wsb_preprocessor=True 시 WSBPreprocessor로 슬랭/이모지/반어법 전처리 후 FinBERT 적용.
+    # Design Ref: §3.2 — FinBERTProvider: use_wsb_preprocessor 파라미터
     """
+
+    def __init__(self, use_wsb_preprocessor: bool = False):
+        # Plan SC SC-05: 기존 finbert 동작 변경 없음 (default=False)
+        self._use_wsb = use_wsb_preprocessor
+        self._preprocessor = None  # lazy init
+
+    @property
+    def preprocessor(self):
+        if self._use_wsb and self._preprocessor is None:
+            from wsb_preprocessor import WSBPreprocessor
+            self._preprocessor = WSBPreprocessor()
+        return self._preprocessor
+
+    def _log_preprocessing_samples(
+        self,
+        original: list[dict],
+        processed: list[dict],
+        n: int = 3,
+    ) -> None:
+        """Plan SC SC-02: 전처리 전/후 샘플 로깅 (첫 n개) + 집계."""
+        for orig, proc in zip(original[:n], processed[:n]):
+            orig_title = orig.get("title", "")[:60]
+            proc_title = proc.get("title", "")[:60]
+            if orig_title != proc_title:
+                logger.debug(
+                    f"[WSB-Preprocess] Before: '{orig_title}'"
+                    f" → After: '{proc_title}'"
+                )
+        changed = sum(
+            1 for o, p in zip(original, processed)
+            if o.get("title") != p.get("title")
+            or o.get("body_excerpt") != p.get("body_excerpt")
+        )
+        if changed > 0:
+            logger.info(
+                f"[FinBERT-WSB] 전처리 완료: {len(original)}건 중 {changed}건 변환"
+            )
 
     def score(self, articles: list[dict]) -> tuple[float, list[dict]]:
         if not articles:
             logger.warning("FinBERT: 뉴스 기사 없음 — 기본값 50.0 반환")
             return 50.0, []
+
+        # Plan SC SC-01: finbert-wsb 실행 시 전처리 활성화
+        if self.preprocessor:
+            original_articles = articles
+            articles = [self.preprocessor.preprocess_post(a) for a in articles]
+            self._log_preprocessing_samples(original_articles, articles)
 
         # indicators 모듈에서 공유 파이프라인 가져옴 (ONNX 캐시 재사용)
         import indicators
@@ -111,7 +157,10 @@ class FinBERTProvider(SentimentProvider):
         fallback_scores = []  # 폴백용: avg(p - n)
 
         for article in articles:
-            text = f"{article.get('title', '')} {article.get('description', '')}".strip()
+            # Reddit 게시글은 body_excerpt, 뉴스 기사는 description 사용
+            # Design Ref: §3.2 — WSB Daily Thread 댓글(title="")은 body_excerpt가 핵심 텍스트
+            body = article.get("description", "") or article.get("body_excerpt", "")
+            text = f"{article.get('title', '')} {body}".strip()
             title = article.get("title", "")
 
             if not text:
@@ -345,7 +394,10 @@ def get_provider(name: str) -> SentimentProvider:
     if name == "textblob":
         return TextBlobProvider()
     if name == "finbert":
-        return FinBERTProvider()
+        return FinBERTProvider(use_wsb_preprocessor=False)
+    if name == "finbert-wsb":
+        # Plan SC SC-01: finbert-wsb 모델 옵션 — WSBPreprocessor 활성화
+        return FinBERTProvider(use_wsb_preprocessor=True)
     if name == "gpt4":
         return GPTProvider()
-    raise ValueError(f"알 수 없는 SentimentProvider: '{name}'. 사용 가능: textblob, finbert, gpt4")
+    raise ValueError(f"알 수 없는 SentimentProvider: '{name}'. 사용 가능: textblob, finbert, finbert-wsb, gpt4")

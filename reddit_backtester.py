@@ -36,8 +36,9 @@ class RedditReplayBacktester:
         from_date: str,       # "YYYY-MM-DD"
         to_date: str,         # "YYYY-MM-DD"
     ):
-        if model not in ("finbert", "gpt4"):
-            raise ValueError(f"Reddit 모델은 finbert/gpt4 지원: {model}")
+        # Plan SC SC-01: finbert-wsb 모델 옵션 추가
+        if model not in ("finbert", "finbert-wsb", "gpt4"):
+            raise ValueError(f"Reddit 모델은 finbert/finbert-wsb/gpt4 지원: {model}")
         if ranking not in ("mentions", "ratio"):
             raise ValueError(f"ranking은 mentions/ratio: {ranking}")
         if sizing not in ("equal", "sentiment", "volatility"):

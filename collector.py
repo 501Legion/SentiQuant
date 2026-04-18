@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 import requests
-from massive import RESTClient
+from polygon import RESTClient
 
 import config
 

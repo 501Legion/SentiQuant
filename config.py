@@ -23,9 +23,22 @@ GPT_COMMENT_MAX = 100               # 댓글당 최대 100자
 REDDIT_CLIENT_ID: str = os.getenv("REDDIT_CLIENT_ID", "")
 REDDIT_CLIENT_SECRET: str = os.getenv("REDDIT_CLIENT_SECRET", "")
 REDDIT_USER_AGENT = "trading-bot/1.0"
-REDDIT_SUBREDDITS = ["wallstreetbets", "investing", "stocks"]
+REDDIT_SUBREDDITS = [
+    "wallstreetbets", "investing", "stocks",
+    "options", "StockMarket", "thetagang",
+]
 REDDIT_ALLOWED_FLAIRS = ["DD", "Discussion", "Fundamentals", "Daily Discussion", "Earnings"]
 REDDIT_LOOKBACK_HOURS = 24          # 최근 24시간 게시글 수집
+REDDIT_DAILY_THREAD_COMMENTS = 500  # Daily Discussion Thread 수집 댓글 수
+# 서브레딧별 Daily Discussion Thread 탐색 패턴 (소문자 부분일치)
+REDDIT_DAILY_PATTERNS: dict[str, list[str]] = {
+    "wallstreetbets": ["daily discussion"],
+    "investing":      ["daily general discussion", "daily discussion"],
+    "stocks":         ["daily discussion"],
+    "options":        ["megathread", "safe haven", "what are your moves"],
+    "StockMarket":    ["daily discussion"],
+    "thetagang":      ["daily discussion", "what are your moves"],
+}
 REDDIT_DATA_DIR = "data/reddit"     # data/reddit/YYYY-MM-DD/ 루트
 REDDIT_MODE = False                 # True: Reddit 실시간 모드 활성화
 REDDIT_BACKTEST_MIN_DAYS = 14       # 최소 거래일 미만 시 경고
@@ -65,7 +78,22 @@ SYMBOLS: list[str] = ["NVDA", "TSLA"]
 # 종목별 검색에 사용할 회사명 (NewsAPI 검색 품질 향상)
 COMPANY_NAMES: dict[str, str] = {
     "NVDA": "Nvidia",
-    "": "TQQQ"
+    "AAPL": "Apple",
+    "MSFT": "Microsoft",
+    "GOOGL": "Google",
+    "AMZN": "Amazon",
+    "META": "Meta",
+    "TSLA": "Tesla",
+    "AMD": "AMD",
+    "PLTR": "Palantir",
+    "SOFI": "SoFi",
+    "MSTR": "MicroStrategy",
+    "COIN": "Coinbase",
+    "SMCI": "Super Micro",
+    "ARM": "ARM Holdings",
+    "HOOD": "Robinhood",
+    "GME": "GameStop",
+    "AMC": "AMC",
 }
 
 # --- API 엔드포인트 ---

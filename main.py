@@ -74,12 +74,12 @@ def _run_news_backtest(args) -> None:
 
 
 def _run_reddit_backtest(args) -> None:
-    """Reddit replay 백테스팅 — 단일 전략 지정 필수.
+    """Reddit replay 백테스팅 -단일 전략 지정 필수.
     # Plan SC FR-21: --source reddit --from DATE --to DATE replay 백테스팅
     """
     missing = []
     if not args.model or args.model == "combined":
-        missing.append("--model {finbert|gpt4}")
+        missing.append("--model {finbert|finbert-wsb|gpt4}")
     if not args.ranking:
         missing.append("--ranking {mentions|ratio}")
     if not args.sizing:
@@ -131,7 +131,7 @@ def _run_reddit_collect() -> None:
         print(f"저장 경로: data/reddit/{today_str}/wsb_posts.json")
     else:
         logger.warning("[Reddit] 수집 결과 없음")
-        print("Reddit 수집 결과 없음 — PRAW API 키 및 네트워크 확인")
+        print("Reddit 수집 결과 없음 -PRAW API 키 및 네트워크 확인")
 
 
 def _run_report_reddit(from_date: str | None, to_date: str | None) -> None:
@@ -158,7 +158,7 @@ def _run_report_reddit(from_date: str | None, to_date: str | None) -> None:
     )
 
     if not all_dates:
-        print("Reddit 데이터 없음 — --reddit-run-now 로 먼저 수집하세요.")
+        print("Reddit 데이터 없음 ---reddit-run-now 로 먼저 수집하세요.")
         return
 
     effective_from = from_date or all_dates[0]
@@ -200,9 +200,9 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        choices=["textblob", "finbert", "gpt4", "combined"],
+        choices=["textblob", "finbert", "finbert-wsb", "gpt4", "combined"],
         default="combined",
-        help="감성 모델 (combined=3종 비교, 기본값: combined)",
+        help="감성 모델 (combined=3종 비교, finbert-wsb=WSB 전처리 FinBERT, 기본값: combined)",
     )
     # Plan SC NFR-01: --source 미지정 시 기존 뉴스 동작 유지
     parser.add_argument(
