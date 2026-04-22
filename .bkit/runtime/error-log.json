@@ -25,5 +25,23 @@
     "agentId": null,
     "agentType": null,
     "message": ""
+  },
+  {
+    "timestamp": "2026-04-22T05:04:40.201Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": null,
+    "agentType": null,
+    "message": ""
+  },
+  {
+    "timestamp": "2026-04-22T05:07:52.794Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": "acf9af7ab20614b75",
+    "agentType": null,
+    "message": ""
   }
 ]

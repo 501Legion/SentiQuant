@@ -218,10 +218,20 @@ class RedditCollector:
             except Exception:
                 pass
 
-        # 2. hot fallback (sticky 없거나 패턴 미일치)
+        # 2. hot fallback (sticky 없거나 패턴 미일치) — limit 50으로 확장
         if thread is None:
             try:
-                for s in subreddit.hot(limit=20):
+                for s in subreddit.hot(limit=50):
+                    if any(p in s.title.lower() for p in patterns):
+                        thread = s
+                        break
+            except Exception:
+                pass
+
+        # 3. new 피드 fallback (hot에도 없을 경우 — WSB처럼 빠른 서브레딧 대응)
+        if thread is None:
+            try:
+                for s in subreddit.new(limit=20):
                     if any(p in s.title.lower() for p in patterns):
                         thread = s
                         break
@@ -234,12 +244,12 @@ class RedditCollector:
 
         logger.info(
             f"r/{name}: Daily Thread '{thread.title[:50]}' "
-            f"({thread.num_comments} comments) - top {config.REDDIT_DAILY_THREAD_COMMENTS}개 수집"
+            f"(전체 {thread.num_comments}개 댓글) → top {config.REDDIT_DAILY_THREAD_COMMENTS}개 수집"
         )
 
         posts = []
         try:
-            thread.comments.replace_more(limit=0)
+            thread.comments.replace_more(limit=3)  # top-level MoreComments 3개까지 확장
             # top 댓글 순 정렬 (score 내림차순)
             top_comments = sorted(
                 [c for c in thread.comments if hasattr(c, "body")],
@@ -263,6 +273,7 @@ class RedditCollector:
         except Exception as e:
             logger.warning(f"r/{name} Daily Thread 댓글 수집 실패: {e}")
 
+        logger.info(f"r/{name}: Daily Thread 댓글 {len(posts)}개 추출 (source=daily_thread)")
         time.sleep(1.0)
         return posts
 
@@ -285,13 +296,15 @@ class RedditCollector:
             if symbol and name
         }
 
+        blacklist = _COMMON_WORDS | config.REDDIT_TICKER_BLACKLIST
+
         for post in posts:
             text = f"{post['title']} {post['body_excerpt']}"
 
             # Stage 1: $TICKER 명시 패턴 -가장 신뢰도 높음
             for match in _TICKER_PATTERN.finditer(text):
                 ticker = match.group(1)
-                if ticker not in _COMMON_WORDS:
+                if ticker not in blacklist:
                     high_conf_posts.setdefault(ticker, []).append(post)
 
             # Stage 2: 회사명 키워드 매칭
@@ -302,7 +315,7 @@ class RedditCollector:
             # Stage 3: 대문자 단어 (3자 이상, 후보 수집)
             for match in _WORD_TICKER_PATTERN.finditer(text):
                 word = match.group(1)
-                if word not in _COMMON_WORDS and len(word) >= 3:
+                if word not in blacklist and len(word) >= 3:
                     word_posts.setdefault(word, []).append(post)
 
         # Stage 3: 2개 이상 게시글에 등장 + Stage 1/2 미수집 종목만 추가

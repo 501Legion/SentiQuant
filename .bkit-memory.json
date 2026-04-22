@@ -1,7 +1,7 @@
 {
-  "feature": "wsb-finbert-preprocessor",
-  "phase": "completed",
+  "feature": "wsb-daily-comments",
+  "phase": "check",
   "matchRate": 100,
   "iterationCount": 0,
-  "updatedAt": "2026-04-18T00:00:00Z"
+  "updatedAt": "2026-04-22T00:00:00Z"
 }

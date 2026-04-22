@@ -10,6 +10,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import date
 
 import config
+import wsb_state
 from position_sizer import PositionSizer
 
 logger = logging.getLogger(__name__)
@@ -63,6 +64,7 @@ class RedditPortfolio:
         sizer: PositionSizer,
         scored: dict[str, dict] = None,  # 감성 점수 (SentimentSizer용)
         atr_cache: dict[str, float] = None,  # ATR (VolatilitySizer용)
+        position_scores: dict[str, dict] = None,  # wsb_state position_scores (entry_score 저장)
     ) -> dict:
         """
         하루 포트폴리오 처리.
@@ -78,6 +80,7 @@ class RedditPortfolio:
         """
         scored = scored or {}
         atr_cache = atr_cache or {}
+        position_scores = position_scores if position_scores is not None else wsb_state.load_position_scores()
         daily_buys = []
         daily_sells = []
 
@@ -90,10 +93,11 @@ class RedditPortfolio:
                 continue
 
             gap_pct = (open_price - prev_close) / prev_close * 100
-            if gap_pct <= config.STOP_LOSS_PCT:
+            if gap_pct <= config.WSB_GAP_DOWN_PCT:  # -5% (WSB V3)
                 trade = self._sell(symbol, open_price, date_str, reason="gap_down")
                 if trade:
                     daily_sells.append(trade)
+                    wsb_state.remove_position_score(position_scores, symbol)
                     logger.info(
                         f"[{symbol}] Gap Down 청산: gap={gap_pct:.2f}%,"
                         f" open={open_price:.2f}"
@@ -110,6 +114,7 @@ class RedditPortfolio:
             trade = self._sell(symbol, close_price, date_str, reason=reason)
             if trade:
                 daily_sells.append(trade)
+                wsb_state.remove_position_score(position_scores, symbol)
 
         # --- Step 3: highest_price 업데이트 (청산 후) ---
         for symbol, pos in self.positions.items():
@@ -148,6 +153,14 @@ class RedditPortfolio:
             trade = self._buy(symbol, open_price, shares, date_str)
             if trade:
                 daily_buys.append(trade)
+                # Design Ref: §wsb-signal-v3 §4.3 — 매수 시 entry_score 저장
+                today_score = scored.get(symbol, {}).get("score")
+                if today_score is not None:
+                    wsb_state.upsert_position_score(
+                        position_scores, symbol, entry_score=today_score
+                    )
+
+        wsb_state.save_position_scores(position_scores)
 
         # 총 평가액 계산
         total_value = self.cash

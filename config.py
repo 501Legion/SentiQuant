@@ -29,10 +29,10 @@ REDDIT_SUBREDDITS = [
 ]
 REDDIT_ALLOWED_FLAIRS = ["DD", "Discussion", "Fundamentals", "Daily Discussion", "Earnings"]
 REDDIT_LOOKBACK_HOURS = 24          # 최근 24시간 게시글 수집
-REDDIT_DAILY_THREAD_COMMENTS = 500  # Daily Discussion Thread 수집 댓글 수
+REDDIT_DAILY_THREAD_COMMENTS = 1000  # Daily Discussion Thread 수집 댓글 수 (wsb-daily-comments)
 # 서브레딧별 Daily Discussion Thread 탐색 패턴 (소문자 부분일치)
 REDDIT_DAILY_PATTERNS: dict[str, list[str]] = {
-    "wallstreetbets": ["daily discussion"],
+    "wallstreetbets": ["what are your moves", "daily discussion"],
     "investing":      ["daily general discussion", "daily discussion"],
     "stocks":         ["daily discussion"],
     "options":        ["megathread", "safe haven", "what are your moves"],
@@ -40,6 +40,11 @@ REDDIT_DAILY_PATTERNS: dict[str, list[str]] = {
     "thetagang":      ["daily discussion", "what are your moves"],
 }
 REDDIT_DATA_DIR = "data/reddit"     # data/reddit/YYYY-MM-DD/ 루트
+
+# 수동 제외 티커 — 실제 종목이 아닌 단어가 수집될 때 여기에 추가
+REDDIT_TICKER_BLACKLIST: set[str] = {
+    "WTF", "WAR", "YOU", "ARE", "TACO", "USO",
+}
 REDDIT_MODE = False                 # True: Reddit 실시간 모드 활성화
 REDDIT_BACKTEST_MIN_DAYS = 14       # 최소 거래일 미만 시 경고
 
@@ -164,6 +169,29 @@ ARTICLES_DETAIL_FILE = "data/articles_detail.json"
 MARKET_SYMBOL = "QQQ"              # 나스닥 100 추종 ETF
 MARKET_RSI_OVERBOUGHT = 70.0       # 초과열 임계값 → 매수 신호 다운그레이드
 MARKET_RSI_DOWNTREND = 30.0        # 하락 추세 임계값 → 매수 신호 다운그레이드
+
+# --- WSB Signal V3: 매수 기준 (Design Ref: §wsb-signal-v3 §3) ---
+WSB_STRONG_BUY_SCORE = 70.0          # 기본 STRONG_BUY score 임계값
+WSB_BUY_SCORE = 55.0                 # 기본 BUY score 임계값 (기존 50 → 55 강화)
+WSB_NEUTRAL_RATIO_MAX = 0.70         # neutral/total 초과 시 NEUTRAL 강제
+
+# --- WSB Signal V3: Mention Velocity ---
+WSB_VELOCITY_LOOKBACK_DAYS = 7       # 7일 평균 멘션
+WSB_VELOCITY_HIGH_THRESHOLD = 2.0    # HIGH_MOMENTUM 기준
+WSB_VELOCITY_LOW_THRESHOLD = 0.5     # DECLINING 기준
+WSB_VELOCITY_SCORE_ADJUST = 5.0      # 보정 점수 (±5)
+WSB_NEW_SPIKE_MIN_MENTIONS = 20      # 신규 종목 NEW_SPIKE 최소 멘션
+WSB_NEW_SPIKE_SCORE = 65.0           # NEW_SPIKE STRONG_BUY score 기준
+
+# --- WSB Signal V3: 청산 조건 ---
+WSB_SENTIMENT_REVERSAL_RATIO = 0.60  # entry_score × 0.6 미만 시 감성 역전
+WSB_RSI_EXIT_OVERBOUGHT = 70.0       # 청산 RSI 과매수 기준
+WSB_GAP_DOWN_PCT = -5.0              # Gap Down 임계값 (%) — reddit_portfolio 전용
+WSB_RSI_HOLD_ONCE = True             # HIGH_MOMENTUM 시 RSI 과매수 1회 유예
+
+# --- WSB Signal V3: 데이터 파일 ---
+MENTION_HISTORY_FILE = "data/mention_history.json"
+POSITION_SCORES_FILE = "data/position_scores.json"
 
 # --- API 요청 설정 ---
 REQUEST_MAX_RETRIES = 3

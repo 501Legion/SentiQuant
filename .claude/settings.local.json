@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "Bash(python)"
+      "Bash(python)",
+      "Bash(mv C:/Users/auto_stock/docs/01-plan/features/news-rsi-trading.plan.md C:/Users/auto_stock/docs/archive/2026-04/news-rsi-trading/)",
+      "Bash(mv C:/Users/auto_stock/docs/02-design/features/news-rsi-trading.design.md C:/Users/auto_stock/docs/archive/2026-04/news-rsi-trading/)",
+      "Bash(mv C:/Users/auto_stock/docs/03-analysis/news-rsi-trading.analysis.md C:/Users/auto_stock/docs/archive/2026-04/news-rsi-trading/)",
+      "Bash(mv C:/Users/auto_stock/docs/01-plan/features/polygon-massive-migration.plan.md C:/Users/auto_stock/docs/archive/2026-04/polygon-massive-migration/)",
+      "Bash(mv C:/Users/auto_stock/docs/03-analysis/polygon-massive-migration.analysis.md C:/Users/auto_stock/docs/archive/2026-04/polygon-massive-migration/)"
     ]
   }
 }

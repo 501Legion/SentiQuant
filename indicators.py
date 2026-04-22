@@ -172,6 +172,16 @@ def get_atr(ohlcv_df: pd.DataFrame, period: int = 14) -> float | None:
     return float(result.iloc[-1]) if not result.empty else None
 
 
+def calculate_atr(ohlcv_df: pd.DataFrame, period: int = None) -> float | None:
+    """
+    ATR 계산 — wsb-signal-v3 §6 stub. get_atr() 위임.
+    # Design Ref: §wsb-signal-v3 §6 — wsb-atr-stop 피처 준비용, 신호 미연동
+    """
+    if period is None:
+        period = config.ATR_PERIOD
+    return get_atr(ohlcv_df, period)
+
+
 def get_latest_rsi(symbol: str, ohlcv_df: pd.DataFrame) -> tuple[float | None, float | None]:
     """
     OHLCV DataFrame에서 최신 RSI와 RSI MA를 계산해 반환한다.

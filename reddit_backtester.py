@@ -5,6 +5,7 @@
 import logging
 
 import config
+import wsb_state
 from backtester import BacktestResult, TradeRecord, _summarize_trades, _calc_total_return, _calc_win_rate, _calc_mdd
 from position_sizer import get_sizer
 from reddit_collector import RedditCollector
@@ -108,26 +109,18 @@ class RedditReplayBacktester:
                 posts_by_symbol, ohlcv_cache, date_str
             )
 
-            # 청산 신호 계산
-            scored = {
-                d["symbol"]: {
-                    "bullish": d["bullish"],
-                    "bearish": d["bearish"],
-                    "ratio": d["ratio"],
-                    "score": d.get("ratio", 0.5) * 100,
-                }
+            # 청산 신호 계산 — signal_details에서 scored + velocity_state 추출
+            scored = {d["symbol"]: d for d in signal_details}
+            velocity_map = {
+                d["symbol"]: d.get("velocity_state", "NORMAL")
                 for d in signal_details
             }
 
+            # Design Ref: §wsb-signal-v3 §3.5 — position_scores 로드 후 check_exit 전달
+            position_scores = wsb_state.load_position_scores()
+
             exit_signals = {}
             for symbol in list(portfolio.positions.keys()):
-                from datetime import date as date_cls, datetime
-                entry_dt = datetime.strptime(
-                    portfolio.positions[symbol].entry_date, "%Y-%m-%d"
-                )
-                curr_dt = datetime.strptime(date_str, "%Y-%m-%d")
-                holding_days = (curr_dt - entry_dt).days
-
                 sym_ohlcv = ohlcv_cache.get(symbol, {})
                 should_exit, reason = engine.check_exit(
                     position={
@@ -139,10 +132,13 @@ class RedditReplayBacktester:
                     today_ohlcv=sym_ohlcv,
                     scored=scored,
                     ohlcv_cache=ohlcv_cache,
-                    holding_days=holding_days,
+                    position_scores=position_scores,
+                    velocity_state=velocity_map.get(symbol, "NORMAL"),
                 )
                 if should_exit:
                     exit_signals[symbol] = reason
+
+            wsb_state.save_position_scores(position_scores)
 
             # ATR cache for VolatilitySizer
             atr_cache = self._calc_atr_cache(ohlcv_cache)
@@ -155,6 +151,7 @@ class RedditReplayBacktester:
                 sizer=sizer,
                 scored=scored,
                 atr_cache=atr_cache,
+                position_scores=position_scores,
             )
 
         # BacktestResult 변환 (portfolio.trade_log 기반)
