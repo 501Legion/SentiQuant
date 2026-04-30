@@ -72,7 +72,7 @@ def get_ohlcv(symbol: str, days: int = None) -> pd.DataFrame:
                 logger.warning(f"[{symbol}] OHLCV 데이터 없음")
                 return pd.DataFrame()
 
-            df = pd.DataFrame(rows).tail(days).reset_index(drop=True)
+            df = _normalize_ohlcv_rows(rows).tail(days).reset_index(drop=True)
             logger.info(f"[{symbol}] OHLCV {len(df)}일치 수집 완료")
             return df
 
@@ -127,7 +127,7 @@ def get_ohlcv_range(symbol: str, from_date: str, to_date: str) -> pd.DataFrame:
                 logger.warning(f"[{symbol}] OHLCV range 데이터 없음 ({from_date}~{to_date})")
                 return pd.DataFrame()
 
-            df = pd.DataFrame(rows).reset_index(drop=True)
+            df = _normalize_ohlcv_rows(rows)
             logger.info(f"[{symbol}] OHLCV range {len(df)}일치 수집 완료 ({from_date}~{to_date})")
             return df
 
@@ -222,8 +222,31 @@ def get_news(
             "publishedAt": published_at,
         })
 
+    articles = _sort_articles(articles)
     logger.info(f"[{symbol}] 뉴스 {len(articles)}건 수집 완료 (Finnhub, {from_date}~{to_date})")
     return articles
+
+
+def _normalize_ohlcv_rows(rows: list[dict]) -> pd.DataFrame:
+    """OHLCV rows를 날짜 기준으로 안정 정렬한다."""
+    return (
+        pd.DataFrame(rows)
+        .sort_values("date")
+        .drop_duplicates(subset=["date"], keep="last")
+        .reset_index(drop=True)
+    )
+
+
+def _sort_articles(articles: list[dict]) -> list[dict]:
+    """뉴스 기사 순서를 API 응답 순서가 아닌 콘텐츠 기준으로 고정한다."""
+    return sorted(
+        articles,
+        key=lambda a: (
+            a.get("publishedAt", ""),
+            a.get("title", ""),
+            a.get("description", ""),
+        ),
+    )
 
 
 def _finnhub_request(url: str, params: dict) -> list | None:

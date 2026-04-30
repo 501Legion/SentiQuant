@@ -163,6 +163,7 @@ SENTIMENT_PROVIDERS: list[str] = ["finbert", "textblob"]  # 활성 Provider 목�
 BACKTEST_START = "2026-02-01"
 BACKTEST_END   = "2026-04-01"
 BACKTEST_CACHE_FILE = "data/backtest_cache.json"
+BACKTEST_SNAPSHOT_DIR = "data/backtest_snapshots"
 ARTICLES_DETAIL_FILE = "data/articles_detail.json"
 
 # --- Market RSI Filter (Design Ref: §2.3) ---
