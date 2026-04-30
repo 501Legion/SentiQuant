@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import re
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -16,6 +17,8 @@ import sentiment_provider as sp
 from signals import determine_signal
 
 logger = logging.getLogger(__name__)
+
+BACKTEST_CACHE_VERSION = "v2"
 
 
 # ---------------------------------------------------------------------------
@@ -69,6 +72,7 @@ class BacktestEngine:
             )
         self.model = model
         self._cache: dict = _load_backtest_cache()
+        self._sentiment_cache: dict = self._cache.setdefault("sentiment", {})
         self._providers = self._build_providers()
 
     def _build_providers(self) -> list[sp.SentimentProvider]:
@@ -144,7 +148,7 @@ class BacktestEngine:
         # RSI 계산 버퍼 포함 (70거래일 전부터)
         ohlcv_start = (start_dt - timedelta(days=100)).strftime("%Y-%m-%d")
 
-        ohlcv_full = collector.get_ohlcv_range(symbol, ohlcv_start, config.BACKTEST_END)
+        ohlcv_full = _get_ohlcv_snapshot(symbol, ohlcv_start, config.BACKTEST_END)
         if ohlcv_full.empty:
             logger.warning(f"[Backtest] {symbol} OHLCV 없음 — 스킵")
             return []
@@ -177,23 +181,14 @@ class BacktestEngine:
         캐시 조회 → 미스 시 Finnhub + Provider 계산 후 캐시 저장.
         캐시 키: "{symbol}_{date_str}_{model}"
         """
-        cache_key = f"{symbol}_{date_str}_{self.model}"
-        if cache_key in self._cache:
-            return self._cache[cache_key]
-
-        # Finnhub rate limit 대응: 1초 delay
-        time.sleep(config.FINNHUB_REQUEST_DELAY)
+        cache_key = _sentiment_cache_key(symbol, date_str, self.model)
+        if cache_key in self._sentiment_cache:
+            return self._sentiment_cache[cache_key]
 
         news_from = (
             datetime.strptime(date_str, "%Y-%m-%d") - timedelta(days=7)
         ).strftime("%Y-%m-%d")
-        # to_date=date_str: 백테스팅 기준일 이후 뉴스 제외 (Lookahead Bias 방지)
-        articles = collector.get_news(
-            symbol,
-            from_date=news_from,
-            to_date=date_str,
-            limit=config.NEWS_MAX_ARTICLES,
-        )
+        articles = _get_news_snapshot(symbol, news_from, date_str)
 
         scores = []
         for provider in self._providers:
@@ -201,7 +196,7 @@ class BacktestEngine:
             scores.append(score)
 
         sentiment = round(sum(scores) / len(scores), 2) if scores else 50.0
-        self._cache[cache_key] = sentiment
+        self._sentiment_cache[cache_key] = sentiment
         logger.info(
             f"[Backtest] {symbol} {date_str}: 뉴스 {len(articles)}건"
             f" | sentiment={sentiment:.1f} ({self.model})"
@@ -324,7 +319,7 @@ def _calc_buy_and_hold(symbols: list[str]) -> dict[str, float]:
     bnh: dict[str, float] = {}
     for symbol in symbols:
         try:
-            df = collector.get_ohlcv_range(symbol, config.BACKTEST_START, config.BACKTEST_END)
+            df = _get_ohlcv_snapshot(symbol, config.BACKTEST_START, config.BACKTEST_END)
             if df.empty or len(df) < 2:
                 continue
             start_price = float(df.iloc[0]["open"])
@@ -408,6 +403,98 @@ def _get_trading_days(start: str, end: str) -> list[str]:
         return days
 
 
+def _get_ohlcv_snapshot(symbol: str, from_date: str, to_date: str) -> pd.DataFrame:
+    """백테스트 OHLCV를 파일 스냅샷으로 고정해 재실행 결과를 안정화한다."""
+    path = _snapshot_path("ohlcv", f"{symbol}_{from_date}_{to_date}.csv")
+    if os.path.exists(path):
+        df = pd.read_csv(path)
+        return _normalize_ohlcv_df(df)
+
+    df = collector.get_ohlcv_range(symbol, from_date, to_date)
+    if df.empty:
+        return df
+
+    df = _normalize_ohlcv_df(df)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    df.to_csv(path, index=False)
+    logger.info(f"[Backtest] OHLCV 스냅샷 저장: {path}")
+    return df
+
+
+def _get_news_snapshot(symbol: str, from_date: str, to_date: str) -> list[dict]:
+    """백테스트 뉴스 원문을 파일 스냅샷으로 고정한다."""
+    path = _snapshot_path("news", f"{symbol}_{from_date}_{to_date}.json")
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                raw = json.load(f)
+            if isinstance(raw, list):
+                return _sort_articles(raw)[:config.NEWS_MAX_ARTICLES]
+            logger.warning(f"[Backtest] 뉴스 스냅샷 형식 오류: {path}")
+        except json.JSONDecodeError:
+            logger.warning(f"[Backtest] 뉴스 스냅샷 손상, 재수집: {path}")
+
+    # Finnhub rate limit 대응: API 호출이 필요할 때만 delay
+    time.sleep(config.FINNHUB_REQUEST_DELAY)
+    articles = collector.get_news(
+        symbol,
+        from_date=from_date,
+        to_date=to_date,
+        limit=config.NEWS_MAX_ARTICLES,
+    )
+    articles = _sort_articles(articles)[:config.NEWS_MAX_ARTICLES]
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(articles, f, ensure_ascii=False, indent=2)
+    logger.info(f"[Backtest] 뉴스 스냅샷 저장: {path}")
+    return articles
+
+
+def _snapshot_path(kind: str, filename: str) -> str:
+    safe_filename = re.sub(r"[^A-Za-z0-9_.-]", "_", filename)
+    return os.path.join(
+        config.BACKTEST_SNAPSHOT_DIR,
+        BACKTEST_CACHE_VERSION,
+        kind,
+        safe_filename,
+    )
+
+
+def _normalize_ohlcv_df(df: pd.DataFrame) -> pd.DataFrame:
+    return (
+        df[["date", "open", "high", "low", "close", "volume"]]
+        .copy()
+        .sort_values("date")
+        .drop_duplicates(subset=["date"], keep="last")
+        .reset_index(drop=True)
+    )
+
+
+def _sort_articles(articles: list[dict]) -> list[dict]:
+    return sorted(
+        articles,
+        key=lambda a: (
+            a.get("publishedAt", ""),
+            a.get("title", ""),
+            a.get("description", ""),
+        ),
+    )
+
+
+def _sentiment_cache_key(symbol: str, date_str: str, model: str) -> str:
+    settings = [
+        BACKTEST_CACHE_VERSION,
+        f"model={model}",
+        f"symbol={symbol}",
+        f"date={date_str}",
+        f"limit={config.NEWS_MAX_ARTICLES}",
+        f"neutral={config.NEUTRAL_FILTER_THRESHOLD}",
+        f"min={config.NEUTRAL_FILTER_MIN_ARTICLES}",
+    ]
+    return "|".join(settings)
+
+
 def _summarize_trades(trades: list[TradeRecord]) -> dict:
     """종목별 성과 요약."""
     if not trades:
@@ -459,16 +546,34 @@ def _load_backtest_cache() -> dict:
     """data/backtest_cache.json 로드. 없거나 손상 시 {} 반환."""
     try:
         with open(config.BACKTEST_CACHE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            raw = json.load(f)
+            if "sentiment" in raw and isinstance(raw["sentiment"], dict):
+                return raw
+            if isinstance(raw, dict):
+                return {
+                    "version": BACKTEST_CACHE_VERSION,
+                    "sentiment": raw,
+                }
+            return {
+                "version": BACKTEST_CACHE_VERSION,
+                "sentiment": {},
+            }
     except FileNotFoundError:
-        return {}
+        return {
+            "version": BACKTEST_CACHE_VERSION,
+            "sentiment": {},
+        }
     except json.JSONDecodeError:
         logger.warning("backtest_cache.json 손상 — 빈 캐시로 재시작")
-        return {}
+        return {
+            "version": BACKTEST_CACHE_VERSION,
+            "sentiment": {},
+        }
 
 
 def _save_backtest_cache(cache: dict) -> None:
     """data/backtest_cache.json 저장."""
     os.makedirs(config.DATA_DIR, exist_ok=True)
+    cache["version"] = BACKTEST_CACHE_VERSION
     with open(config.BACKTEST_CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(cache, f, ensure_ascii=False, indent=2)
