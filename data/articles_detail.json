@@ -1,0 +1,1005 @@
+{
+  "date": "2026-04-06",
+  "AAPL": [
+    {
+      "title": "A Crude Awakening For the Global Economy",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0138,
+        "negative": 0.9248,
+        "neutral": 0.0614
+      },
+      "included": true
+    },
+    {
+      "title": "Foxconn Q1 revenue jumps 30% on AI tailwinds; cautions on Middle East \"volatility\"",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.945,
+        "negative": 0.0329,
+        "neutral": 0.0221
+      },
+      "included": true
+    },
+    {
+      "title": "Nvidia Partner Hon Hai’s Sales Meet Estimates on Solid AI Demand",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9455,
+        "negative": 0.0334,
+        "neutral": 0.0211
+      },
+      "included": true
+    },
+    {
+      "title": "Foxconn first-quarter revenue jumps 30% y/y",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9385,
+        "negative": 0.0389,
+        "neutral": 0.0226
+      },
+      "included": true
+    },
+    {
+      "title": "Apple's Unusual Market Dominance, Iran Retaliation List And More: This Week In Appleverse",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.1183,
+        "negative": 0.4458,
+        "neutral": 0.4359
+      },
+      "included": true
+    },
+    {
+      "title": "How Much Would You Have if You Had Invested $2,000 In Apple When It Went Public?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0584,
+        "negative": 0.0178,
+        "neutral": 0.9238
+      },
+      "included": false
+    },
+    {
+      "title": "Jim Cramer Thinks New Apple (AAPL) CFO Is Settling Well In His Role",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0323,
+        "negative": 0.0803,
+        "neutral": 0.8873
+      },
+      "included": false
+    },
+    {
+      "title": "Globalstar: Don't Buy Amazon's Possible Takeover Deal",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6198,
+        "negative": 0.1177,
+        "neutral": 0.2625
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon Globalstar Interest Puts Apple Satellite Story Under Fresh Review",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0305,
+        "negative": 0.1155,
+        "neutral": 0.854
+      },
+      "included": false
+    },
+    {
+      "title": "Will Qualcomm’s US$20 Billion Buyback And Dividend Hike Change QUALCOMM's (QCOM) Narrative?",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9466,
+        "negative": 0.026,
+        "neutral": 0.0274
+      },
+      "included": true
+    },
+    {
+      "title": "Arm Holdings: The Chip Designer Drawing NVIDIA Comparisons—Is It Justified?",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6107,
+        "negative": 0.0446,
+        "neutral": 0.3447
+      },
+      "included": true
+    },
+    {
+      "title": "Apple Turns 50: From Garage Startup To $3.73 Trillion Giant—Here's How Much A $1,000 Investment At Its IPO Would Be Worth Today",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1592,
+        "negative": 0.0134,
+        "neutral": 0.8274
+      },
+      "included": false
+    },
+    {
+      "title": "Apple's 50th Anniversary Was April 1. Is the Tech Giant's Stock Worth Buying and Holding for Another 50 Years?",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6937,
+        "negative": 0.0121,
+        "neutral": 0.2942
+      },
+      "included": true
+    },
+    {
+      "title": "Gavin Newsom Hails Apple's '50 Years Of Innovation' As Tesla, Chevron, McKesson Leave California",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6576,
+        "negative": 0.0174,
+        "neutral": 0.325
+      },
+      "included": true
+    },
+    {
+      "title": "Russia’s VPN Crackdown Caused Bank Outage, Telegram Founder Says",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0284,
+        "negative": 0.5525,
+        "neutral": 0.419
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon Vs. Starlink: The $9 Billion Globalstar Deal That Could Change Everything",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.3262,
+        "negative": 0.5272,
+        "neutral": 0.1466
+      },
+      "included": true
+    },
+    {
+      "title": "Consumer Tech News (Mar 30-Apr 2): Tesla, Nio, XPeng Drive EV Growth, Apple iPhone 17, Meta Ray-Ban Launches & More",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.846,
+        "negative": 0.0091,
+        "neutral": 0.1449
+      },
+      "included": true
+    },
+    {
+      "title": "Buffett may end donations to Gates charity over Bill's ties to Epstein",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0105,
+        "negative": 0.9585,
+        "neutral": 0.0309
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon Globalstar Talks Raise Questions For Project Kuiper And Valuation",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1164,
+        "negative": 0.0289,
+        "neutral": 0.8547
+      },
+      "included": false
+    },
+    {
+      "title": "Is the \"Magnificent Seven\" Era Over? Here Are the Stocks That Replace Them",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1491,
+        "negative": 0.0118,
+        "neutral": 0.8392
+      },
+      "included": false
+    },
+    {
+      "title": "Apple at 50: The iPhone maker 'blew a 5-year lead' on AI, but former insiders say it can still win",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2374,
+        "negative": 0.1304,
+        "neutral": 0.6322
+      },
+      "included": true
+    },
+    {
+      "title": "IHD: This Fund Has A Lot Going For It, But The Price Is Above Average",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1105,
+        "negative": 0.0115,
+        "neutral": 0.8781
+      },
+      "included": false
+    },
+    {
+      "title": "Trump warns Iran '48 hours before all Hell will reign down,' while search for missing crew member intensifies",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0212,
+        "negative": 0.8789,
+        "neutral": 0.0999
+      },
+      "included": true
+    },
+    {
+      "title": "The Stock Market Is More Expensive Than It Looks. Tread Carefully.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0333,
+        "negative": 0.053,
+        "neutral": 0.9137
+      },
+      "included": false
+    },
+    {
+      "title": "Why investors are so eager for the SpaceX IPO countdown",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1483,
+        "negative": 0.046,
+        "neutral": 0.8057
+      },
+      "included": false
+    },
+    {
+      "title": "Amazon.com, Inc. (AMZN) Advances AI and Satellite Expansion Plans",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8898,
+        "negative": 0.0089,
+        "neutral": 0.1012
+      },
+      "included": true
+    },
+    {
+      "title": "Apple Just Showed Me 50 Years of History That Nobody Has Ever Seen",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0419,
+        "negative": 0.0288,
+        "neutral": 0.9293
+      },
+      "included": false
+    },
+    {
+      "title": "Is IBM a good investment in 2026? Its buy-and-hold prospects explained",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.483,
+        "negative": 0.0139,
+        "neutral": 0.5032
+      },
+      "included": true
+    },
+    {
+      "title": "SpaceX Targets Over $2 Trillion Valuation in Potential IPO",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2002,
+        "negative": 0.0098,
+        "neutral": 0.7901
+      },
+      "included": true
+    },
+    {
+      "title": "What markets have learned since Trump's Liberation Day tariffs",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0312,
+        "negative": 0.2161,
+        "neutral": 0.7527
+      },
+      "included": true
+    },
+    {
+      "title": "Amplify’s QDVO Turned Magnificent Seven Stocks Into a 10.7% Income Machine",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0497,
+        "negative": 0.0292,
+        "neutral": 0.9211
+      },
+      "included": false
+    },
+    {
+      "title": "Fidelity’s Active Large-Cap Growth ETF FFLG Is Winning the Battle but Losing the War",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0734,
+        "negative": 0.2812,
+        "neutral": 0.6454
+      },
+      "included": true
+    },
+    {
+      "title": "The S&P 500 Without Big Tech Is Quietly Beating the Full Index in 2026",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1719,
+        "negative": 0.0365,
+        "neutral": 0.7916
+      },
+      "included": true
+    },
+    {
+      "title": "YMAG ETF Pays Weekly but the Share Price Tells a Harder Story",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0484,
+        "negative": 0.0337,
+        "neutral": 0.9179
+      },
+      "included": false
+    },
+    {
+      "title": "Is Trending Stock Apple Inc. (AAPL) a Buy Now?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0817,
+        "negative": 0.0152,
+        "neutral": 0.9031
+      },
+      "included": false
+    },
+    {
+      "title": "Cloud AI Update - Hidden Costs Surge In Global Enterprise AI Operations",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0553,
+        "negative": 0.8251,
+        "neutral": 0.1196
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon’s Globalstar play about spectrum, not just hardware",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0703,
+        "negative": 0.0128,
+        "neutral": 0.917
+      },
+      "included": false
+    },
+    {
+      "title": "The Magnificent 7 Stock Crash's Toll Reaches $2.1 Trillion",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0236,
+        "negative": 0.549,
+        "neutral": 0.4274
+      },
+      "included": true
+    },
+    {
+      "title": "Big Tech H-1B Filings Plunge As Amazon, Google, Meta And Microsoft Slash Jobs Amid Rising Immigration Costs",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.008,
+        "negative": 0.975,
+        "neutral": 0.017
+      },
+      "included": true
+    },
+    {
+      "title": "1 Reason Why April 10 Could Be Huge for Taiwan Semiconductor Manufacturing",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0489,
+        "negative": 0.8075,
+        "neutral": 0.1436
+      },
+      "included": true
+    },
+    {
+      "title": "PayPal transformed digital payments. Why the California fintech giant is now struggling",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0105,
+        "negative": 0.964,
+        "neutral": 0.0255
+      },
+      "included": true
+    },
+    {
+      "title": "SpaceX Is Worth $2 Trillion? What That Might Mean.",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9301,
+        "negative": 0.0162,
+        "neutral": 0.0537
+      },
+      "included": true
+    },
+    {
+      "title": "'Chasing vibes' — OpenAI's M&A strategy gets more confusing with TBPN purchase",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0895,
+        "negative": 0.0762,
+        "neutral": 0.8343
+      },
+      "included": false
+    },
+    {
+      "title": "7 Dividend Increases Expected In April 2026",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.931,
+        "negative": 0.0195,
+        "neutral": 0.0495
+      },
+      "included": true
+    },
+    {
+      "title": "Apple At 50 Weighs AI Partnerships Satellite Ties And Succession",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8031,
+        "negative": 0.0116,
+        "neutral": 0.1853
+      },
+      "included": true
+    },
+    {
+      "title": "Early Apple stock investors now earn a 5.2 percent dividend yield",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1061,
+        "negative": 0.0179,
+        "neutral": 0.876
+      },
+      "included": false
+    },
+    {
+      "title": "Apple Just Turned 50 Years Old. Is the AAPL Stock Cake Stale or Sweet?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0964,
+        "negative": 0.0193,
+        "neutral": 0.8843
+      },
+      "included": false
+    },
+    {
+      "title": "Sector Update: Tech Stocks Rise Late Afternoon",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9382,
+        "negative": 0.0287,
+        "neutral": 0.033
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon is Considering a $9 Billion Deal to Acquire Satellite Communications Company Globalstar. Here's Why Amazon, Apple, and Tesla Investors Should Pay Attention.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.4765,
+        "negative": 0.0096,
+        "neutral": 0.5139
+      },
+      "included": true
+    },
+    {
+      "title": "Saudi Business Hubs Shift to Remote Work After Iran Threats to U.S. Firms",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0103,
+        "negative": 0.9609,
+        "neutral": 0.0288
+      },
+      "included": true
+    },
+    {
+      "title": "Apple Turns 50 — From Near Bankruptcy To $3.6T, Now The AI Test Begins",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.213,
+        "negative": 0.0132,
+        "neutral": 0.7738
+      },
+      "included": true
+    },
+    {
+      "title": "Warren Buffett Says He'd Buy 'A Whole Lot' Of Apple If It Gets Cheaper— And He's Not Losing Sleep Over Cashing Out $100 Billion Stake",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2429,
+        "negative": 0.0532,
+        "neutral": 0.7039
+      },
+      "included": true
+    },
+    {
+      "title": "Apple, Nvidia and Microsoft: Buy the Dip in Big Tech?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0739,
+        "negative": 0.189,
+        "neutral": 0.7371
+      },
+      "included": true
+    },
+    {
+      "title": "Iran Identifies Palantir as a ‘Legitimate Target’ for Threatened Attacks: Should You Sell PLTR Stock Now?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0846,
+        "negative": 0.3334,
+        "neutral": 0.582
+      },
+      "included": true
+    },
+    {
+      "title": "Apple's AI Strategy Is Pivoting. Here's Why That Could Be Great News for the Stock.",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.7864,
+        "negative": 0.0248,
+        "neutral": 0.1887
+      },
+      "included": true
+    },
+    {
+      "title": "Apple at 50 is fighting for the future of software",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0231,
+        "negative": 0.5105,
+        "neutral": 0.4664
+      },
+      "included": true
+    },
+    {
+      "title": "DELL Stock Jumps 17% in a Month: Here Are 3 Reasons Why It Is a Buy",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.3204,
+        "negative": 0.2631,
+        "neutral": 0.4165
+      },
+      "included": true
+    },
+    {
+      "title": "Deal Talks With Amazon Have This Satellite Internet Provider's Stock Popping",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8423,
+        "negative": 0.1029,
+        "neutral": 0.0548
+      },
+      "included": true
+    },
+    {
+      "title": "Nvidia, Apple Are Outgunning Defense Stocks During A War — That's Weird",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.3434,
+        "negative": 0.4078,
+        "neutral": 0.2488
+      },
+      "included": true
+    },
+    {
+      "title": "The Epic 50-Year Story of Apple, Told Through the WSJ Archive",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0802,
+        "negative": 0.0138,
+        "neutral": 0.9061
+      },
+      "included": false
+    },
+    {
+      "title": "Intel: The Easy Money Is Gone",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8416,
+        "negative": 0.0146,
+        "neutral": 0.1438
+      },
+      "included": true
+    },
+    {
+      "title": "Top Midday Stories: Iran, Oman Drafting Hormuz Strait Traffic Protocol; Blue Owl Caps Redemptions at 5% for Two Private Credit Funds",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0081,
+        "negative": 0.9712,
+        "neutral": 0.0207
+      },
+      "included": true
+    },
+    {
+      "title": "Is Apple Stock Overvalued Or Undervalued?",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0086,
+        "negative": 0.9746,
+        "neutral": 0.0168
+      },
+      "included": true
+    },
+    {
+      "title": "Can Qualcomm's Snapdragon Innovations for Wearables Drive Growth?",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8637,
+        "negative": 0.0072,
+        "neutral": 0.1291
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon in talks to acquire satellite firm Globalstar in $8.8B deal",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9404,
+        "negative": 0.0114,
+        "neutral": 0.0482
+      },
+      "included": true
+    },
+    {
+      "title": "Microsoft vs. Apple: $30B AI Buildout vs $85B iPhone Surge",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1055,
+        "negative": 0.0639,
+        "neutral": 0.8307
+      },
+      "included": false
+    },
+    {
+      "title": "Amazon vs. Apple: Which Is the Better Artificial Intelligence (AI) Stock to Buy Today?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0471,
+        "negative": 0.0353,
+        "neutral": 0.9176
+      },
+      "included": false
+    },
+    {
+      "title": "Apple Investors Face New Risk as Amazon Eyes Takeover of iPhone’s Satellite Partner",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1039,
+        "negative": 0.1149,
+        "neutral": 0.7812
+      },
+      "included": true
+    },
+    {
+      "title": "AAPL Stock on Watch: Iran Threatens Retaliatory Strikes Could Hit Apple Next",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0232,
+        "negative": 0.8819,
+        "neutral": 0.095
+      },
+      "included": true
+    },
+    {
+      "title": "The bull market is still strong thanks to these 'dual tailwinds'",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.3219,
+        "negative": 0.019,
+        "neutral": 0.6592
+      },
+      "included": true
+    },
+    {
+      "title": "ROKU Slumps 12% YTD: Here's Why It Is Time to Buy the Stock",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0388,
+        "negative": 0.9378,
+        "neutral": 0.0235
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon.com (AMZN) Planning a Smartphone Comeback, Here’s What You Should Know",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0571,
+        "negative": 0.0273,
+        "neutral": 0.9155
+      },
+      "included": false
+    },
+    {
+      "title": "Globalstar Soars 10%: Amazon’s Reported Takeover Bid Ignites a Spectrum War With SpaceX",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8756,
+        "negative": 0.0814,
+        "neutral": 0.043
+      },
+      "included": true
+    },
+    {
+      "title": "OpenAI Announces The Roll Out Of ChatGPT In Apple CarPlay",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0638,
+        "negative": 0.0164,
+        "neutral": 0.9199
+      },
+      "included": false
+    },
+    {
+      "title": "Apple Turned 50 Years Old. Here's What Its Earliest Investor Saw in the Company and What It Shows About Investing",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.142,
+        "negative": 0.0158,
+        "neutral": 0.8421
+      },
+      "included": false
+    },
+    {
+      "title": "Alcatraz Raises $50 Million to Replace the Badge With Your Face -- Without Sacrificing Privacy",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5343,
+        "negative": 0.0097,
+        "neutral": 0.456
+      },
+      "included": true
+    },
+    {
+      "title": "Globalstar Stock Jumps After Report Amazon Is In Talks To Acquire Satellite Firm",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.723,
+        "negative": 0.1942,
+        "neutral": 0.0827
+      },
+      "included": true
+    },
+    {
+      "title": "Globalstar Stock Rises on Amazon Deal Report. Why Apple Could Scuttle the Launch.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.3787,
+        "negative": 0.1613,
+        "neutral": 0.46
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon in Talks to Buy Globalstar in $9 Billion Satellite Deal",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6043,
+        "negative": 0.0789,
+        "neutral": 0.3168
+      },
+      "included": true
+    },
+    {
+      "title": "Why Investors Own VOOG for Growth Not Its Tiny 0.46% Dividend",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0383,
+        "negative": 0.0217,
+        "neutral": 0.9399
+      },
+      "included": false
+    },
+    {
+      "title": "Coca-Cola vs. Apple: Which Warren Buffett Favorite Belongs in Your Portfolio Forever?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1758,
+        "negative": 0.0148,
+        "neutral": 0.8094
+      },
+      "included": false
+    },
+    {
+      "title": "VYMI vs. VIG vs. VYM: Which Vanguard Dividend ETF Pays You Most?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1159,
+        "negative": 0.0114,
+        "neutral": 0.8726
+      },
+      "included": false
+    },
+    {
+      "title": "EXCLUSIVE: Top 12 Most-Searched Tickers On Benzinga Pro In March – Where Do Tesla, Nvidia, Micron Stocks Rank?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1576,
+        "negative": 0.0168,
+        "neutral": 0.8256
+      },
+      "included": false
+    },
+    {
+      "title": "These Stocks Are Today’s Movers: Tesla, Globalstar, Amazon, Exxon Mobil, Penguin Solutions, and More",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.1192,
+        "negative": 0.5855,
+        "neutral": 0.2953
+      },
+      "included": true
+    },
+    {
+      "title": "Where Will Apple Stock Be in 5 Years?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2239,
+        "negative": 0.0104,
+        "neutral": 0.7656
+      },
+      "included": true
+    },
+    {
+      "title": "Tech, Chip Stocks Slide As Trump's Iran Warning Rattles Markets",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0101,
+        "negative": 0.9422,
+        "neutral": 0.0478
+      },
+      "included": true
+    },
+    {
+      "title": "Apple looks behind in AI. History says don’t count it out.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1806,
+        "negative": 0.0459,
+        "neutral": 0.7734
+      },
+      "included": true
+    },
+    {
+      "title": "Stocks to Watch Thursday: Apple, Exxon, Delta Air Lines",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0075,
+        "negative": 0.9733,
+        "neutral": 0.0192
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon Lines Up Deal to Rival SpaceX’s Starlink: Report. Why Apple Could Be a Problem.",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.7601,
+        "negative": 0.1051,
+        "neutral": 0.1348
+      },
+      "included": true
+    },
+    {
+      "title": "Samsung Still Leads — But Foldable Rivals Are Closing In Fast",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5775,
+        "negative": 0.0302,
+        "neutral": 0.3923
+      },
+      "included": true
+    },
+    {
+      "title": "Elon Musk's SpaceX Files FCC Complaint Against Amazon Over Orbital Debris Violations",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0154,
+        "negative": 0.8966,
+        "neutral": 0.088
+      },
+      "included": true
+    },
+    {
+      "title": "Goldman Sachs Highlights AT&T’s OneConnect Push into Value Segment",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.7712,
+        "negative": 0.0078,
+        "neutral": 0.221
+      },
+      "included": true
+    },
+    {
+      "title": "Goldman Sachs Initiates Qualcomm (QCOM) at Neutral, Notes Mixed Growth Outlook",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.7262,
+        "negative": 0.0093,
+        "neutral": 0.2646
+      },
+      "included": true
+    },
+    {
+      "title": "CNBC Daily Open: Trump threatens to put Iran in 'stone ages,' dampening ceasefire hopes",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.024,
+        "negative": 0.9582,
+        "neutral": 0.0178
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon Globalstar Talks Put Satellite Push And Valuation In New Focus",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.396,
+        "negative": 0.0107,
+        "neutral": 0.5933
+      },
+      "included": true
+    },
+    {
+      "title": "Globalstar Rallies on Report That Amazon Is in Buyout Talks",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.93,
+        "negative": 0.0336,
+        "neutral": 0.0364
+      },
+      "included": true
+    },
+    {
+      "title": "Mark Gurman Dismisses Apple Intelligence China Launch As Error, Points To Missing Approval And Unusual Timing",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.026,
+        "negative": 0.8118,
+        "neutral": 0.1622
+      },
+      "included": true
+    },
+    {
+      "title": "Amazon in talks to buy $9 billion satellite group Globalstar, FT reports",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8929,
+        "negative": 0.0103,
+        "neutral": 0.0968
+      },
+      "included": true
+    },
+    {
+      "title": "Globalstar Stock Pops More Than 15% After Report Claims Amazon In Talks To Acquire Apple-Backed Satellite Communications Company",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9435,
+        "negative": 0.0322,
+        "neutral": 0.0243
+      },
+      "included": true
+    },
+    {
+      "title": "Apple's next chapter: Who succeeds Tim Cook?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0481,
+        "negative": 0.0203,
+        "neutral": 0.9317
+      },
+      "included": false
+    }
+  ]
+}
