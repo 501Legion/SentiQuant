@@ -240,14 +240,14 @@ class FinBERTProvider(SentimentProvider):
 
 class GPTProvider(SentimentProvider):
     """
-    OpenAI GPT-4o 기반 감성 분석.
+    OpenAI GPT-5.4 Mini 기반 감성 분석.
     # Design Ref: §2.1 — GPTProvider (batch 10, gpt_cache.json)
-    # Plan SC FR-01: GPTProvider OpenAI gpt-4o 구현
+    # Plan SC FR-01: GPTProvider OpenAI gpt-5.4-mini 구현
     # Plan SC FR-02: 배치 처리(10건/호출) + gpt_cache.json 캐시
 
     알고리즘:
     1. 각 텍스트를 sha256[:16]으로 캐시 키 생성
-    2. 캐시 미스 항목만 GPT-4o 배치 호출 (10건/호출)
+    2. 캐시 미스 항목만 GPT-5.4 Mini 배치 호출 (10건/호출)
     3. bullish/bearish/neutral 분류 → pos/(pos+neg)*100 공식
     4. neutral은 score에 포함하지 않음 (FinBERT와 동일 방식)
 
@@ -323,7 +323,7 @@ class GPTProvider(SentimentProvider):
         return f"{title} {desc}".strip()
 
     def _batch_call_all(self, texts: list[str]) -> list[str]:
-        """texts를 GPT_BATCH_SIZE 단위로 나눠 GPT-4o 호출."""
+        """texts를 GPT_BATCH_SIZE 단위로 나눠 GPT-5.4 Mini 호출."""
         results = []
         for i in range(0, len(texts), config.GPT_BATCH_SIZE):
             batch = texts[i: i + config.GPT_BATCH_SIZE]
@@ -331,7 +331,7 @@ class GPTProvider(SentimentProvider):
         return results
 
     def _batch_call(self, texts: list[str]) -> list[str]:
-        """GPT-4o에 배치 호출. 응답 파싱 실패 시 "neutral" 폴백."""
+        """GPT-5.4 Mini에 배치 호출. 응답 파싱 실패 시 "neutral" 폴백."""
         try:
             from openai import OpenAI
             client = OpenAI(api_key=config.OPENAI_API_KEY)
@@ -380,10 +380,10 @@ def _today() -> str:
 def get_provider(name: str) -> SentimentProvider:
     """
     이름으로 Provider 인스턴스를 반환한다.
-    # Plan SC FR-03: get_provider("gpt4") 분기 추가
+    # Plan SC FR-03: get_provider("gpt5") 분기 추가
 
     Args:
-        name: "textblob" | "finbert" | "gpt4"
+        name: "textblob" | "finbert" | "gpt5"
 
     Returns:
         SentimentProvider 인스턴스
@@ -398,6 +398,9 @@ def get_provider(name: str) -> SentimentProvider:
     if name == "finbert-wsb":
         # Plan SC SC-01: finbert-wsb 모델 옵션 — WSBPreprocessor 활성화
         return FinBERTProvider(use_wsb_preprocessor=True)
-    if name == "gpt4":
+    if name == config.GPT_MODEL_ALIAS:
         return GPTProvider()
-    raise ValueError(f"알 수 없는 SentimentProvider: '{name}'. 사용 가능: textblob, finbert, finbert-wsb, gpt4")
+    raise ValueError(
+        f"알 수 없는 SentimentProvider: '{name}'. "
+        f"사용 가능: textblob, finbert, finbert-wsb, {config.GPT_MODEL_ALIAS}"
+    )

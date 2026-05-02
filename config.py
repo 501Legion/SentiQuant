@@ -12,6 +12,7 @@ FINNHUB_API_KEY: str = os.getenv("FINNHUB_API_KEY", "")
 # --- OpenAI (Design Ref: §2.1 GPTProvider) ---
 OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 GPT_MODEL = "gpt-5.4-mini"
+GPT_MODEL_ALIAS = "gpt5"
 GPT_BATCH_SIZE = 10                 # 호출당 처리 기사 수
 GPT_CACHE_FILE = "data/gpt_cache.json"
 GPT_POST_TITLE_MAX = 200            # Reddit 제목 최대 200자

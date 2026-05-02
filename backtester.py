@@ -60,10 +60,10 @@ class BacktestEngine:
       "textblob"  → TextBlobProvider만 사용
       "finbert"   → FinBERTProvider(neutral 필터 포함)만 사용
       "combined"  → FinBERT + TextBlob 평균
-      "gpt4"      → GPTProvider (Plan SC FR-14: 뉴스 3종 비교)
+      "gpt5"     → GPTProvider (실제 호출 모델: config.GPT_MODEL)
     """
 
-    _VALID_MODELS = ("textblob", "finbert", "combined", "gpt4")
+    _VALID_MODELS = ("textblob", "finbert", "combined", config.GPT_MODEL_ALIAS)
 
     def __init__(self, model: str):
         if model not in self._VALID_MODELS:
@@ -80,7 +80,7 @@ class BacktestEngine:
             return [sp.TextBlobProvider()]
         if self.model == "finbert":
             return [sp.FinBERTProvider()]
-        if self.model == "gpt4":
+        if self.model == config.GPT_MODEL_ALIAS:
             return [sp.GPTProvider()]
         return [sp.FinBERTProvider(), sp.TextBlobProvider()]  # combined
 
@@ -298,7 +298,7 @@ def run_all_models(
 ) -> dict[str, BacktestResult]:
     """
     지정 모델 목록 순차 실행.
-    # Plan SC FR-14: --model gpt4 추가로 뉴스 3종 비교 가능
+    # Plan SC FR-14: --model gpt5 추가로 뉴스 3종 비교 가능
 
     Args:
         symbols: 백테스팅 대상 종목 리스트
