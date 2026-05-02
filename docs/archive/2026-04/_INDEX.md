@@ -9,3 +9,4 @@
 | [reddit-gpt4-quant](reddit-gpt4-quant/) | 2026-04-17 | 100% | Reddit 파이프라인 + GPT-4 + 12전략 비교 |
 | [daily-thread-collector](daily-thread-collector/) | 2026-04-18 | 100% | Daily Thread 댓글 수집 (99% 커버리지 복구) |
 | [wsb-finbert-preprocessor](wsb-finbert-preprocessor/) | 2026-04-18 | 100% | WSB 전처리 101개 슬랭 + finbert-wsb 옵션 |
+| [wsb-signal-v3](wsb-signal-v3/) | 2026-04-22 | — | 30MA 제거 + Velocity 보정 매트릭스 + 5단계 청산 |

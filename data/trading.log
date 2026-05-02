@@ -5237,6 +5237,278 @@ ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.i
 2026-04-22 22:45:49,429 [WARNING] collector: [TSLA] OHLCV range 수집 실패 (2/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/TSLA/range/1/day/2026-02-01/2026-04-01?limit=500 (Caused by ResponseError('too many 429 error responses'))
 2026-04-22 22:45:52,954 [WARNING] collector: [TSLA] OHLCV range 수집 실패 (3/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/TSLA/range/1/day/2026-02-01/2026-04-01?limit=500 (Caused by ResponseError('too many 429 error responses'))
 2026-04-22 22:45:52,955 [ERROR] collector: [TSLA] OHLCV range 수집 최종 실패
+2026-05-01 00:32:17,364 [INFO] backtester: [Backtest] 시작 — model=finbert (2026-02-01 ~ 2026-04-01)
+2026-05-01 00:32:18,090 [INFO] backtester: [Backtest] NVDA 처리 중...
+2026-05-01 00:32:19,057 [INFO] collector: [NVDA] OHLCV range 109일치 수집 완료 (2025-10-24~2026-04-01)
+2026-05-01 00:32:19,065 [INFO] indicators: [NVDA] RSI=49.46, RSI_MA=55.87
+2026-05-01 00:32:19,066 [INFO] indicators: [NVDA] RSI=42.94, RSI_MA=54.16
+2026-05-01 00:32:19,067 [INFO] indicators: [NVDA] RSI=36.84, RSI_MA=51.83
+2026-05-01 00:32:19,068 [INFO] indicators: [NVDA] RSI=34.84, RSI_MA=48.84
+2026-05-01 00:32:19,069 [INFO] indicators: [NVDA] RSI=51.48, RSI_MA=47.72
+2026-05-01 00:32:19,070 [INFO] indicators: [NVDA] RSI=55.65, RSI_MA=47.03
+2026-05-01 00:32:19,072 [INFO] indicators: [NVDA] RSI=54.03, RSI_MA=46.46
+2026-05-01 00:32:19,074 [INFO] indicators: [NVDA] RSI=55.43, RSI_MA=47.32
+2026-05-01 00:32:19,075 [INFO] indicators: [NVDA] RSI=51.91, RSI_MA=48.60
+2026-05-01 00:32:19,076 [INFO] indicators: [NVDA] RSI=47.58, RSI_MA=50.13
+2026-05-01 00:32:19,077 [INFO] indicators: [NVDA] RSI=49.93, RSI_MA=52.29
+2026-05-01 00:32:19,080 [INFO] indicators: [NVDA] RSI=53.09, RSI_MA=52.52
+2026-05-01 00:32:19,081 [INFO] indicators: [NVDA] RSI=52.99, RSI_MA=52.14
+2026-05-01 00:32:19,083 [INFO] indicators: [NVDA] RSI=55.09, RSI_MA=52.29
+2026-05-01 00:32:19,084 [INFO] indicators: [NVDA] RSI=56.94, RSI_MA=52.51
+2026-05-01 00:32:19,086 [INFO] indicators: [NVDA] RSI=58.34, RSI_MA=53.42
+2026-05-01 00:32:19,088 [INFO] indicators: [NVDA] RSI=61.16, RSI_MA=55.36
+2026-05-01 00:32:19,089 [INFO] indicators: [NVDA] RSI=47.51, RSI_MA=55.02
+2026-05-01 00:32:19,090 [INFO] indicators: [NVDA] RSI=40.48, RSI_MA=53.22
+2026-05-01 00:32:19,093 [INFO] indicators: [NVDA] RSI=46.35, RSI_MA=52.27
+2026-05-01 00:32:19,095 [INFO] indicators: [NVDA] RSI=44.19, RSI_MA=50.71
+2026-05-01 00:32:19,096 [INFO] indicators: [NVDA] RSI=47.43, RSI_MA=49.35
+2026-05-01 00:32:19,098 [INFO] indicators: [NVDA] RSI=47.76, RSI_MA=47.84
+2026-05-01 00:32:19,099 [INFO] indicators: [NVDA] RSI=42.51, RSI_MA=45.18
+2026-05-01 00:32:19,100 [INFO] indicators: [NVDA] RSI=47.91, RSI_MA=45.23
+2026-05-01 00:32:19,103 [INFO] indicators: [NVDA] RSI=50.12, RSI_MA=46.61
+2026-05-01 00:32:19,104 [INFO] indicators: [NVDA] RSI=51.44, RSI_MA=47.34
+2026-05-01 00:32:19,105 [INFO] indicators: [NVDA] RSI=48.28, RSI_MA=47.92
+2026-05-01 00:32:19,107 [INFO] indicators: [NVDA] RSI=45.29, RSI_MA=47.62
+2026-05-01 00:32:19,108 [INFO] indicators: [NVDA] RSI=48.80, RSI_MA=47.77
+2026-05-01 00:32:19,110 [INFO] indicators: [NVDA] RSI=47.38, RSI_MA=48.46
+2026-05-01 00:32:19,111 [INFO] indicators: [NVDA] RSI=45.68, RSI_MA=48.14
+2026-05-01 00:32:19,113 [INFO] indicators: [NVDA] RSI=43.65, RSI_MA=47.22
+2026-05-01 00:32:19,115 [INFO] indicators: [NVDA] RSI=37.87, RSI_MA=45.28
+2026-05-01 00:32:19,116 [INFO] indicators: [NVDA] RSI=42.02, RSI_MA=44.38
+2026-05-01 00:32:19,117 [INFO] indicators: [NVDA] RSI=41.57, RSI_MA=43.85
+2026-05-01 00:32:19,119 [INFO] indicators: [NVDA] RSI=46.43, RSI_MA=43.51
+2026-05-01 00:32:19,120 [INFO] indicators: [NVDA] RSI=38.97, RSI_MA=42.31
+2026-05-01 00:32:19,122 [INFO] indicators: [NVDA] RSI=35.87, RSI_MA=40.91
+2026-05-01 00:32:19,123 [INFO] indicators: [NVDA] RSI=34.03, RSI_MA=39.54
+2026-05-01 00:32:19,125 [INFO] indicators: [NVDA] RSI=45.80, RSI_MA=40.67
+2026-05-01 00:32:19,126 [INFO] indicators: [NVDA] RSI=47.28, RSI_MA=41.42
+2026-05-01 00:32:19,127 [INFO] backtester: [Backtest] TSLA 처리 중...
+2026-05-01 00:32:19,401 [INFO] collector: [TSLA] OHLCV range 109일치 수집 완료 (2025-10-24~2026-04-01)
+2026-05-01 00:32:19,406 [INFO] indicators: [TSLA] RSI=43.24, RSI_MA=45.68
+2026-05-01 00:32:19,408 [INFO] indicators: [TSLA] RSI=43.32, RSI_MA=44.33
+2026-05-01 00:32:19,410 [INFO] indicators: [TSLA] RSI=37.68, RSI_MA=43.01
+2026-05-01 00:32:19,411 [INFO] indicators: [TSLA] RSI=34.97, RSI_MA=41.55
+2026-05-01 00:32:19,413 [INFO] indicators: [TSLA] RSI=42.05, RSI_MA=41.07
+2026-05-01 00:32:19,414 [INFO] indicators: [TSLA] RSI=44.93, RSI_MA=41.81
+2026-05-01 00:32:19,415 [INFO] indicators: [TSLA] RSI=48.44, RSI_MA=42.09
+2026-05-01 00:32:19,419 [INFO] indicators: [TSLA] RSI=49.78, RSI_MA=43.02
+2026-05-01 00:32:19,420 [INFO] indicators: [TSLA] RSI=45.16, RSI_MA=43.29
+2026-05-01 00:32:19,422 [INFO] indicators: [TSLA] RSI=45.34, RSI_MA=44.38
+2026-05-01 00:32:19,423 [INFO] indicators: [TSLA] RSI=42.57, RSI_MA=45.47
+2026-05-01 00:32:19,425 [INFO] indicators: [TSLA] RSI=42.95, RSI_MA=45.60
+2026-05-01 00:32:19,427 [INFO] indicators: [TSLA] RSI=43.18, RSI_MA=45.35
+2026-05-01 00:32:19,429 [INFO] indicators: [TSLA] RSI=43.25, RSI_MA=44.61
+2026-05-01 00:32:19,431 [INFO] indicators: [TSLA] RSI=37.83, RSI_MA=42.90
+2026-05-01 00:32:19,433 [INFO] indicators: [TSLA] RSI=43.86, RSI_MA=42.71
+2026-05-01 00:32:19,435 [INFO] indicators: [TSLA] RSI=48.39, RSI_MA=43.15
+2026-05-01 00:32:19,436 [INFO] indicators: [TSLA] RSI=44.17, RSI_MA=43.38
+2026-05-01 00:32:19,437 [INFO] indicators: [TSLA] RSI=41.49, RSI_MA=43.17
+2026-05-01 00:32:19,439 [INFO] indicators: [TSLA] RSI=42.00, RSI_MA=43.00
+2026-05-01 00:32:19,441 [INFO] indicators: [TSLA] RSI=37.32, RSI_MA=42.15
+2026-05-01 00:32:19,442 [INFO] indicators: [TSLA] RSI=45.44, RSI_MA=43.24
+2026-05-01 00:32:19,443 [INFO] indicators: [TSLA] RSI=45.25, RSI_MA=43.44
+2026-05-01 00:32:19,444 [INFO] indicators: [TSLA] RSI=41.23, RSI_MA=42.41
+2026-05-01 00:32:19,446 [INFO] indicators: [TSLA] RSI=42.45, RSI_MA=42.17
+2026-05-01 00:32:19,448 [INFO] indicators: [TSLA] RSI=42.81, RSI_MA=42.36
+2026-05-01 00:32:19,450 [INFO] indicators: [TSLA] RSI=48.25, RSI_MA=43.25
+2026-05-01 00:32:19,451 [INFO] indicators: [TSLA] RSI=41.85, RSI_MA=43.90
+2026-05-01 00:32:19,453 [INFO] indicators: [TSLA] RSI=40.15, RSI_MA=43.14
+2026-05-01 00:32:19,454 [INFO] indicators: [TSLA] RSI=43.01, RSI_MA=42.82
+2026-05-01 00:32:19,456 [INFO] indicators: [TSLA] RSI=45.40, RSI_MA=43.42
+2026-05-01 00:32:19,457 [INFO] indicators: [TSLA] RSI=42.07, RSI_MA=43.36
+2026-05-01 00:32:19,458 [INFO] indicators: [TSLA] RSI=36.53, RSI_MA=42.47
+2026-05-01 00:32:19,460 [INFO] indicators: [TSLA] RSI=32.03, RSI_MA=40.15
+2026-05-01 00:32:19,461 [INFO] indicators: [TSLA] RSI=40.30, RSI_MA=39.93
+2026-05-01 00:32:19,463 [INFO] indicators: [TSLA] RSI=41.59, RSI_MA=40.13
+2026-05-01 00:32:19,465 [INFO] indicators: [TSLA] RSI=43.36, RSI_MA=40.18
+2026-05-01 00:32:19,466 [INFO] indicators: [TSLA] RSI=37.55, RSI_MA=39.06
+2026-05-01 00:32:19,468 [INFO] indicators: [TSLA] RSI=33.92, RSI_MA=37.90
+2026-05-01 00:32:19,469 [INFO] indicators: [TSLA] RSI=31.80, RSI_MA=37.22
+2026-05-01 00:32:19,470 [INFO] indicators: [TSLA] RSI=41.65, RSI_MA=38.60
+2026-05-01 00:32:19,471 [INFO] indicators: [TSLA] RSI=46.45, RSI_MA=39.48
+2026-05-01 00:32:19,473 [INFO] backtester: [Backtest] 완료 — model=finbert | 수익률=+1.2% | 거래=14회 | 승률=71.4% | MDD=-15.2%
+2026-05-01 00:32:19,766 [INFO] collector: [NVDA] OHLCV range 42일치 수집 완료 (2026-02-01~2026-04-01)
+2026-05-01 00:32:20,071 [INFO] collector: [TSLA] OHLCV range 42일치 수집 완료 (2026-02-01~2026-04-01)
+2026-05-01 00:32:40,751 [INFO] __main__: [Reddit] 수집 시작: 2026-05-01
+2026-05-01 00:32:41,667 [INFO] reddit_collector: PRAW Reddit 초기화 완료
+2026-05-01 00:33:19,393 [INFO] reddit_collector: r/wallstreetbets: Daily Thread 'Daily Discussion Thread for April 30, 2026' (전체 5936개 댓글) → top 1000개 수집
+2026-05-01 00:33:21,838 [INFO] reddit_collector: r/wallstreetbets: Daily Thread 댓글 732개 추출 (source=daily_thread)
+2026-05-01 00:33:22,838 [INFO] reddit_collector: r/wallstreetbets: 게시글 24개 + Daily Thread 732개
+2026-05-01 00:33:37,067 [INFO] reddit_collector: r/investing: Daily Thread 'Daily General Discussion and Advice Thread - April' (전체 3개 댓글) → top 1000개 수집
+2026-05-01 00:33:37,067 [INFO] reddit_collector: r/investing: Daily Thread 댓글 3개 추출 (source=daily_thread)
+2026-05-01 00:33:38,068 [INFO] reddit_collector: r/investing: 게시글 24개 + Daily Thread 3개
+2026-05-01 00:34:13,537 [INFO] reddit_collector: r/stocks: Daily Thread 'r/Stocks Daily Discussion & Options Trading Thursd' (전체 155개 댓글) → top 1000개 수집
+2026-05-01 00:34:13,537 [INFO] reddit_collector: r/stocks: Daily Thread 댓글 63개 추출 (source=daily_thread)
+2026-05-01 00:34:14,539 [INFO] reddit_collector: r/stocks: 게시글 61개 + Daily Thread 63개
+2026-05-01 00:34:23,985 [INFO] reddit_collector: r/options: Daily Thread 'Options Questions Safe Haven periodic megathread |' (전체 61개 댓글) → top 1000개 수집
+2026-05-01 00:34:23,985 [INFO] reddit_collector: r/options: Daily Thread 댓글 19개 추출 (source=daily_thread)
+2026-05-01 00:34:24,987 [INFO] reddit_collector: r/options: 게시글 11개 + Daily Thread 19개
+2026-05-01 00:34:42,367 [INFO] reddit_collector: r/StockMarket: 게시글 15개 + Daily Thread 0개
+2026-05-01 00:34:51,636 [INFO] reddit_collector: r/thetagang: Daily Thread 'Daily r/thetagang Discussion Thread - What are you' (전체 164개 댓글) → top 1000개 수집
+2026-05-01 00:34:51,637 [INFO] reddit_collector: r/thetagang: Daily Thread 댓글 51개 추출 (source=daily_thread)
+2026-05-01 00:34:52,638 [INFO] reddit_collector: r/thetagang: 게시글 8개 + Daily Thread 51개
+2026-05-01 00:34:53,303 [INFO] reddit_collector: Polygon 검증: 신규 87개 (캐시 유효 0개 / 캐시 제외 0개)
+2026-05-01 00:34:54,321 [INFO] collector: [META] OHLCV 4일치 수집 완료
+2026-05-01 00:35:06,695 [INFO] collector: [AMZN] OHLCV 4일치 수집 완료
+2026-05-01 00:35:18,979 [INFO] collector: [MSFT] OHLCV 4일치 수집 완료
+2026-05-01 00:35:31,445 [WARNING] collector: [X] OHLCV 데이터 없음
+2026-05-01 00:35:43,722 [INFO] collector: [RKLB] OHLCV 4일치 수집 완료
+2026-05-01 00:35:55,993 [INFO] collector: [FLY] OHLCV 4일치 수집 완료
+2026-05-01 00:36:08,297 [INFO] collector: [GOOGL] OHLCV 4일치 수집 완료
+2026-05-01 00:36:20,665 [INFO] collector: [PSUS] OHLCV 1일치 수집 완료
+2026-05-01 00:36:32,950 [INFO] collector: [PS] OHLCV 1일치 수집 완료
+2026-05-01 00:36:45,255 [INFO] collector: [NVDA] OHLCV 4일치 수집 완료
+2026-05-01 00:36:57,599 [INFO] collector: [HOOD] OHLCV 4일치 수집 완료
+2026-05-01 00:37:09,962 [INFO] collector: [AMD] OHLCV 4일치 수집 완료
+2026-05-01 00:37:22,259 [INFO] collector: [RDDT] OHLCV 4일치 수집 완료
+2026-05-01 00:37:34,612 [INFO] collector: [SOFI] OHLCV 4일치 수집 완료
+2026-05-01 00:37:46,951 [INFO] collector: [AAPL] OHLCV 4일치 수집 완료
+2026-05-01 00:37:59,281 [INFO] collector: [WEN] OHLCV 4일치 수집 완료
+2026-05-01 00:38:11,571 [INFO] collector: [CAR] OHLCV 4일치 수집 완료
+2026-05-01 00:38:23,846 [INFO] collector: [TSLA] OHLCV 4일치 수집 완료
+2026-05-01 00:38:36,130 [INFO] collector: [ADBE] OHLCV 4일치 수집 완료
+2026-05-01 00:38:48,439 [INFO] collector: [INDI] OHLCV 4일치 수집 완료
+2026-05-01 00:39:23,791 [INFO] collector: [PLTR] OHLCV 4일치 수집 완료
+2026-05-01 00:39:36,117 [INFO] collector: [LAC] OHLCV 4일치 수집 완료
+2026-05-01 00:39:48,400 [INFO] collector: [USAR] OHLCV 4일치 수집 완료
+2026-05-01 00:40:00,804 [INFO] collector: [MP] OHLCV 4일치 수집 완료
+2026-05-01 00:40:13,107 [INFO] collector: [CAT] OHLCV 4일치 수집 완료
+2026-05-01 00:40:25,423 [INFO] collector: [VXUS] OHLCV 4일치 수집 완료
+2026-05-01 00:40:37,741 [INFO] collector: [INTC] OHLCV 4일치 수집 완료
+2026-05-01 00:40:50,202 [INFO] collector: [MRVL] OHLCV 4일치 수집 완료
+2026-05-01 00:41:02,856 [INFO] collector: [HPE] OHLCV 4일치 수집 완료
+2026-05-01 00:41:15,105 [WARNING] collector: [COVID] OHLCV 데이터 없음
+2026-05-01 00:41:27,386 [INFO] collector: [USA] OHLCV 4일치 수집 완료
+2026-05-01 00:41:39,642 [WARNING] collector: [NOT] OHLCV 데이터 없음
+2026-05-01 00:41:51,924 [WARNING] collector: [LMAO] OHLCV 데이터 없음
+2026-05-01 00:42:04,204 [WARNING] collector: [MARCH] OHLCV 데이터 없음
+2026-05-01 00:42:16,537 [WARNING] collector: [PCE] OHLCV 데이터 없음
+2026-05-01 00:42:28,802 [WARNING] collector: [PRICE] OHLCV 데이터 없음
+2026-05-01 00:42:41,129 [WARNING] collector: [INDEX] OHLCV 데이터 없음
+2026-05-01 00:42:53,410 [WARNING] collector: [RISES] OHLCV 데이터 없음
+2026-05-01 00:43:05,746 [WARNING] collector: [EST] OHLCV 데이터 없음
+2026-05-01 00:43:18,196 [WARNING] collector: [CORE] OHLCV 데이터 없음
+2026-05-01 00:43:30,467 [INFO] collector: [GOOG] OHLCV 4일치 수집 완료
+2026-05-01 00:43:42,834 [INFO] collector: [JPM] OHLCV 4일치 수집 완료
+2026-05-01 00:43:55,159 [WARNING] collector: [NACHO] OHLCV 데이터 없음
+2026-05-01 00:44:07,504 [INFO] collector: [POET] OHLCV 4일치 수집 완료
+2026-05-01 00:44:19,769 [WARNING] collector: [GOING] OHLCV 데이터 없음
+2026-05-01 00:44:33,311 [WARNING] collector: [BACK] OHLCV 수집 실패 (1/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/BACK/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:44:35,808 [WARNING] collector: [BACK] OHLCV 수집 실패 (2/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/BACK/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:44:39,319 [WARNING] collector: [BACK] OHLCV 수집 실패 (3/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/BACK/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:44:39,319 [ERROR] collector: [BACK] OHLCV 수집 최종 실패
+2026-05-01 00:44:52,828 [WARNING] collector: [ALL] OHLCV 수집 실패 (1/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/ALL/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:44:55,399 [WARNING] collector: [ALL] OHLCV 수집 실패 (2/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/ALL/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:44:59,059 [WARNING] collector: [ALL] OHLCV 수집 실패 (3/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/ALL/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:44:59,059 [ERROR] collector: [ALL] OHLCV 수집 최종 실패
+2026-05-01 00:45:11,442 [INFO] collector: [SNDK] OHLCV 4일치 수집 완료
+2026-05-01 00:45:23,748 [INFO] collector: [EOD] OHLCV 4일치 수집 완료
+2026-05-01 00:45:37,249 [WARNING] collector: [CAN] OHLCV 수집 실패 (1/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/CAN/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:45:39,798 [WARNING] collector: [CAN] OHLCV 수집 실패 (2/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/CAN/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:45:43,399 [WARNING] collector: [CAN] OHLCV 수집 실패 (3/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/CAN/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:45:43,400 [ERROR] collector: [CAN] OHLCV 수집 최종 실패
+2026-05-01 00:45:57,056 [WARNING] collector: [LETS] OHLCV 수집 실패 (1/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/LETS/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:45:59,665 [WARNING] collector: [LETS] OHLCV 수집 실패 (2/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/LETS/range/1/day/2026-04-24/2026-05-01?limit=200 (Caused by ResponseError('too many 429 error responses'))
+2026-05-01 00:46:01,968 [WARNING] collector: [LETS] OHLCV 데이터 없음
+2026-05-01 00:46:16,534 [WARNING] collector: [HOW] OHLCV 데이터 없음
+2026-05-01 00:46:28,792 [WARNING] collector: [WAS] OHLCV 데이터 없음
+2026-05-01 00:46:41,091 [INFO] collector: [CVNA] OHLCV 4일치 수집 완료
+2026-05-01 00:46:53,376 [WARNING] collector: [ONLY] OHLCV 데이터 없음
+2026-05-01 00:47:05,641 [WARNING] collector: [GET] OHLCV 데이터 없음
+2026-05-01 00:47:17,912 [WARNING] collector: [BEARS] OHLCV 데이터 없음
+2026-05-01 00:47:30,179 [WARNING] collector: [USS] OHLCV 데이터 없음
+2026-05-01 00:47:42,438 [WARNING] collector: [TODAY] OHLCV 데이터 없음
+2026-05-01 00:47:55,528 [WARNING] collector: [CAPEX] OHLCV 데이터 없음
+2026-05-01 00:48:07,799 [WARNING] collector: [GUH] OHLCV 데이터 없음
+2026-05-01 00:48:20,026 [WARNING] collector: [TRADE] OHLCV 데이터 없음
+2026-05-01 00:48:32,263 [WARNING] collector: [WHO] OHLCV 데이터 없음
+2026-05-01 00:48:44,611 [WARNING] collector: [BLOOD] OHLCV 데이터 없음
+2026-05-01 00:48:56,836 [WARNING] collector: [BOJ] OHLCV 데이터 없음
+2026-05-01 00:49:09,073 [INFO] collector: [NXXT] OHLCV 4일치 수집 완료
+2026-05-01 00:49:21,312 [WARNING] collector: [AWS] OHLCV 데이터 없음
+2026-05-01 00:49:33,796 [INFO] collector: [VIXY] OHLCV 4일치 수집 완료
+2026-05-01 00:49:46,049 [INFO] collector: [NFLX] OHLCV 4일치 수집 완료
+2026-05-01 00:49:58,272 [WARNING] collector: [SWPPX] OHLCV 데이터 없음
+2026-05-01 00:50:10,527 [INFO] collector: [SMH] OHLCV 4일치 수집 완료
+2026-05-01 00:50:22,769 [INFO] collector: [NTDOY] OHLCV 4일치 수집 완료
+2026-05-01 00:50:35,076 [WARNING] collector: [YORK] OHLCV 데이터 없음
+2026-05-01 00:50:47,376 [WARNING] collector: [WFH] OHLCV 데이터 없음
+2026-05-01 00:50:59,624 [INFO] collector: [FCF] OHLCV 4일치 수집 완료
+2026-05-01 00:51:11,891 [WARNING] collector: [FAA] OHLCV 데이터 없음
+2026-05-01 00:51:24,121 [WARNING] collector: [LSEG] OHLCV 데이터 없음
+2026-05-01 00:51:36,415 [INFO] collector: [ATI] OHLCV 4일치 수집 완료
+2026-05-01 00:51:49,931 [WARNING] collector: [GAAP] OHLCV 데이터 없음
+2026-05-01 00:52:02,265 [INFO] collector: [LLY] OHLCV 4일치 수집 완료
+2026-05-01 00:52:14,493 [WARNING] collector: [MONEY] OHLCV 데이터 없음
+2026-05-01 00:52:26,783 [INFO] collector: [AMT] OHLCV 4일치 수집 완료
+2026-05-01 00:52:39,036 [INFO] collector: [USLM] OHLCV 4일치 수집 완료
+2026-05-01 00:52:51,308 [INFO] collector: [ASTS] OHLCV 4일치 수집 완료
+2026-05-01 00:53:03,597 [INFO] collector: [KDP] OHLCV 4일치 수집 완료
+2026-05-01 00:53:15,842 [WARNING] collector: [STO] OHLCV 데이터 없음
+2026-05-01 00:53:28,147 [INFO] collector: [HIMS] OHLCV 4일치 수집 완료
+2026-05-01 00:53:40,150 [INFO] reddit_collector: 유효 종목: 48/87개 -['META', 'AMZN', 'MSFT', 'RKLB', 'FLY', 'GOOGL', 'PSUS', 'PS', 'NVDA', 'HOOD', 'AMD', 'RDDT', 'SOFI', 'AAPL', 'WEN', 'CAR', 'TSLA', 'ADBE', 'INDI', 'PLTR', 'LAC', 'USAR', 'MP', 'CAT', 'VXUS', 'INTC', 'MRVL', 'HPE', 'USA', 'GOOG', 'JPM', 'POET', 'SNDK', 'EOD', 'CVNA', 'NXXT', 'VIXY', 'NFLX', 'SMH', 'NTDOY', 'FCF', 'ATI', 'LLY', 'AMT', 'USLM', 'ASTS', 'KDP', 'HIMS']
+2026-05-01 00:53:40,155 [INFO] reddit_collector: wsb_posts.json 저장 완료: data/reddit\2026-05-01\wsb_posts.json (48개 종목)
+2026-05-01 00:53:40,156 [INFO] __main__: [Reddit] 수집 완료: 48개 종목 → data/reddit/2026-05-01/wsb_posts.json 저장
+2026-05-02 23:38:06,716 [INFO] __main__: [Reddit] 수집 시작: 2026-05-02
+2026-05-02 23:38:07,973 [INFO] reddit_collector: PRAW Reddit 초기화 완료
+2026-05-02 23:38:37,323 [INFO] reddit_collector: r/wallstreetbets: Daily Thread 'Daily Discussion Thread for May 01, 2026' (전체 10194개 댓글) → top 1000개 수집
+2026-05-02 23:38:43,655 [INFO] reddit_collector: r/wallstreetbets: Daily Thread 댓글 776개 추출 (source=daily_thread)
+2026-05-02 23:38:44,657 [INFO] reddit_collector: r/wallstreetbets: 게시글 19개 + Daily Thread 776개
+2026-05-02 23:38:58,015 [INFO] reddit_collector: r/investing: Daily Thread 'Daily General Discussion and Advice Thread - May 0' (전체 1개 댓글) → top 1000개 수집
+2026-05-02 23:38:58,015 [INFO] reddit_collector: r/investing: Daily Thread 댓글 1개 추출 (source=daily_thread)
+2026-05-02 23:38:59,016 [INFO] reddit_collector: r/investing: 게시글 18개 + Daily Thread 1개
+2026-05-02 23:39:18,392 [INFO] reddit_collector: r/stocks: Daily Thread 'r/Stocks Daily Discussion & Fundamentals Friday Ma' (전체 342개 댓글) → top 1000개 수집
+2026-05-02 23:39:20,376 [INFO] reddit_collector: r/stocks: Daily Thread 댓글 95개 추출 (source=daily_thread)
+2026-05-02 23:39:21,377 [INFO] reddit_collector: r/stocks: 게시글 20개 + Daily Thread 95개
+2026-05-02 23:39:29,581 [INFO] reddit_collector: r/options: Daily Thread 'Options Questions Safe Haven periodic megathread |' (전체 82개 댓글) → top 1000개 수집
+2026-05-02 23:39:29,582 [INFO] reddit_collector: r/options: Daily Thread 댓글 27개 추출 (source=daily_thread)
+2026-05-02 23:39:30,582 [INFO] reddit_collector: r/options: 게시글 4개 + Daily Thread 27개
+2026-05-02 23:39:39,907 [INFO] reddit_collector: r/StockMarket: 게시글 2개 + Daily Thread 0개
+2026-05-02 23:39:48,064 [INFO] reddit_collector: r/thetagang: Daily Thread 'Daily r/thetagang Discussion Thread - What are you' (전체 51개 댓글) → top 1000개 수집
+2026-05-02 23:39:48,065 [INFO] reddit_collector: r/thetagang: Daily Thread 댓글 16개 추출 (source=daily_thread)
+2026-05-02 23:39:49,066 [INFO] reddit_collector: r/thetagang: 게시글 7개 + Daily Thread 16개
+2026-05-02 23:39:52,414 [INFO] reddit_collector: Polygon 검증: 신규 38개 (캐시 유효 24개 / 캐시 제외 6개)
+2026-05-02 23:39:53,283 [INFO] collector: [ARVN] OHLCV 5일치 수집 완료
+2026-05-02 23:40:05,511 [INFO] collector: [SOUN] OHLCV 5일치 수집 완료
+2026-05-02 23:40:17,739 [INFO] collector: [GME] OHLCV 5일치 수집 완료
+2026-05-02 23:40:29,963 [INFO] collector: [PL] OHLCV 5일치 수집 완료
+2026-05-02 23:40:42,190 [INFO] collector: [TEAM] OHLCV 5일치 수집 완료
+2026-05-02 23:40:54,414 [INFO] collector: [SPIR] OHLCV 5일치 수집 완료
+2026-05-02 23:41:06,642 [INFO] collector: [RDW] OHLCV 5일치 수집 완료
+2026-05-02 23:41:18,866 [INFO] collector: [NOK] OHLCV 5일치 수집 완료
+2026-05-02 23:41:31,092 [INFO] collector: [MARA] OHLCV 5일치 수집 완료
+2026-05-02 23:41:43,320 [INFO] collector: [VIAV] OHLCV 5일치 수집 완료
+2026-05-02 23:41:55,534 [WARNING] collector: [FDA] OHLCV 데이터 없음
+2026-05-02 23:42:07,760 [INFO] collector: [OPRA] OHLCV 5일치 수집 완료
+2026-05-02 23:42:19,968 [WARNING] collector: [CRAZY] OHLCV 데이터 없음
+2026-05-02 23:42:32,184 [WARNING] collector: [FISH] OHLCV 데이터 없음
+2026-05-02 23:42:44,393 [WARNING] collector: [WSJ] OHLCV 데이터 없음
+2026-05-02 23:42:56,617 [INFO] collector: [HERE] OHLCV 5일치 수집 완료
+2026-05-02 23:43:08,842 [INFO] collector: [HAS] OHLCV 5일치 수집 완료
+2026-05-02 23:43:21,066 [INFO] collector: [TWO] OHLCV 5일치 수집 완료
+2026-05-02 23:43:33,277 [WARNING] collector: [EOY] OHLCV 데이터 없음
+2026-05-02 23:43:45,487 [WARNING] collector: [YOUR] OHLCV 데이터 없음
+2026-05-02 23:43:57,702 [WARNING] collector: [MAKE] OHLCV 데이터 없음
+2026-05-02 23:44:09,914 [WARNING] collector: [FUCK] OHLCV 데이터 없음
+2026-05-02 23:44:22,130 [WARNING] collector: [WRONG] OHLCV 데이터 없음
+2026-05-02 23:44:34,350 [INFO] collector: [WAY] OHLCV 5일치 수집 완료
+2026-05-02 23:44:46,568 [WARNING] collector: [TRUMP] OHLCV 데이터 없음
+2026-05-02 23:44:58,790 [INFO] collector: [WANT] OHLCV 5일치 수집 완료
+2026-05-02 23:45:11,000 [WARNING] collector: [LIKE] OHLCV 데이터 없음
+2026-05-02 23:45:23,217 [WARNING] collector: [OIL] OHLCV 데이터 없음
+2026-05-02 23:45:35,427 [WARNING] collector: [MUCH] OHLCV 데이터 없음
+2026-05-02 23:45:47,656 [INFO] collector: [RBLX] OHLCV 5일치 수집 완료
+2026-05-02 23:45:59,868 [WARNING] collector: [DONT] OHLCV 데이터 없음
+2026-05-02 23:46:12,090 [INFO] collector: [HYSA] OHLCV 5일치 수집 완료
+2026-05-02 23:46:24,313 [INFO] collector: [SGOV] OHLCV 5일치 수집 완료
+2026-05-02 23:46:36,537 [INFO] collector: [LULU] OHLCV 5일치 수집 완료
+2026-05-02 23:46:48,752 [WARNING] collector: [IES] OHLCV 데이터 없음
+2026-05-02 23:47:00,977 [INFO] collector: [FEIM] OHLCV 5일치 수집 완료
+2026-05-02 23:47:13,201 [INFO] collector: [SOXL] OHLCV 5일치 수집 완료
+2026-05-02 23:47:25,425 [INFO] collector: [AXTI] OHLCV 5일치 수집 완료
+2026-05-02 23:47:37,428 [INFO] reddit_collector: 유효 종목: 47/68개 -['META', 'CAR', 'AMD', 'TSLA', 'GOOGL', 'HOOD', 'SOFI', 'NVDA', 'MSFT', 'AAPL', 'RKLB', 'INTC', 'MRVL', 'HPE', 'PLTR', 'POET', 'JPM', 'RDDT', 'GOOG', 'ASTS', 'SNDK', 'EOD', 'USA', 'KDP', 'ARVN', 'SOUN', 'GME', 'PL', 'TEAM', 'SPIR', 'RDW', 'NOK', 'MARA', 'VIAV', 'OPRA', 'HERE', 'HAS', 'TWO', 'WAY', 'WANT', 'RBLX', 'HYSA', 'SGOV', 'LULU', 'FEIM', 'SOXL', 'AXTI']
+2026-05-02 23:47:37,435 [INFO] reddit_collector: wsb_posts.json 저장 완료: data/reddit\2026-05-02\wsb_posts.json (47개 종목)
+2026-05-02 23:47:37,435 [INFO] __main__: [Reddit] 수집 완료: 47개 종목 → data/reddit/2026-05-02/wsb_posts.json 저장
 2026-05-03 00:19:05,631 [INFO] backtester: [Backtest] 시작 — model=finbert (2026-02-01 ~ 2026-04-01)
 2026-05-03 00:19:05,832 [INFO] backtester: [Backtest] NVDA 처리 중...
 2026-05-03 00:19:05,845 [INFO] indicators: [NVDA] RSI=49.46, RSI_MA=55.87
