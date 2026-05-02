@@ -43,5 +43,41 @@
     "agentId": "acf9af7ab20614b75",
     "agentType": null,
     "message": ""
+  },
+  {
+    "timestamp": "2026-05-01T17:17:01.474Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": null,
+    "agentType": null,
+    "message": ""
+  },
+  {
+    "timestamp": "2026-05-02T06:40:45.241Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": "ae49c5fd7d5359281",
+    "agentType": null,
+    "message": ""
+  },
+  {
+    "timestamp": "2026-05-02T06:41:13.228Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": "a2a21b6e66f7a4417",
+    "agentType": null,
+    "message": ""
+  },
+  {
+    "timestamp": "2026-05-02T07:16:36.780Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": "ac7ccdcaa4cabe208",
+    "agentType": null,
+    "message": ""
   }
 ]

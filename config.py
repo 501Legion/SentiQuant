@@ -199,3 +199,17 @@ POSITION_SCORES_FILE = "data/position_scores.json"
 REQUEST_MAX_RETRIES = 3
 REQUEST_RETRY_BASE_DELAY = 1.0     # 초 (지수 백오프 기반)
 REQUEST_TIMEOUT = 10               # 초
+
+# --- KIS (한국투자증권) Design Ref: §4.1 — 모의투자 OpenAPI 연동 ---
+KIS_APP_KEY: str = os.getenv("KIS_APP_KEY", "")
+KIS_APP_SECRET: str = os.getenv("KIS_APP_SECRET", "")
+KIS_ACCOUNT_NO: str = os.getenv("KIS_ACCOUNT_NO", "")            # "12345678-01" 형식
+KIS_PAPER_TRADING: bool = os.getenv("KIS_PAPER_TRADING", "true").lower() == "true"
+KIS_BASE_URL_PAPER = "https://openapivts.koreainvestment.com:29443"  # 모의 도메인
+KIS_BASE_URL_REAL = "https://openapi.koreainvestment.com:9443"        # 실전 — FR-20으로 차단
+KIS_TOKEN_CACHE_FILE = "data/kis_token.json"   # OAuth 24h 캐시
+KIS_SYMBOLS_FILE = "data/kis_symbols.json"     # 매매 가능 종목 캐시
+KIS_SYMBOLS_REFRESH_DAYS = 7                   # 종목 마스터 갱신 주기
+
+# --- Signal Engine 선택 (Design Ref: §3.3 SignalProvider Protocol) ---
+SIGNAL_ENGINE: str = os.getenv("SIGNAL_ENGINE", "finbert")  # "finbert" | "gpt5"

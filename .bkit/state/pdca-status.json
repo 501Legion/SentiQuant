@@ -1,23 +1,28 @@
 {
   "version": "3.0",
-  "lastUpdated": "2026-04-22T10:57:42.472Z",
+  "lastUpdated": "2026-05-02T15:13:24.946Z",
   "activeFeatures": [
-    "auto_stock"
+    "auto_stock",
+    "kis-paper-trading"
   ],
   "primaryFeature": "auto_stock",
   "features": {
     "auto_stock": {
       "phase": "do",
       "phaseNumber": 3,
-      "matchRate": null,
-      "iterationCount": 0,
+      "matchRate": 100,
+      "iterationCount": 1,
       "requirements": [],
-      "documents": {},
+      "documents": {
+        "analysis": "docs/03-analysis/auto_stock.analysis.md",
+        "report": "docs/04-report/features/auto_stock.report.md",
+        "designProxy": "ARCHITECTURE.md"
+      },
       "timestamps": {
         "started": "2026-03-31T17:48:06.569Z",
-        "lastUpdated": "2026-04-22T10:57:42.470Z"
+        "lastUpdated": "2026-05-02T15:13:24.944Z"
       },
-      "lastFile": "C:\\Users\\auto_stock\\reddit_collector.py"
+      "lastFile": "C:\\Users\\auto_stock\\kis_broker.py"
     }
   },
   "pipeline": {
@@ -28,7 +33,7 @@
   "session": {
     "startedAt": "2026-03-31T15:36:13.245Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-22T10:57:42.472Z"
+    "lastActivity": "2026-05-02T15:13:24.946Z"
   },
   "history": [
     {
@@ -837,6 +842,24 @@
     },
     {
       "timestamp": "2026-04-22T10:57:42.472Z",
+      "feature": "auto_stock",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-01T17:12:45.981Z",
+      "feature": "auto_stock — ARCHITECTURE.md 기반 gap 분석",
+      "phase": "act",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-02T15:12:00.972Z",
+      "feature": "auto_stock",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-02T15:13:24.946Z",
       "feature": "auto_stock",
       "phase": "do",
       "action": "updated"

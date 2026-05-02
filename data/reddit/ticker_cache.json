@@ -1,11 +1,11 @@
 {
   "TSLA": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "AAPL": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "IBRX": {
     "valid": true,
@@ -25,15 +25,15 @@
   },
   "NVDA": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "GOOGL": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "META": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "MSTR": {
     "valid": true,
@@ -49,27 +49,27 @@
   },
   "HOOD": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "VXUS": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "PLTR": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "MSFT": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "AMZN": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "HIMS": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "NVO": {
     "valid": true,
@@ -85,11 +85,11 @@
   },
   "ADBE": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "SOFI": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "COIN": {
     "valid": true,
@@ -97,7 +97,7 @@
   },
   "NFLX": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "LMT": {
     "valid": true,
@@ -121,11 +121,11 @@
   },
   "RDDT": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "ASTS": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "IGV": {
     "valid": true,
@@ -141,11 +141,11 @@
   },
   "STO": {
     "valid": false,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "GOOG": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "COST": {
     "valid": true,
@@ -153,11 +153,11 @@
   },
   "CAR": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "SNDK": {
     "valid": true,
-    "checked": "2026-04-18"
+    "checked": "2026-05-01"
   },
   "UAMY": {
     "valid": true,
@@ -181,7 +181,7 @@
   },
   "HAS": {
     "valid": true,
-    "checked": "2026-04-22"
+    "checked": "2026-05-02"
   },
   "BNTX": {
     "valid": true,
@@ -197,7 +197,7 @@
   },
   "AMD": {
     "valid": true,
-    "checked": "2026-04-22"
+    "checked": "2026-05-01"
   },
   "GE": {
     "valid": true,
@@ -221,7 +221,7 @@
   },
   "NOT": {
     "valid": false,
-    "checked": "2026-04-22"
+    "checked": "2026-05-01"
   },
   "CNBC": {
     "valid": false,
@@ -241,11 +241,11 @@
   },
   "USAR": {
     "valid": true,
-    "checked": "2026-04-22"
+    "checked": "2026-05-01"
   },
   "TRUMP": {
     "valid": false,
-    "checked": "2026-04-22"
+    "checked": "2026-05-02"
   },
   "TACO": {
     "valid": true,
@@ -265,7 +265,7 @@
   },
   "POET": {
     "valid": true,
-    "checked": "2026-04-22"
+    "checked": "2026-05-01"
   },
   "WTF": {
     "valid": true,
@@ -281,7 +281,7 @@
   },
   "LMAO": {
     "valid": false,
-    "checked": "2026-04-22"
+    "checked": "2026-05-01"
   },
   "CLOSE": {
     "valid": false,
@@ -317,11 +317,11 @@
   },
   "OIL": {
     "valid": false,
-    "checked": "2026-04-22"
+    "checked": "2026-05-02"
   },
   "FUCK": {
     "valid": false,
-    "checked": "2026-04-22"
+    "checked": "2026-05-02"
   },
   "AVIS": {
     "valid": false,
@@ -346,5 +346,389 @@
   "SNAP": {
     "valid": true,
     "checked": "2026-04-22"
+  },
+  "X": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "RKLB": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "FLY": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "PSUS": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "PS": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "WEN": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "INDI": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "LAC": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "MP": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "CAT": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "INTC": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "MRVL": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "HPE": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "COVID": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "USA": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "MARCH": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "PCE": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "PRICE": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "INDEX": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "RISES": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "EST": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "CORE": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "JPM": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "NACHO": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "GOING": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "BACK": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "ALL": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "EOD": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "CAN": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "LETS": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "HOW": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "WAS": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "CVNA": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "ONLY": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "GET": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "BEARS": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "USS": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "TODAY": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "CAPEX": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "GUH": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "TRADE": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "WHO": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "BLOOD": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "BOJ": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "NXXT": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "AWS": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "VIXY": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "SWPPX": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "SMH": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "NTDOY": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "YORK": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "WFH": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "FCF": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "FAA": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "LSEG": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "ATI": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "GAAP": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "LLY": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "MONEY": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "AMT": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "USLM": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "KDP": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "ARVN": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "SOUN": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "GME": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "PL": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "TEAM": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "SPIR": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "RDW": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "NOK": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "MARA": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "VIAV": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "FDA": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "OPRA": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "CRAZY": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "FISH": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "WSJ": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "HERE": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "TWO": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "EOY": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "YOUR": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "MAKE": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "WRONG": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "WAY": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "WANT": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "LIKE": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "MUCH": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "RBLX": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "DONT": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "HYSA": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "SGOV": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "LULU": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "IES": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "FEIM": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "SOXL": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "AXTI": {
+    "valid": true,
+    "checked": "2026-05-02"
   }
 }
