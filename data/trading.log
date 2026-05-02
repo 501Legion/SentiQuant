@@ -5237,3 +5237,272 @@ ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.i
 2026-04-22 22:45:49,429 [WARNING] collector: [TSLA] OHLCV range 수집 실패 (2/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/TSLA/range/1/day/2026-02-01/2026-04-01?limit=500 (Caused by ResponseError('too many 429 error responses'))
 2026-04-22 22:45:52,954 [WARNING] collector: [TSLA] OHLCV range 수집 실패 (3/3): HTTPSConnectionPool(host='api.polygon.io', port=443): Max retries exceeded with url: /v2/aggs/ticker/TSLA/range/1/day/2026-02-01/2026-04-01?limit=500 (Caused by ResponseError('too many 429 error responses'))
 2026-04-22 22:45:52,955 [ERROR] collector: [TSLA] OHLCV range 수집 최종 실패
+2026-05-03 00:19:05,631 [INFO] backtester: [Backtest] 시작 — model=finbert (2026-02-01 ~ 2026-04-01)
+2026-05-03 00:19:05,832 [INFO] backtester: [Backtest] NVDA 처리 중...
+2026-05-03 00:19:05,845 [INFO] indicators: [NVDA] RSI=49.46, RSI_MA=55.87
+2026-05-03 00:19:08,376 [INFO] indicators: FinBERT 모델 로드 중... (캐시)
+2026-05-03 00:19:08,769 [WARNING] huggingface_hub.utils._http: '(MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /ProsusAI/finbert/resolve/main/tokenizer_config.json (Caused by NameResolutionError("HTTPSConnection(host=\'huggingface.co\', port=443): Failed to resolve \'huggingface.co\' ([Errno 8] nodename nor servname provided, or not known)"))'), '(Request ID: f42c56ce-f9b4-42ae-93f6-cc8fcf05a776)')' thrown while requesting HEAD https://huggingface.co/ProsusAI/finbert/resolve/main/tokenizer_config.json
+2026-05-03 00:19:08,769 [WARNING] huggingface_hub.utils._http: Retrying in 1s [Retry 1/5].
+2026-05-03 00:19:09,775 [WARNING] huggingface_hub.utils._http: '(MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /ProsusAI/finbert/resolve/main/tokenizer_config.json (Caused by NameResolutionError("HTTPSConnection(host=\'huggingface.co\', port=443): Failed to resolve \'huggingface.co\' ([Errno 8] nodename nor servname provided, or not known)"))'), '(Request ID: 15c43f08-c527-4632-aa32-dd3eda14b962)')' thrown while requesting HEAD https://huggingface.co/ProsusAI/finbert/resolve/main/tokenizer_config.json
+2026-05-03 00:19:09,776 [WARNING] huggingface_hub.utils._http: Retrying in 2s [Retry 2/5].
+2026-05-03 00:19:11,785 [WARNING] huggingface_hub.utils._http: '(MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /ProsusAI/finbert/resolve/main/tokenizer_config.json (Caused by NameResolutionError("HTTPSConnection(host=\'huggingface.co\', port=443): Failed to resolve \'huggingface.co\' ([Errno 8] nodename nor servname provided, or not known)"))'), '(Request ID: 22de4db4-582d-44a4-9a5c-12e6bb2c11ac)')' thrown while requesting HEAD https://huggingface.co/ProsusAI/finbert/resolve/main/tokenizer_config.json
+2026-05-03 00:19:11,786 [WARNING] huggingface_hub.utils._http: Retrying in 4s [Retry 3/5].
+2026-05-03 00:19:15,799 [WARNING] huggingface_hub.utils._http: '(MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /ProsusAI/finbert/resolve/main/tokenizer_config.json (Caused by NameResolutionError("HTTPSConnection(host=\'huggingface.co\', port=443): Failed to resolve \'huggingface.co\' ([Errno 8] nodename nor servname provided, or not known)"))'), '(Request ID: 719be411-120e-45cd-b1d8-55ad36baca3a)')' thrown while requesting HEAD https://huggingface.co/ProsusAI/finbert/resolve/main/tokenizer_config.json
+2026-05-03 00:19:15,801 [WARNING] huggingface_hub.utils._http: Retrying in 8s [Retry 4/5].
+2026-05-03 00:19:23,810 [WARNING] huggingface_hub.utils._http: '(MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /ProsusAI/finbert/resolve/main/tokenizer_config.json (Caused by NameResolutionError("HTTPSConnection(host=\'huggingface.co\', port=443): Failed to resolve \'huggingface.co\' ([Errno 8] nodename nor servname provided, or not known)"))'), '(Request ID: 90204a72-c603-4ccd-8f40-67c97fd61c0f)')' thrown while requesting HEAD https://huggingface.co/ProsusAI/finbert/resolve/main/tokenizer_config.json
+2026-05-03 00:19:23,811 [WARNING] huggingface_hub.utils._http: Retrying in 8s [Retry 5/5].
+2026-05-03 00:19:31,819 [WARNING] huggingface_hub.utils._http: '(MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /ProsusAI/finbert/resolve/main/tokenizer_config.json (Caused by NameResolutionError("HTTPSConnection(host=\'huggingface.co\', port=443): Failed to resolve \'huggingface.co\' ([Errno 8] nodename nor servname provided, or not known)"))'), '(Request ID: 970fa858-b733-4032-95d6-430c270f3842)')' thrown while requesting HEAD https://huggingface.co/ProsusAI/finbert/resolve/main/tokenizer_config.json
+2026-05-03 00:19:31,893 [INFO] indicators: FinBERT 초기화 완료 (ONNX Runtime)
+2026-05-03 00:19:35,117 [INFO] sentiment_provider: FinBERT 감성 점수: pos=40/78건 valid → score=61.54 (neutral 필터 제외: 22건)
+2026-05-03 00:19:35,118 [INFO] backtester: [Backtest] NVDA 2026-02-02: 뉴스 100건 | sentiment=61.5 (finbert)
+2026-05-03 00:19:35,120 [INFO] indicators: [NVDA] RSI=42.94, RSI_MA=54.16
+2026-05-03 00:19:38,471 [INFO] sentiment_provider: FinBERT 감성 점수: pos=40/88건 valid → score=54.05 (neutral 필터 제외: 12건)
+2026-05-03 00:19:38,472 [INFO] backtester: [Backtest] NVDA 2026-02-03: 뉴스 100건 | sentiment=54.0 (finbert)
+2026-05-03 00:19:38,474 [INFO] indicators: [NVDA] RSI=36.84, RSI_MA=51.83
+2026-05-03 00:19:41,807 [INFO] sentiment_provider: FinBERT 감성 점수: pos=30/80건 valid → score=41.67 (neutral 필터 제외: 20건)
+2026-05-03 00:19:41,808 [INFO] backtester: [Backtest] NVDA 2026-02-04: 뉴스 100건 | sentiment=41.7 (finbert)
+2026-05-03 00:19:41,809 [INFO] indicators: [NVDA] RSI=34.84, RSI_MA=48.84
+2026-05-03 00:19:45,227 [INFO] sentiment_provider: FinBERT 감성 점수: pos=34/78건 valid → score=53.97 (neutral 필터 제외: 22건)
+2026-05-03 00:19:45,229 [INFO] backtester: [Backtest] NVDA 2026-02-05: 뉴스 100건 | sentiment=54.0 (finbert)
+2026-05-03 00:19:45,231 [INFO] indicators: [NVDA] RSI=51.48, RSI_MA=47.72
+2026-05-03 00:19:48,228 [INFO] sentiment_provider: FinBERT 감성 점수: pos=50/77건 valid → score=75.76 (neutral 필터 제외: 23건)
+2026-05-03 00:19:48,228 [INFO] backtester: [Backtest] NVDA 2026-02-06: 뉴스 100건 | sentiment=75.8 (finbert)
+2026-05-03 00:19:48,230 [INFO] indicators: [NVDA] RSI=55.65, RSI_MA=47.03
+2026-05-03 00:19:51,040 [INFO] sentiment_provider: FinBERT 감성 점수: pos=42/77건 valid → score=66.67 (neutral 필터 제외: 23건)
+2026-05-03 00:19:51,041 [INFO] backtester: [Backtest] NVDA 2026-02-09: 뉴스 100건 | sentiment=66.7 (finbert)
+2026-05-03 00:19:51,042 [INFO] indicators: [NVDA] RSI=54.03, RSI_MA=46.46
+2026-05-03 00:19:54,270 [INFO] sentiment_provider: FinBERT 감성 점수: pos=39/75건 valid → score=60.00 (neutral 필터 제외: 25건)
+2026-05-03 00:19:54,271 [INFO] backtester: [Backtest] NVDA 2026-02-10: 뉴스 100건 | sentiment=60.0 (finbert)
+2026-05-03 00:19:54,272 [INFO] indicators: [NVDA] RSI=55.43, RSI_MA=47.32
+2026-05-03 00:19:57,050 [INFO] sentiment_provider: FinBERT 감성 점수: pos=39/79건 valid → score=61.90 (neutral 필터 제외: 21건)
+2026-05-03 00:19:57,051 [INFO] backtester: [Backtest] NVDA 2026-02-11: 뉴스 100건 | sentiment=61.9 (finbert)
+2026-05-03 00:19:57,052 [INFO] indicators: [NVDA] RSI=51.91, RSI_MA=48.60
+2026-05-03 00:20:00,089 [INFO] sentiment_provider: FinBERT 감성 점수: pos=34/74건 valid → score=55.74 (neutral 필터 제외: 26건)
+2026-05-03 00:20:00,089 [INFO] backtester: [Backtest] NVDA 2026-02-12: 뉴스 100건 | sentiment=55.7 (finbert)
+2026-05-03 00:20:00,091 [INFO] indicators: [NVDA] RSI=47.58, RSI_MA=50.13
+2026-05-03 00:20:02,851 [INFO] sentiment_provider: FinBERT 감성 점수: pos=41/80건 valid → score=63.08 (neutral 필터 제외: 20건)
+2026-05-03 00:20:02,852 [INFO] backtester: [Backtest] NVDA 2026-02-13: 뉴스 100건 | sentiment=63.1 (finbert)
+2026-05-03 00:20:02,854 [INFO] indicators: [NVDA] RSI=49.93, RSI_MA=52.29
+2026-05-03 00:20:05,909 [INFO] sentiment_provider: FinBERT 감성 점수: pos=42/74건 valid → score=62.69 (neutral 필터 제외: 26건)
+2026-05-03 00:20:05,909 [INFO] backtester: [Backtest] NVDA 2026-02-17: 뉴스 100건 | sentiment=62.7 (finbert)
+2026-05-03 00:20:05,911 [INFO] indicators: [NVDA] RSI=53.09, RSI_MA=52.52
+2026-05-03 00:20:08,984 [INFO] sentiment_provider: FinBERT 감성 점수: pos=39/71건 valid → score=60.00 (neutral 필터 제외: 29건)
+2026-05-03 00:20:08,984 [INFO] backtester: [Backtest] NVDA 2026-02-18: 뉴스 100건 | sentiment=60.0 (finbert)
+2026-05-03 00:20:08,987 [INFO] indicators: [NVDA] RSI=52.99, RSI_MA=52.14
+2026-05-03 00:20:12,253 [INFO] sentiment_provider: FinBERT 감성 점수: pos=38/75건 valid → score=64.41 (neutral 필터 제외: 25건)
+2026-05-03 00:20:12,254 [INFO] backtester: [Backtest] NVDA 2026-02-19: 뉴스 100건 | sentiment=64.4 (finbert)
+2026-05-03 00:20:12,255 [INFO] indicators: [NVDA] RSI=55.09, RSI_MA=52.29
+2026-05-03 00:20:15,107 [INFO] sentiment_provider: FinBERT 감성 점수: pos=36/78건 valid → score=58.06 (neutral 필터 제외: 22건)
+2026-05-03 00:20:15,108 [INFO] backtester: [Backtest] NVDA 2026-02-20: 뉴스 100건 | sentiment=58.1 (finbert)
+2026-05-03 00:20:15,109 [INFO] indicators: [NVDA] RSI=56.94, RSI_MA=52.51
+2026-05-03 00:20:18,733 [INFO] sentiment_provider: FinBERT 감성 점수: pos=23/75건 valid → score=41.82 (neutral 필터 제외: 25건)
+2026-05-03 00:20:18,734 [INFO] backtester: [Backtest] NVDA 2026-02-23: 뉴스 100건 | sentiment=41.8 (finbert)
+2026-05-03 00:20:18,736 [INFO] indicators: [NVDA] RSI=58.34, RSI_MA=53.42
+2026-05-03 00:20:22,144 [INFO] sentiment_provider: FinBERT 감성 점수: pos=41/70건 valid → score=69.49 (neutral 필터 제외: 30건)
+2026-05-03 00:20:22,145 [INFO] backtester: [Backtest] NVDA 2026-02-24: 뉴스 100건 | sentiment=69.5 (finbert)
+2026-05-03 00:20:22,147 [INFO] indicators: [NVDA] RSI=61.16, RSI_MA=55.36
+2026-05-03 00:20:25,402 [INFO] sentiment_provider: FinBERT 감성 점수: pos=47/84건 valid → score=67.14 (neutral 필터 제외: 16건)
+2026-05-03 00:20:25,403 [INFO] backtester: [Backtest] NVDA 2026-02-25: 뉴스 100건 | sentiment=67.1 (finbert)
+2026-05-03 00:20:25,404 [INFO] indicators: [NVDA] RSI=47.51, RSI_MA=55.02
+2026-05-03 00:20:28,740 [INFO] sentiment_provider: FinBERT 감성 점수: pos=27/86건 valid → score=35.06 (neutral 필터 제외: 14건)
+2026-05-03 00:20:28,740 [INFO] backtester: [Backtest] NVDA 2026-02-26: 뉴스 100건 | sentiment=35.1 (finbert)
+2026-05-03 00:20:28,742 [INFO] indicators: [NVDA] RSI=40.48, RSI_MA=53.22
+2026-05-03 00:20:31,695 [INFO] sentiment_provider: FinBERT 감성 점수: pos=29/83건 valid → score=44.62 (neutral 필터 제외: 17건)
+2026-05-03 00:20:31,695 [INFO] backtester: [Backtest] NVDA 2026-02-27: 뉴스 100건 | sentiment=44.6 (finbert)
+2026-05-03 00:20:31,697 [INFO] indicators: [NVDA] RSI=46.35, RSI_MA=52.27
+2026-05-03 00:20:34,644 [INFO] sentiment_provider: FinBERT 감성 점수: pos=33/74건 valid → score=54.10 (neutral 필터 제외: 26건)
+2026-05-03 00:20:34,645 [INFO] backtester: [Backtest] NVDA 2026-03-02: 뉴스 100건 | sentiment=54.1 (finbert)
+2026-05-03 00:20:34,647 [INFO] indicators: [NVDA] RSI=44.19, RSI_MA=50.71
+2026-05-03 00:20:37,794 [INFO] sentiment_provider: FinBERT 감성 점수: pos=33/77건 valid → score=50.77 (neutral 필터 제외: 23건)
+2026-05-03 00:20:37,795 [INFO] backtester: [Backtest] NVDA 2026-03-03: 뉴스 100건 | sentiment=50.8 (finbert)
+2026-05-03 00:20:37,796 [INFO] indicators: [NVDA] RSI=47.43, RSI_MA=49.35
+2026-05-03 00:20:40,815 [INFO] sentiment_provider: FinBERT 감성 점수: pos=31/71건 valid → score=58.49 (neutral 필터 제외: 29건)
+2026-05-03 00:20:40,815 [INFO] backtester: [Backtest] NVDA 2026-03-04: 뉴스 100건 | sentiment=58.5 (finbert)
+2026-05-03 00:20:40,817 [INFO] indicators: [NVDA] RSI=47.76, RSI_MA=47.84
+2026-05-03 00:20:44,146 [INFO] sentiment_provider: FinBERT 감성 점수: pos=26/74건 valid → score=45.61 (neutral 필터 제외: 26건)
+2026-05-03 00:20:44,146 [INFO] backtester: [Backtest] NVDA 2026-03-05: 뉴스 100건 | sentiment=45.6 (finbert)
+2026-05-03 00:20:44,148 [INFO] indicators: [NVDA] RSI=42.51, RSI_MA=45.18
+2026-05-03 00:20:47,322 [INFO] sentiment_provider: FinBERT 감성 점수: pos=25/77건 valid → score=43.10 (neutral 필터 제외: 23건)
+2026-05-03 00:20:47,322 [INFO] backtester: [Backtest] NVDA 2026-03-06: 뉴스 100건 | sentiment=43.1 (finbert)
+2026-05-03 00:20:47,324 [INFO] indicators: [NVDA] RSI=47.91, RSI_MA=45.23
+2026-05-03 00:20:50,956 [INFO] sentiment_provider: FinBERT 감성 점수: pos=39/80건 valid → score=56.52 (neutral 필터 제외: 20건)
+2026-05-03 00:20:50,957 [INFO] backtester: [Backtest] NVDA 2026-03-09: 뉴스 100건 | sentiment=56.5 (finbert)
+2026-05-03 00:20:50,959 [INFO] indicators: [NVDA] RSI=50.12, RSI_MA=46.61
+2026-05-03 00:20:54,426 [INFO] sentiment_provider: FinBERT 감성 점수: pos=49/77건 valid → score=74.24 (neutral 필터 제외: 23건)
+2026-05-03 00:20:54,427 [INFO] backtester: [Backtest] NVDA 2026-03-10: 뉴스 100건 | sentiment=74.2 (finbert)
+2026-05-03 00:20:54,432 [INFO] indicators: [NVDA] RSI=51.44, RSI_MA=47.34
+2026-05-03 00:20:57,781 [INFO] sentiment_provider: FinBERT 감성 점수: pos=40/73건 valid → score=61.54 (neutral 필터 제외: 27건)
+2026-05-03 00:20:57,781 [INFO] backtester: [Backtest] NVDA 2026-03-11: 뉴스 100건 | sentiment=61.5 (finbert)
+2026-05-03 00:20:57,784 [INFO] indicators: [NVDA] RSI=48.28, RSI_MA=47.92
+2026-05-03 00:21:01,150 [INFO] sentiment_provider: FinBERT 감성 점수: pos=30/77건 valid → score=52.63 (neutral 필터 제외: 23건)
+2026-05-03 00:21:01,151 [INFO] backtester: [Backtest] NVDA 2026-03-12: 뉴스 100건 | sentiment=52.6 (finbert)
+2026-05-03 00:21:01,153 [INFO] indicators: [NVDA] RSI=45.29, RSI_MA=47.62
+2026-05-03 00:21:04,634 [INFO] sentiment_provider: FinBERT 감성 점수: pos=23/65건 valid → score=48.94 (neutral 필터 제외: 35건)
+2026-05-03 00:21:04,635 [INFO] backtester: [Backtest] NVDA 2026-03-13: 뉴스 100건 | sentiment=48.9 (finbert)
+2026-05-03 00:21:04,636 [INFO] indicators: [NVDA] RSI=48.80, RSI_MA=47.77
+2026-05-03 00:21:08,624 [INFO] sentiment_provider: FinBERT 감성 점수: pos=45/74건 valid → score=83.33 (neutral 필터 제외: 26건)
+2026-05-03 00:21:08,624 [INFO] backtester: [Backtest] NVDA 2026-03-16: 뉴스 100건 | sentiment=83.3 (finbert)
+2026-05-03 00:21:08,626 [INFO] indicators: [NVDA] RSI=47.38, RSI_MA=48.46
+2026-05-03 00:21:12,315 [INFO] sentiment_provider: FinBERT 감성 점수: pos=50/83건 valid → score=70.42 (neutral 필터 제외: 17건)
+2026-05-03 00:21:12,315 [INFO] backtester: [Backtest] NVDA 2026-03-17: 뉴스 100건 | sentiment=70.4 (finbert)
+2026-05-03 00:21:12,318 [INFO] indicators: [NVDA] RSI=45.68, RSI_MA=48.14
+2026-05-03 00:21:15,894 [INFO] sentiment_provider: FinBERT 감성 점수: pos=40/79건 valid → score=61.54 (neutral 필터 제외: 21건)
+2026-05-03 00:21:15,895 [INFO] backtester: [Backtest] NVDA 2026-03-18: 뉴스 100건 | sentiment=61.5 (finbert)
+2026-05-03 00:21:15,896 [INFO] indicators: [NVDA] RSI=43.65, RSI_MA=47.22
+2026-05-03 00:21:19,554 [INFO] sentiment_provider: FinBERT 감성 점수: pos=35/76건 valid → score=59.32 (neutral 필터 제외: 24건)
+2026-05-03 00:21:19,554 [INFO] backtester: [Backtest] NVDA 2026-03-19: 뉴스 100건 | sentiment=59.3 (finbert)
+2026-05-03 00:21:19,556 [INFO] indicators: [NVDA] RSI=37.87, RSI_MA=45.28
+2026-05-03 00:21:23,229 [INFO] sentiment_provider: FinBERT 감성 점수: pos=29/78건 valid → score=42.65 (neutral 필터 제외: 22건)
+2026-05-03 00:21:23,229 [INFO] backtester: [Backtest] NVDA 2026-03-20: 뉴스 100건 | sentiment=42.6 (finbert)
+2026-05-03 00:21:23,231 [INFO] indicators: [NVDA] RSI=42.02, RSI_MA=44.38
+2026-05-03 00:21:26,418 [INFO] sentiment_provider: FinBERT 감성 점수: pos=33/71건 valid → score=56.90 (neutral 필터 제외: 29건)
+2026-05-03 00:21:26,418 [INFO] backtester: [Backtest] NVDA 2026-03-23: 뉴스 100건 | sentiment=56.9 (finbert)
+2026-05-03 00:21:26,420 [INFO] indicators: [NVDA] RSI=41.57, RSI_MA=43.85
+2026-05-03 00:21:30,189 [INFO] sentiment_provider: FinBERT 감성 점수: pos=31/77건 valid → score=56.36 (neutral 필터 제외: 23건)
+2026-05-03 00:21:30,190 [INFO] backtester: [Backtest] NVDA 2026-03-24: 뉴스 100건 | sentiment=56.4 (finbert)
+2026-05-03 00:21:30,191 [INFO] indicators: [NVDA] RSI=46.43, RSI_MA=43.51
+2026-05-03 00:21:33,453 [INFO] sentiment_provider: FinBERT 감성 점수: pos=26/72건 valid → score=46.43 (neutral 필터 제외: 28건)
+2026-05-03 00:21:33,453 [INFO] backtester: [Backtest] NVDA 2026-03-25: 뉴스 100건 | sentiment=46.4 (finbert)
+2026-05-03 00:21:33,455 [INFO] indicators: [NVDA] RSI=38.97, RSI_MA=42.31
+2026-05-03 00:21:37,170 [INFO] sentiment_provider: FinBERT 감성 점수: pos=25/68건 valid → score=43.10 (neutral 필터 제외: 32건)
+2026-05-03 00:21:37,170 [INFO] backtester: [Backtest] NVDA 2026-03-26: 뉴스 100건 | sentiment=43.1 (finbert)
+2026-05-03 00:21:37,172 [INFO] indicators: [NVDA] RSI=35.87, RSI_MA=40.91
+2026-05-03 00:21:40,443 [INFO] sentiment_provider: FinBERT 감성 점수: pos=20/78건 valid → score=38.46 (neutral 필터 제외: 22건)
+2026-05-03 00:21:40,444 [INFO] backtester: [Backtest] NVDA 2026-03-27: 뉴스 100건 | sentiment=38.5 (finbert)
+2026-05-03 00:21:40,446 [INFO] indicators: [NVDA] RSI=34.03, RSI_MA=39.54
+2026-05-03 00:21:43,673 [INFO] sentiment_provider: FinBERT 감성 점수: pos=30/72건 valid → score=55.56 (neutral 필터 제외: 28건)
+2026-05-03 00:21:43,673 [INFO] backtester: [Backtest] NVDA 2026-03-30: 뉴스 100건 | sentiment=55.6 (finbert)
+2026-05-03 00:21:43,675 [INFO] indicators: [NVDA] RSI=45.80, RSI_MA=40.67
+2026-05-03 00:21:46,957 [INFO] sentiment_provider: FinBERT 감성 점수: pos=38/82건 valid → score=61.29 (neutral 필터 제외: 18건)
+2026-05-03 00:21:46,958 [INFO] backtester: [Backtest] NVDA 2026-03-31: 뉴스 100건 | sentiment=61.3 (finbert)
+2026-05-03 00:21:46,960 [INFO] indicators: [NVDA] RSI=47.28, RSI_MA=41.42
+2026-05-03 00:21:50,783 [INFO] sentiment_provider: FinBERT 감성 점수: pos=36/75건 valid → score=62.07 (neutral 필터 제외: 25건)
+2026-05-03 00:21:50,783 [INFO] backtester: [Backtest] NVDA 2026-04-01: 뉴스 100건 | sentiment=62.1 (finbert)
+2026-05-03 00:21:50,784 [INFO] backtester: [Backtest] TSLA 처리 중...
+2026-05-03 00:21:50,789 [INFO] indicators: [TSLA] RSI=43.24, RSI_MA=45.68
+2026-05-03 00:21:54,641 [INFO] sentiment_provider: FinBERT 감성 점수: pos=23/67건 valid → score=41.07 (neutral 필터 제외: 33건)
+2026-05-03 00:21:54,642 [INFO] backtester: [Backtest] TSLA 2026-02-02: 뉴스 100건 | sentiment=41.1 (finbert)
+2026-05-03 00:21:54,643 [INFO] indicators: [TSLA] RSI=43.32, RSI_MA=44.33
+2026-05-03 00:21:58,962 [INFO] sentiment_provider: FinBERT 감성 점수: pos=37/72건 valid → score=74.00 (neutral 필터 제외: 28건)
+2026-05-03 00:21:58,962 [INFO] backtester: [Backtest] TSLA 2026-02-03: 뉴스 100건 | sentiment=74.0 (finbert)
+2026-05-03 00:21:58,964 [INFO] indicators: [TSLA] RSI=37.68, RSI_MA=43.01
+2026-05-03 00:22:03,423 [INFO] sentiment_provider: FinBERT 감성 점수: pos=28/76건 valid → score=56.00 (neutral 필터 제외: 24건)
+2026-05-03 00:22:03,424 [INFO] backtester: [Backtest] TSLA 2026-02-04: 뉴스 100건 | sentiment=56.0 (finbert)
+2026-05-03 00:22:03,425 [INFO] indicators: [TSLA] RSI=34.97, RSI_MA=41.55
+2026-05-03 00:22:08,051 [INFO] sentiment_provider: FinBERT 감성 점수: pos=28/71건 valid → score=50.91 (neutral 필터 제외: 29건)
+2026-05-03 00:22:08,052 [INFO] backtester: [Backtest] TSLA 2026-02-05: 뉴스 100건 | sentiment=50.9 (finbert)
+2026-05-03 00:22:08,053 [INFO] indicators: [TSLA] RSI=42.05, RSI_MA=41.07
+2026-05-03 00:22:12,111 [INFO] sentiment_provider: FinBERT 감성 점수: pos=33/71건 valid → score=61.11 (neutral 필터 제외: 29건)
+2026-05-03 00:22:12,112 [INFO] backtester: [Backtest] TSLA 2026-02-06: 뉴스 100건 | sentiment=61.1 (finbert)
+2026-05-03 00:22:12,114 [INFO] indicators: [TSLA] RSI=44.93, RSI_MA=41.81
+2026-05-03 00:22:16,330 [INFO] sentiment_provider: FinBERT 감성 점수: pos=30/64건 valid → score=68.18 (neutral 필터 제외: 36건)
+2026-05-03 00:22:16,330 [INFO] backtester: [Backtest] TSLA 2026-02-09: 뉴스 100건 | sentiment=68.2 (finbert)
+2026-05-03 00:22:16,333 [INFO] indicators: [TSLA] RSI=48.44, RSI_MA=42.09
+2026-05-03 00:22:20,591 [INFO] sentiment_provider: FinBERT 감성 점수: pos=34/71건 valid → score=68.00 (neutral 필터 제외: 29건)
+2026-05-03 00:22:20,591 [INFO] backtester: [Backtest] TSLA 2026-02-10: 뉴스 100건 | sentiment=68.0 (finbert)
+2026-05-03 00:22:20,593 [INFO] indicators: [TSLA] RSI=49.78, RSI_MA=43.02
+2026-05-03 00:22:24,884 [INFO] sentiment_provider: FinBERT 감성 점수: pos=38/73건 valid → score=66.67 (neutral 필터 제외: 27건)
+2026-05-03 00:22:24,884 [INFO] backtester: [Backtest] TSLA 2026-02-11: 뉴스 100건 | sentiment=66.7 (finbert)
+2026-05-03 00:22:24,886 [INFO] indicators: [TSLA] RSI=45.16, RSI_MA=43.29
+2026-05-03 00:22:29,007 [INFO] sentiment_provider: FinBERT 감성 점수: pos=35/73건 valid → score=58.33 (neutral 필터 제외: 27건)
+2026-05-03 00:22:29,008 [INFO] backtester: [Backtest] TSLA 2026-02-12: 뉴스 100건 | sentiment=58.3 (finbert)
+2026-05-03 00:22:29,010 [INFO] indicators: [TSLA] RSI=45.34, RSI_MA=44.38
+2026-05-03 00:22:33,017 [INFO] sentiment_provider: FinBERT 감성 점수: pos=26/67건 valid → score=50.00 (neutral 필터 제외: 33건)
+2026-05-03 00:22:33,017 [INFO] backtester: [Backtest] TSLA 2026-02-13: 뉴스 100건 | sentiment=50.0 (finbert)
+2026-05-03 00:22:33,019 [INFO] indicators: [TSLA] RSI=42.57, RSI_MA=45.47
+2026-05-03 00:22:37,357 [INFO] sentiment_provider: FinBERT 감성 점수: pos=26/74건 valid → score=48.15 (neutral 필터 제외: 26건)
+2026-05-03 00:22:37,358 [INFO] backtester: [Backtest] TSLA 2026-02-17: 뉴스 100건 | sentiment=48.1 (finbert)
+2026-05-03 00:22:37,360 [INFO] indicators: [TSLA] RSI=42.95, RSI_MA=45.60
+2026-05-03 00:22:41,554 [INFO] sentiment_provider: FinBERT 감성 점수: pos=30/71건 valid → score=50.00 (neutral 필터 제외: 29건)
+2026-05-03 00:22:41,555 [INFO] backtester: [Backtest] TSLA 2026-02-18: 뉴스 100건 | sentiment=50.0 (finbert)
+2026-05-03 00:22:41,557 [INFO] indicators: [TSLA] RSI=43.18, RSI_MA=45.35
+2026-05-03 00:22:45,688 [INFO] sentiment_provider: FinBERT 감성 점수: pos=29/69건 valid → score=47.54 (neutral 필터 제외: 31건)
+2026-05-03 00:22:45,688 [INFO] backtester: [Backtest] TSLA 2026-02-19: 뉴스 100건 | sentiment=47.5 (finbert)
+2026-05-03 00:22:45,690 [INFO] indicators: [TSLA] RSI=43.25, RSI_MA=44.61
+2026-05-03 00:22:49,774 [INFO] sentiment_provider: FinBERT 감성 점수: pos=19/75건 valid → score=32.20 (neutral 필터 제외: 25건)
+2026-05-03 00:22:49,775 [INFO] backtester: [Backtest] TSLA 2026-02-20: 뉴스 100건 | sentiment=32.2 (finbert)
+2026-05-03 00:22:49,777 [INFO] indicators: [TSLA] RSI=37.83, RSI_MA=42.90
+2026-05-03 00:22:53,903 [INFO] sentiment_provider: FinBERT 감성 점수: pos=24/77건 valid → score=44.44 (neutral 필터 제외: 23건)
+2026-05-03 00:22:53,904 [INFO] backtester: [Backtest] TSLA 2026-02-23: 뉴스 100건 | sentiment=44.4 (finbert)
+2026-05-03 00:22:53,906 [INFO] indicators: [TSLA] RSI=43.86, RSI_MA=42.71
+2026-05-03 00:22:57,817 [INFO] sentiment_provider: FinBERT 감성 점수: pos=26/75건 valid → score=44.07 (neutral 필터 제외: 25건)
+2026-05-03 00:22:57,817 [INFO] backtester: [Backtest] TSLA 2026-02-24: 뉴스 100건 | sentiment=44.1 (finbert)
+2026-05-03 00:22:57,819 [INFO] indicators: [TSLA] RSI=48.39, RSI_MA=43.15
+2026-05-03 00:23:01,875 [INFO] sentiment_provider: FinBERT 감성 점수: pos=23/71건 valid → score=38.98 (neutral 필터 제외: 29건)
+2026-05-03 00:23:01,875 [INFO] backtester: [Backtest] TSLA 2026-02-25: 뉴스 100건 | sentiment=39.0 (finbert)
+2026-05-03 00:23:01,878 [INFO] indicators: [TSLA] RSI=44.17, RSI_MA=43.38
+2026-05-03 00:23:05,952 [INFO] sentiment_provider: FinBERT 감성 점수: pos=20/71건 valid → score=33.33 (neutral 필터 제외: 29건)
+2026-05-03 00:23:05,953 [INFO] backtester: [Backtest] TSLA 2026-02-26: 뉴스 100건 | sentiment=33.3 (finbert)
+2026-05-03 00:23:05,955 [INFO] indicators: [TSLA] RSI=41.49, RSI_MA=43.17
+2026-05-03 00:23:10,232 [INFO] sentiment_provider: FinBERT 감성 점수: pos=17/75건 valid → score=28.33 (neutral 필터 제외: 25건)
+2026-05-03 00:23:10,233 [INFO] backtester: [Backtest] TSLA 2026-02-27: 뉴스 100건 | sentiment=28.3 (finbert)
+2026-05-03 00:23:10,235 [INFO] indicators: [TSLA] RSI=42.00, RSI_MA=43.00
+2026-05-03 00:23:14,830 [INFO] sentiment_provider: FinBERT 감성 점수: pos=26/79건 valid → score=41.27 (neutral 필터 제외: 21건)
+2026-05-03 00:23:14,831 [INFO] backtester: [Backtest] TSLA 2026-03-02: 뉴스 100건 | sentiment=41.3 (finbert)
+2026-05-03 00:23:14,832 [INFO] indicators: [TSLA] RSI=37.32, RSI_MA=42.15
+2026-05-03 00:23:19,277 [INFO] sentiment_provider: FinBERT 감성 점수: pos=32/80건 valid → score=49.23 (neutral 필터 제외: 20건)
+2026-05-03 00:23:19,278 [INFO] backtester: [Backtest] TSLA 2026-03-03: 뉴스 100건 | sentiment=49.2 (finbert)
+2026-05-03 00:23:19,281 [INFO] indicators: [TSLA] RSI=45.44, RSI_MA=43.24
+2026-05-03 00:23:23,358 [INFO] sentiment_provider: FinBERT 감성 점수: pos=40/76건 valid → score=62.50 (neutral 필터 제외: 24건)
+2026-05-03 00:23:23,358 [INFO] backtester: [Backtest] TSLA 2026-03-04: 뉴스 100건 | sentiment=62.5 (finbert)
+2026-05-03 00:23:23,360 [INFO] indicators: [TSLA] RSI=45.25, RSI_MA=43.44
+2026-05-03 00:23:27,509 [INFO] sentiment_provider: FinBERT 감성 점수: pos=36/76건 valid → score=59.02 (neutral 필터 제외: 24건)
+2026-05-03 00:23:27,509 [INFO] backtester: [Backtest] TSLA 2026-03-05: 뉴스 100건 | sentiment=59.0 (finbert)
+2026-05-03 00:23:27,512 [INFO] indicators: [TSLA] RSI=41.23, RSI_MA=42.41
+2026-05-03 00:23:31,600 [INFO] sentiment_provider: FinBERT 감성 점수: pos=32/74건 valid → score=55.17 (neutral 필터 제외: 26건)
+2026-05-03 00:23:31,601 [INFO] backtester: [Backtest] TSLA 2026-03-06: 뉴스 100건 | sentiment=55.2 (finbert)
+2026-05-03 00:23:31,603 [INFO] indicators: [TSLA] RSI=42.45, RSI_MA=42.17
+2026-05-03 00:23:35,971 [INFO] sentiment_provider: FinBERT 감성 점수: pos=23/77건 valid → score=38.98 (neutral 필터 제외: 23건)
+2026-05-03 00:23:35,971 [INFO] backtester: [Backtest] TSLA 2026-03-09: 뉴스 100건 | sentiment=39.0 (finbert)
+2026-05-03 00:23:35,973 [INFO] indicators: [TSLA] RSI=42.81, RSI_MA=42.36
+2026-05-03 00:23:40,527 [INFO] sentiment_provider: FinBERT 감성 점수: pos=33/79건 valid → score=56.90 (neutral 필터 제외: 21건)
+2026-05-03 00:23:40,528 [INFO] backtester: [Backtest] TSLA 2026-03-10: 뉴스 100건 | sentiment=56.9 (finbert)
+2026-05-03 00:23:40,530 [INFO] indicators: [TSLA] RSI=48.25, RSI_MA=43.25
+2026-05-03 00:23:45,107 [INFO] sentiment_provider: FinBERT 감성 점수: pos=39/74건 valid → score=68.42 (neutral 필터 제외: 26건)
+2026-05-03 00:23:45,107 [INFO] backtester: [Backtest] TSLA 2026-03-11: 뉴스 100건 | sentiment=68.4 (finbert)
+2026-05-03 00:23:45,110 [INFO] indicators: [TSLA] RSI=41.85, RSI_MA=43.90
+2026-05-03 00:23:49,611 [INFO] sentiment_provider: FinBERT 감성 점수: pos=27/68건 valid → score=50.94 (neutral 필터 제외: 32건)
+2026-05-03 00:23:49,611 [INFO] backtester: [Backtest] TSLA 2026-03-12: 뉴스 100건 | sentiment=50.9 (finbert)
+2026-05-03 00:23:49,614 [INFO] indicators: [TSLA] RSI=40.15, RSI_MA=43.14
+2026-05-03 00:23:53,769 [INFO] sentiment_provider: FinBERT 감성 점수: pos=22/70건 valid → score=41.51 (neutral 필터 제외: 30건)
+2026-05-03 00:23:53,770 [INFO] backtester: [Backtest] TSLA 2026-03-13: 뉴스 100건 | sentiment=41.5 (finbert)
+2026-05-03 00:23:53,772 [INFO] indicators: [TSLA] RSI=43.01, RSI_MA=42.82
+2026-05-03 00:23:58,047 [INFO] sentiment_provider: FinBERT 감성 점수: pos=28/69건 valid → score=56.00 (neutral 필터 제외: 31건)
+2026-05-03 00:23:58,047 [INFO] backtester: [Backtest] TSLA 2026-03-16: 뉴스 100건 | sentiment=56.0 (finbert)
+2026-05-03 00:23:58,049 [INFO] indicators: [TSLA] RSI=45.40, RSI_MA=43.42
+2026-05-03 00:24:02,071 [INFO] sentiment_provider: FinBERT 감성 점수: pos=33/70건 valid → score=66.00 (neutral 필터 제외: 30건)
+2026-05-03 00:24:02,072 [INFO] backtester: [Backtest] TSLA 2026-03-17: 뉴스 100건 | sentiment=66.0 (finbert)
+2026-05-03 00:24:02,074 [INFO] indicators: [TSLA] RSI=42.07, RSI_MA=43.36
+2026-05-03 00:24:05,957 [INFO] sentiment_provider: FinBERT 감성 점수: pos=30/73건 valid → score=60.00 (neutral 필터 제외: 27건)
+2026-05-03 00:24:05,958 [INFO] backtester: [Backtest] TSLA 2026-03-18: 뉴스 100건 | sentiment=60.0 (finbert)
+2026-05-03 00:24:05,960 [INFO] indicators: [TSLA] RSI=36.53, RSI_MA=42.47
+2026-05-03 00:24:09,867 [INFO] sentiment_provider: FinBERT 감성 점수: pos=34/80건 valid → score=53.97 (neutral 필터 제외: 20건)
+2026-05-03 00:24:09,868 [INFO] backtester: [Backtest] TSLA 2026-03-19: 뉴스 100건 | sentiment=54.0 (finbert)
+2026-05-03 00:24:09,870 [INFO] indicators: [TSLA] RSI=32.03, RSI_MA=40.15
+2026-05-03 00:24:14,284 [INFO] sentiment_provider: FinBERT 감성 점수: pos=24/77건 valid → score=42.86 (neutral 필터 제외: 23건)
+2026-05-03 00:24:14,284 [INFO] backtester: [Backtest] TSLA 2026-03-20: 뉴스 100건 | sentiment=42.9 (finbert)
+2026-05-03 00:24:14,286 [INFO] indicators: [TSLA] RSI=40.30, RSI_MA=39.93
+2026-05-03 00:24:18,447 [INFO] sentiment_provider: FinBERT 감성 점수: pos=22/68건 valid → score=45.83 (neutral 필터 제외: 32건)
+2026-05-03 00:24:18,447 [INFO] backtester: [Backtest] TSLA 2026-03-23: 뉴스 100건 | sentiment=45.8 (finbert)
+2026-05-03 00:24:18,449 [INFO] indicators: [TSLA] RSI=41.59, RSI_MA=40.13
+2026-05-03 00:24:22,861 [INFO] sentiment_provider: FinBERT 감성 점수: pos=38/79건 valid → score=56.72 (neutral 필터 제외: 21건)
+2026-05-03 00:24:22,862 [INFO] backtester: [Backtest] TSLA 2026-03-24: 뉴스 100건 | sentiment=56.7 (finbert)
+2026-05-03 00:24:22,864 [INFO] indicators: [TSLA] RSI=43.36, RSI_MA=40.18
+2026-05-03 00:24:27,510 [INFO] sentiment_provider: FinBERT 감성 점수: pos=30/74건 valid → score=49.18 (neutral 필터 제외: 26건)
+2026-05-03 00:24:27,511 [INFO] backtester: [Backtest] TSLA 2026-03-25: 뉴스 100건 | sentiment=49.2 (finbert)
+2026-05-03 00:24:27,513 [INFO] indicators: [TSLA] RSI=37.55, RSI_MA=39.06
+2026-05-03 00:24:31,921 [INFO] sentiment_provider: FinBERT 감성 점수: pos=23/74건 valid → score=40.35 (neutral 필터 제외: 26건)
+2026-05-03 00:24:31,922 [INFO] backtester: [Backtest] TSLA 2026-03-26: 뉴스 100건 | sentiment=40.4 (finbert)
+2026-05-03 00:24:31,924 [INFO] indicators: [TSLA] RSI=33.92, RSI_MA=37.90
+2026-05-03 00:24:36,115 [INFO] sentiment_provider: FinBERT 감성 점수: pos=13/75건 valid → score=21.31 (neutral 필터 제외: 25건)
+2026-05-03 00:24:36,116 [INFO] backtester: [Backtest] TSLA 2026-03-27: 뉴스 100건 | sentiment=21.3 (finbert)
+2026-05-03 00:24:36,118 [INFO] indicators: [TSLA] RSI=31.80, RSI_MA=37.22
+2026-05-03 00:24:40,518 [INFO] sentiment_provider: FinBERT 감성 점수: pos=18/80건 valid → score=29.51 (neutral 필터 제외: 20건)
+2026-05-03 00:24:40,518 [INFO] backtester: [Backtest] TSLA 2026-03-30: 뉴스 100건 | sentiment=29.5 (finbert)
+2026-05-03 00:24:40,520 [INFO] indicators: [TSLA] RSI=41.65, RSI_MA=38.60
+2026-05-03 00:24:44,814 [INFO] sentiment_provider: FinBERT 감성 점수: pos=31/78건 valid → score=51.67 (neutral 필터 제외: 22건)
+2026-05-03 00:24:44,814 [INFO] backtester: [Backtest] TSLA 2026-03-31: 뉴스 100건 | sentiment=51.7 (finbert)
+2026-05-03 00:24:44,817 [INFO] indicators: [TSLA] RSI=46.45, RSI_MA=39.48
+2026-05-03 00:24:49,071 [INFO] sentiment_provider: FinBERT 감성 점수: pos=37/70건 valid → score=60.66 (neutral 필터 제외: 30건)
+2026-05-03 00:24:49,072 [INFO] backtester: [Backtest] TSLA 2026-04-01: 뉴스 100건 | sentiment=60.7 (finbert)
+2026-05-03 00:24:49,074 [INFO] backtester: [Backtest] 완료 — model=finbert | 수익률=+1.2% | 거래=14회 | 승률=71.4% | MDD=-15.2%
