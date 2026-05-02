@@ -6,6 +6,7 @@ numpy>=1.24.0
 APScheduler>=3.10.0
 pandas_market_calendars>=4.3.0
 python-dotenv>=1.0.0
+openai>=2.33.0
 requests>=2.31.0
 polygon-api-client>=1.16.0
 pytz>=2024.1
