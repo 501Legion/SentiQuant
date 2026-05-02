@@ -4,7 +4,7 @@
 # Plan SC FR-06: 티커 추출 + Polygon OHLCV 유효성 검사
 # Plan SC FR-07: 날짜별 저장 data/reddit/YYYY-MM-DD/wsb_posts.json
 # Plan SC FR-19: Market Cap/Short Interest 필터 없음 -Polygon 조회 성공 = 유효
-# Plan SC FR-20: GPT-4 텍스트 최적화 (title 200자 + body 300자 + top comments 3개×100자)
+# Plan SC FR-20: GPT-5.4 Mini 텍스트 최적화 (title 200자 + body 300자 + top comments 3개×100자)
 import json
 import logging
 import os

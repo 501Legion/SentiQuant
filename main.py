@@ -8,11 +8,11 @@ News-RSI Stock Trading System
     python main.py --report                     # 포트폴리오 현황 출력 후 종료
     python main.py --order-now                  # 즉시 주문 처리 실행 (--run-now 후 테스트용)
 
-    # 뉴스 백테스팅 (기존 + gpt4 추가)
-    python main.py --backtest                   # combined: textblob+finbert+gpt4 3종 비교
+    # 뉴스 백테스팅 (기존 + gpt5 추가; 실제 호출 모델은 config.GPT_MODEL)
+    python main.py --backtest                   # combined: textblob+finbert+gpt5 3종 비교
     python main.py --backtest --model textblob  # TextBlob 단독
     python main.py --backtest --model finbert   # FinBERT 단독
-    python main.py --backtest --model gpt4      # GPT-4o 단독
+    python main.py --backtest --model gpt5      # GPT-5.4 Mini 단독
 
     # Reddit Forward Testing
     python main.py --reddit-run-now             # 오늘 Reddit 데이터 수집 (크론탭용)
@@ -28,6 +28,8 @@ import argparse
 import logging
 import os
 import sys
+
+import config
 
 # 로깅 설정 (Design Ref: §9)
 os.makedirs("data", exist_ok=True)
@@ -57,14 +59,13 @@ def _check_env(require_finnhub: bool = False) -> None:
 
 
 def _run_news_backtest(args) -> None:
-    """뉴스 백테스팅: textblob | finbert | gpt4 | combined(3종)."""
-    import config
+    """뉴스 백테스팅: textblob | finbert | gpt5 | combined(3종)."""
     import backtester
 
     if args.model == "combined":
-        # Plan SC: combined = textblob + finbert + gpt4 3종 비교
+        # Plan SC: combined = textblob + finbert + gpt5 3종 비교
         results = backtester.run_all_models(
-            config.SYMBOLS, models=("textblob", "finbert", "gpt4")
+            config.SYMBOLS, models=("textblob", "finbert", config.GPT_MODEL_ALIAS)
         )
         backtester.print_comparison(results)
     else:
@@ -79,7 +80,7 @@ def _run_reddit_backtest(args) -> None:
     """
     missing = []
     if not args.model or args.model == "combined":
-        missing.append("--model {finbert|finbert-wsb|gpt4}")
+        missing.append(f"--model {{finbert|finbert-wsb|{config.GPT_MODEL_ALIAS}}}")
     if not args.ranking:
         missing.append("--ranking {mentions|ratio}")
     if not args.sizing:
@@ -200,7 +201,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        choices=["textblob", "finbert", "finbert-wsb", "gpt4", "combined"],
+        choices=["textblob", "finbert", "finbert-wsb", config.GPT_MODEL_ALIAS, "combined"],
         default="combined",
         help="감성 모델 (combined=3종 비교, finbert-wsb=WSB 전처리 FinBERT, 기본값: combined)",
     )
@@ -262,7 +263,6 @@ def main() -> None:
             _run_news_backtest(args)
 
     elif args.run_now:
-        import config
         import signals as sig_module
         from portfolio import save_signals
 
@@ -276,7 +276,6 @@ def main() -> None:
 
     elif args.report:
         import collector
-        import config
         from portfolio import load_portfolio, print_portfolio_report
 
         portfolio = load_portfolio()

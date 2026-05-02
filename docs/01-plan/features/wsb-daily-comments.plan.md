@@ -40,7 +40,7 @@
 | FR-03 | 수집된 댓글 score 내림차순 정렬 후 상위 1000개 선별 | Must |
 | FR-04 | 각 댓글 포스트에 `"source": "daily_thread"` 태그 포함 | Must |
 | FR-05 | 일반 포스트와 동일하게 `wsb_posts.json`에 합산 저장 | Must |
-| FR-06 | 댓글 포스트에도 감성분석(FinBERT/GPT-4) 동일 적용 | Must |
+| FR-06 | 댓글 포스트에도 감성분석(FinBERT/GPT-5.4 Mini) 동일 적용 | Must |
 | FR-07 | 수집 시 댓글 수/서브레딧별 로그 출력 | Should |
 
 ### 1.2 비기능 요구사항
