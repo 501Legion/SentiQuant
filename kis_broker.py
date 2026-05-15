@@ -5,16 +5,23 @@ SignalProvider와 일관된 추상화를 유지. 구상클래스 KISBroker가 Pr
 
 Plan SC-01/SC-06/SC-11: 토큰 발급 + 종목 마스터 캐시 + 24h 자동 갱신.
 Plan FR-20: KIS_PAPER_TRADING=False 호출 시 RuntimeError로 실전 도메인 차단.
+
+Implementation note: python-kis 라이브러리는 실전 키 + 모의 키 동시 운영자를 가정해
+인스턴스화 시 실전 키를 강제 요구하고 token property가 항상 실전 도메인을 호출한다.
+모의투자만 사용하는 본 시스템 요구사항(FR-20)과 부적합하여, KIS OpenAPI를 requests로
+직접 호출한다. Plan §5 Risk 'python-kis 서드파티 변경' 회피 + Adapter 격리 강화.
 """
 from __future__ import annotations
 
 import json
 import logging
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Literal, Protocol
+from typing import Any, Literal, Protocol
+
+import requests
 
 import config
 
@@ -70,7 +77,7 @@ class Broker(Protocol):
 
 
 # =============================================================================
-# KISBroker Adapter (Design §3.2)
+# KIS OpenAPI 상수 (모의투자 도메인 전용)
 # =============================================================================
 
 # 토큰 만료 5분 전 선제 갱신 (Plan §5 Risk: 24h 만료 누락 방지)
@@ -79,9 +86,24 @@ _TOKEN_PREEMPT_REFRESH_SECONDS = 5 * 60
 # place_order 네트워크 에러 시 1회 재시도 (Design §6 Error Handling)
 _ORDER_RETRY_COUNT = 1
 
+# 모의투자 tr_id (KIS Developers 포털 — 해외주식주문/잔고/시세)
+_TR_ID_BUY_PAPER = "VTTT1002U"        # 미국주식 매수 — 모의
+_TR_ID_SELL_PAPER = "VTTT1001U"       # 미국주식 매도 — 모의
+_TR_ID_BALANCE_PAPER = "VTTS3012R"    # 미국주식 잔고 — 모의
+_TR_ID_QUOTE = "HHDFS00000300"        # 해외주식 현재가 (실전/모의 공통)
+
+# 거래소 코드 (해외주식 미국 시장)
+# NAS=나스닥, NYS=뉴욕, AMS=아멕스. 종목별로 다름 — config.SYMBOLS 기본은 NASDAQ.
+_DEFAULT_EXCHANGE = "NASD"
+_QUOTE_EXCHANGE = "NAS"               # 시세 조회용 EXCD (price endpoint는 NAS 사용)
+
+
+# =============================================================================
+# KISBroker Adapter (Design §3.2)
+# =============================================================================
 
 class KISBroker:
-    """python-kis 래핑. Broker Protocol 암묵적 만족."""
+    """KIS 모의투자 OpenAPI 직접 호출 Adapter. Broker Protocol 암묵적 만족."""
 
     def __init__(
         self,
@@ -103,71 +125,81 @@ class KISBroker:
 
         self._app_key = app_key
         self._app_secret = app_secret
-        self._account_no = account_no
+        self._account_no = account_no  # "12345678-01"
         self._paper = paper
-        self._kis = None  # python-kis 인스턴스 (lazy)
+        self._base_url = config.KIS_BASE_URL_PAPER
+        self._access_token: str | None = None
+        self._expires_at: datetime | None = None
         self._token_cache_path = Path(config.KIS_TOKEN_CACHE_FILE)
         self._symbols_cache_path = Path(config.KIS_SYMBOLS_FILE)
+
+        # 계좌번호 분해: "12345678-01" → CANO="12345678", ACNT_PRDT_CD="01"
+        # 상품코드 누락 시 종합계좌 기본값 "01" 사용
+        if "-" in account_no:
+            self._cano, self._acnt_prdt_cd = account_no.split("-", 1)
+        else:
+            self._cano, self._acnt_prdt_cd = account_no, "01"
+            logger.warning(
+                f"[KIS] KIS_ACCOUNT_NO product code missing - assuming '{account_no}-01'. "
+                f"If errors occur, specify 'NNNNNNNN-XX' format in .env"
+            )
 
     # -------------------------------------------------------------------------
     # connect — Plan SC-01, SC-11
     # -------------------------------------------------------------------------
 
     def connect(self) -> None:
-        """OAuth 토큰 발급/갱신. python-kis가 자동 갱신 처리, 본 메서드는 조기 갱신 + 캐시 영속화."""
-        # Plan SC: 5분 전 선제 갱신 — 캐시 만료 임박 시 강제 재발급
+        """OAuth 토큰 발급/갱신. 5분 전 선제 갱신으로 24h 만료 대응."""
         cached = self._load_token_cache()
         if cached and not self._token_expiring_soon(cached):
             logger.debug("[KIS] 토큰 캐시 유효 — 재사용")
-            self._kis = self._build_kis_client(cached_token=cached.get("access_token"))
+            self._access_token = cached["access_token"]
+            self._expires_at = datetime.fromisoformat(cached["expires_at"])
             return
 
         # 신규 발급 (또는 만료 임박 → 강제 재발급)
-        self._kis = self._build_kis_client()
         token, expires_at = self._issue_token()
+        self._access_token = token
+        self._expires_at = expires_at
         self._save_token_cache(token, expires_at)
         logger.info(
             f"[KIS] 모의투자 토큰 발급 성공 (만료: {expires_at.isoformat()})"
         )
 
-    def _build_kis_client(self, cached_token: str | None = None):
-        """python-kis 클라이언트 생성. 라이브러리 변경 시 본 메서드만 수정 (Design §1.2 Adapter 격리)."""
-        try:
-            from pykis import PyKis  # type: ignore[import-not-found]
-        except ImportError as e:
-            raise RuntimeError(
-                "python-kis 미설치 — `pip install python-kis` 또는 requirements.txt 설치 필요"
-            ) from e
-
-        # python-kis는 모의투자 전용 인자(virtual_id 등)와 실전 인자가 별도.
-        # 본 어댑터는 paper=True에서만 동작하므로 모의투자 도메인만 구성.
-        # TODO(M1 Open Q): 설치한 python-kis 버전의 PyKis(...) 시그니처 확인 후 인자 정합성 검증.
-        return PyKis(
-            id=self._account_no,
-            account=self._account_no,
-            appkey=self._app_key,
-            secretkey=self._app_secret,
-            virtual_id=self._account_no,
-            virtual_appkey=self._app_key,
-            virtual_secretkey=self._app_secret,
-            keep_token=True,
-        )
-
     def _issue_token(self) -> tuple[str, datetime]:
-        """토큰 발급 → (access_token, expires_at). python-kis 내부 토큰을 가져온다."""
-        # python-kis는 첫 API 호출 시 자동 토큰 발급 — get_account()로 트리거
+        """KIS OAuth — POST /oauth2/tokenP. KIS는 1분에 1회만 토큰 발급 허용 (EGW00133)."""
+        url = f"{self._base_url}/oauth2/tokenP"
+        body = {
+            "grant_type": "client_credentials",
+            "appkey": self._app_key,
+            "appsecret": self._app_secret,
+        }
         try:
-            # 토큰 강제 발급 트리거 (가벼운 잔고조회 1회)
-            _ = self._kis.account().balance()  # type: ignore[union-attr]
-        except Exception as e:
-            raise RuntimeError(f"[KIS] 토큰 발급 실패 — APP_KEY/SECRET/계좌번호 확인: {e}") from e
+            resp = requests.post(url, json=body, timeout=config.REQUEST_TIMEOUT)
+        except requests.RequestException as e:
+            raise RuntimeError(f"[KIS] 토큰 발급 네트워크 오류: {e}") from e
 
-        # python-kis 내부에서 토큰 정보 추출 (라이브러리 버전별 attribute가 다를 수 있음)
-        # TODO(M1 Open Q): python-kis 버전별 토큰 접근 경로 확인
-        token = getattr(self._kis, "token", None) or getattr(self._kis, "access_token", "")
-        # 24h 보수적 만료 (실제 토큰 만료 시각은 라이브러리가 관리)
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=24)
-        return str(token), expires_at
+        if resp.status_code != 200:
+            # EGW00133 (1분 1회 제한) 안내 강화
+            try:
+                err = resp.json()
+                err_code = err.get("error_code", "")
+                err_desc = err.get("error_description", resp.text)
+            except (json.JSONDecodeError, ValueError):
+                err_code, err_desc = "", resp.text
+            raise RuntimeError(
+                f"[KIS] 토큰 발급 실패 ({resp.status_code}) "
+                f"[{err_code}] {err_desc}"
+            )
+
+        data = resp.json()
+        token = data.get("access_token", "")
+        if not token:
+            raise RuntimeError(f"[KIS] 토큰 응답에 access_token 없음: {data}")
+        # access_token_token_expired = "YYYY-MM-DD HH:MM:SS" (KST) 또는 expires_in (초)
+        expires_in = int(data.get("expires_in", 24 * 3600))
+        expires_at = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
+        return token, expires_at
 
     def _load_token_cache(self) -> dict | None:
         if not self._token_cache_path.exists():
@@ -180,12 +212,13 @@ class KISBroker:
 
     def _save_token_cache(self, token: str, expires_at: datetime) -> None:
         self._token_cache_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "access_token": token,
+            "expires_at": expires_at.isoformat(),
+            "paper": True,
+        }
         self._token_cache_path.write_text(
-            json.dumps(
-                {"access_token": token, "expires_at": expires_at.isoformat()},
-                ensure_ascii=False,
-                indent=2,
-            ),
+            json.dumps(payload, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
 
@@ -194,9 +227,52 @@ class KISBroker:
         try:
             expires_at = datetime.fromisoformat(cached["expires_at"])
         except (KeyError, ValueError):
-            return True  # 파싱 실패 → 만료 간주
+            return True
         remaining = (expires_at - datetime.now(timezone.utc)).total_seconds()
         return remaining < _TOKEN_PREEMPT_REFRESH_SECONDS
+
+    # -------------------------------------------------------------------------
+    # HTTP Helper (인증 헤더 + 에러 처리)
+    # -------------------------------------------------------------------------
+
+    def _ensure_connected(self) -> None:
+        if not self._access_token:
+            raise RuntimeError("[KIS] connect() 호출 전에 API 접근됨")
+
+    def _auth_headers(self, tr_id: str) -> dict[str, str]:
+        self._ensure_connected()
+        return {
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self._access_token}",
+            "appkey": self._app_key,
+            "appsecret": self._app_secret,
+            "tr_id": tr_id,
+            "custtype": "P",  # 개인
+        }
+
+    def _get(self, path: str, tr_id: str, params: dict[str, Any]) -> dict:
+        headers = self._auth_headers(tr_id)
+        url = f"{self._base_url}{path}"
+        resp = requests.get(url, headers=headers, params=params, timeout=config.REQUEST_TIMEOUT)
+        return self._parse_response(resp, f"GET {path}")
+
+    def _post(self, path: str, tr_id: str, body: dict[str, Any]) -> dict:
+        headers = self._auth_headers(tr_id)
+        url = f"{self._base_url}{path}"
+        resp = requests.post(url, headers=headers, json=body, timeout=config.REQUEST_TIMEOUT)
+        return self._parse_response(resp, f"POST {path}")
+
+    @staticmethod
+    def _parse_response(resp: requests.Response, context: str) -> dict:
+        if resp.status_code != 200:
+            raise RuntimeError(f"[KIS] {context} HTTP {resp.status_code}: {resp.text[:300]}")
+        data = resp.json()
+        rt_cd = data.get("rt_cd", "")
+        # rt_cd "0" = 성공. 그 외는 msg1 포함 에러
+        if rt_cd != "0":
+            msg = data.get("msg1", "") or data.get("msg", "")
+            raise RuntimeError(f"[KIS] {context} 응답 오류 rt_cd={rt_cd} msg={msg}")
+        return data
 
     # -------------------------------------------------------------------------
     # place_order — Plan FR-03, SC-03/SC-04
@@ -207,11 +283,10 @@ class KISBroker:
         symbol: str,
         action: Literal["BUY", "SELL"],
         shares: int,
-        price: float | None = None,  # None → 시장가
+        price: float | None = None,  # None → 시장가 (KIS 해외주식은 지정가 강제이므로 시세로 대체)
     ) -> OrderResult:
         """KIS 모의투자 주문 위임. 실패 시 OrderResult.status='REJECTED' 반환 (raise 아님)."""
-        if self._kis is None:
-            raise RuntimeError("[KIS] connect() 호출 전에 place_order() 실행됨")
+        self._ensure_connected()
         if shares <= 0:
             return OrderResult(
                 order_no="", status="REJECTED",
@@ -244,32 +319,40 @@ class KISBroker:
         shares: int,
         price: float | None,
     ) -> OrderResult:
-        """python-kis 주문 호출 → OrderResult 정규화. 라이브러리 변경 시 본 메서드만 수정."""
-        # TODO(M3 Open Q): python-kis 버전별 stock(...) / order(...) API 정합성 확인
-        stock = self._kis.stock(symbol, market="NASDAQ")  # type: ignore[union-attr]
-        if action == "BUY":
-            resp = stock.buy(qty=shares, price=price) if price else stock.buy(qty=shares)
-        else:  # SELL
-            resp = stock.sell(qty=shares, price=price) if price else stock.sell(qty=shares)
+        """KIS 해외주식 주문 — POST /uapi/overseas-stock/v1/trading/order."""
+        # KIS 해외주식은 지정가 주문 — price=None이면 현재가로 대체
+        if price is None or price <= 0:
+            price = self.get_quote(symbol)
 
-        # 응답 정규화 (KIS 응답 구조 → OrderResult)
-        order_no = str(getattr(resp, "order_no", "") or getattr(resp, "odno", ""))
-        # python-kis 응답이 거부/체결 상태를 명시적으로 주지 않을 수 있음 → 주문번호 유무로 판정
+        tr_id = _TR_ID_BUY_PAPER if action == "BUY" else _TR_ID_SELL_PAPER
+        body = {
+            "CANO": self._cano,
+            "ACNT_PRDT_CD": self._acnt_prdt_cd,
+            "OVRS_EXCG_CD": _DEFAULT_EXCHANGE,   # NASD=나스닥
+            "PDNO": symbol,
+            "ORD_QTY": str(shares),
+            "OVRS_ORD_UNPR": f"{price:.2f}",     # 지정가 (USD)
+            "ORD_SVR_DVSN_CD": "0",              # 주문서버구분 — 0
+            "ORD_DVSN": "00",                    # 주문구분 — 00=지정가
+        }
+
+        data = self._post("/uapi/overseas-stock/v1/trading/order", tr_id, body)
+        output = data.get("output", {}) or {}
+        order_no = str(output.get("ODNO", "") or output.get("odno", ""))
+
         if not order_no:
-            error_msg = str(getattr(resp, "msg", "") or getattr(resp, "msg1", "unknown error"))
+            error_msg = data.get("msg1", "") or "order_no missing"
             return OrderResult(
                 order_no="", status="REJECTED",
                 fill_price=None, fill_shares=None,
                 timestamp=_now_iso(), error_msg=error_msg,
             )
 
-        # 모의투자는 즉시 체결 가정 — 실제 체결가/수량은 잔고 조회로 확인 가능하나
-        # 여기서는 주문 응답 시점의 가격을 기록 (시장가의 경우 quote 폴백)
-        fill_price = price or self.get_quote(symbol)
+        # 모의투자는 즉시 체결 가정 — 정확한 체결가/수량은 잔고 조회로 사후 확인
         return OrderResult(
             order_no=order_no,
             status="FILLED",
-            fill_price=fill_price,
+            fill_price=price,
             fill_shares=shares,
             timestamp=_now_iso(),
             error_msg=None,
@@ -280,27 +363,41 @@ class KISBroker:
     # -------------------------------------------------------------------------
 
     def get_account(self) -> AccountSnapshot:
-        """KIS 잔고조회. Source of Truth — Design §1.2."""
-        if self._kis is None:
-            raise RuntimeError("[KIS] connect() 호출 전에 get_account() 실행됨")
-        balance = self._kis.account().balance()  # type: ignore[union-attr]
+        """KIS 해외주식 잔고 — Source of Truth (Design §1.2)."""
+        params = {
+            "CANO": self._cano,
+            "ACNT_PRDT_CD": self._acnt_prdt_cd,
+            "OVRS_EXCG_CD": _DEFAULT_EXCHANGE,
+            "TR_CRCY_CD": "USD",
+            "CTX_AREA_FK200": "",
+            "CTX_AREA_NK200": "",
+        }
+        data = self._get(
+            "/uapi/overseas-stock/v1/trading/inquire-balance",
+            _TR_ID_BALANCE_PAPER,
+            params,
+        )
 
-        # python-kis 응답 정규화 (라이브러리별 attribute가 다를 수 있음)
-        # TODO(M2 Open Q): balance.foreign_cash / balance.deposits 등 외화현금 필드 확인
+        # output1: 보유종목 리스트, output2: 외화예수금/평가금액 요약
+        output2 = data.get("output2", {}) or {}
         cash_usd = float(
-            getattr(balance, "foreign_cash_usd", None)
-            or getattr(balance, "frcr_dncl_amt", None)
+            output2.get("frcr_dncl_amt1", 0)        # 외화예수금
+            or output2.get("frcr_evlu_amt2", 0)
             or 0.0
         )
+
         positions: dict[str, PositionSnapshot] = {}
-        for stock in getattr(balance, "stocks", []) or []:
-            sym = str(getattr(stock, "symbol", "") or getattr(stock, "pdno", ""))
+        for row in data.get("output1", []) or []:
+            sym = str(row.get("ovrs_pdno", "") or row.get("pdno", ""))
             if not sym:
                 continue
+            shares = int(float(row.get("ovrs_cblc_qty", 0) or 0))
+            if shares <= 0:
+                continue
             positions[sym] = PositionSnapshot(
-                shares=int(getattr(stock, "qty", 0) or getattr(stock, "ovrs_cblc_qty", 0)),
-                avg_price=float(getattr(stock, "avg_price", 0.0) or getattr(stock, "pchs_avg_pric", 0.0)),
-                current_price=float(getattr(stock, "current_price", 0.0) or getattr(stock, "now_pric2", 0.0)),
+                shares=shares,
+                avg_price=float(row.get("pchs_avg_pric", 0) or 0),
+                current_price=float(row.get("now_pric2", 0) or row.get("ovrs_now_pric1", 0) or 0),
             )
 
         return AccountSnapshot(
@@ -314,24 +411,28 @@ class KISBroker:
     # -------------------------------------------------------------------------
 
     def get_quote(self, symbol: str) -> float:
-        """KIS 해외주식 현재가."""
-        if self._kis is None:
-            raise RuntimeError("[KIS] connect() 호출 전에 get_quote() 실행됨")
+        """KIS 해외주식 현재가 — GET /uapi/overseas-price/v1/quotations/price."""
+        params = {
+            "AUTH": "",
+            "EXCD": _QUOTE_EXCHANGE,             # NAS=나스닥 (price API 전용 코드)
+            "SYMB": symbol,
+        }
         try:
-            stock = self._kis.stock(symbol, market="NASDAQ")  # type: ignore[union-attr]
-            quote = stock.quote()
-            price = float(
-                getattr(quote, "price", None)
-                or getattr(quote, "current", None)
-                or getattr(quote, "last", None)
-                or 0.0
+            data = self._get(
+                "/uapi/overseas-price/v1/quotations/price",
+                _TR_ID_QUOTE,
+                params,
             )
-            if price <= 0:
-                raise RuntimeError(f"invalid quote response for {symbol}")
-            return price
         except Exception as e:
             logger.warning(f"[KIS] {symbol} 현재가 조회 실패: {e}")
             raise
+
+        output = data.get("output", {}) or {}
+        # 'last' = 현재가, 'base' = 전일종가
+        price = float(output.get("last", 0) or output.get("base", 0) or 0)
+        if price <= 0:
+            raise RuntimeError(f"invalid quote response for {symbol}: {output}")
+        return price
 
     # -------------------------------------------------------------------------
     # get_tradable_symbols — Plan FR-14, SC-06
@@ -350,9 +451,14 @@ class KISBroker:
             logger.warning(f"[KIS] 종목 마스터 조회 실패 — 마지막 캐시로 폴백: {e}")
             stale = self._load_symbols_cache(allow_stale=True)
             if stale is None:
-                raise RuntimeError(
-                    "[KIS] 종목 마스터 조회 실패 + 캐시 없음 — 매매 가능 종목 확인 불가"
-                ) from e
+                # 마스터 미노출 + 캐시 없음 → config.SYMBOLS 전체 허용 (사후 거부 학습)
+                logger.warning(
+                    "[KIS] 종목 마스터 미확보 — config.SYMBOLS를 매매 가능으로 가정. "
+                    "REJECTED 응답으로 사후 학습 필요"
+                )
+                fallback = list(config.SYMBOLS)
+                self._save_symbols_cache(fallback)
+                return fallback
             logger.warning("[KIS] 만료된 종목 캐시 강제 사용")
             return stale
 
@@ -360,21 +466,14 @@ class KISBroker:
         return symbols
 
     def _fetch_tradable_symbols(self) -> list[str]:
-        """KIS 종목 마스터 API 호출. python-kis가 mst 파일 다운로드를 래핑."""
-        if self._kis is None:
-            raise RuntimeError("[KIS] connect() 호출 전에 get_tradable_symbols() 실행됨")
-        # TODO(M3 Open Q): python-kis가 종목 마스터를 직접 노출하는지 확인.
-        # 노출 안 하면 자체 mst 파일 다운로드 또는 첫 주문 시도 후 거부 응답 학습 방식으로 대체.
-        market = getattr(self._kis, "market", None)
-        if market is None or not hasattr(market, "symbols"):
-            logger.warning(
-                "[KIS] python-kis가 market.symbols() 미노출 — "
-                "config.SYMBOLS 전체를 매매 가능으로 가정 (REJECTED 응답으로 사후 학습)"
-            )
-            return list(config.SYMBOLS)
+        """KIS 종목 마스터 — 공식 OpenAPI는 종목 전체 마스터 직접 제공 안 함.
+        대신 NASDAQ 마스터 파일 다운로드(별도 인프라) 또는 사후 학습 방식 사용.
 
-        raw = market.symbols(market="NASDAQ")
-        return [str(s) for s in raw if s]
+        본 구현은 폴백 전략 — config.SYMBOLS 전체를 매매 가능으로 가정하고
+        place_order가 REJECTED 응답을 받으면 호출자(trader)가 제외 학습.
+        """
+        # TODO: NASDAQ 마스터 파일 다운로드 또는 KIS 종목조회 API가 노출되면 교체
+        raise RuntimeError("KIS 종목 마스터 직접 조회 미구현 — 폴백 경로 사용")
 
     def _load_symbols_cache(self, allow_stale: bool = False) -> list[str] | None:
         if not self._symbols_cache_path.exists():
