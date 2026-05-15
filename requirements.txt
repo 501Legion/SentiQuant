@@ -16,4 +16,4 @@ onnxruntime>=1.18.0
 torch>=2.2.0
 streamlit>=1.30.0
 watchdog>=3.0.0
-python-kis>=2.0.0  # TODO(M1): pip install 후 `pip freeze | grep python-kis` 결과로 == 고정 (Open Question)
+# KIS 모의투자: requests로 직접 OpenAPI 호출 (python-kis 미사용 — 실전 키 강제 요구 회피)
