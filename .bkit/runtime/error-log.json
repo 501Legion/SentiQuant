@@ -79,5 +79,23 @@
     "agentId": "ac7ccdcaa4cabe208",
     "agentType": null,
     "message": ""
+  },
+  {
+    "timestamp": "2026-05-02T17:25:15.967Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": null,
+    "agentType": null,
+    "message": ""
+  },
+  {
+    "timestamp": "2026-05-02T17:28:48.496Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": "a07e554668d39d39d",
+    "agentType": null,
+    "message": ""
   }
 ]
