@@ -194,6 +194,12 @@ def main() -> None:
         action="store_true",
         help="즉시 주문 처리 실행",
     )
+    # Plan FR-20: --dry-run은 KIS place_order 직전까지만 실행, 실주문 없음 (SC-02)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="--order-now와 함께 사용 — KIS 주문 직전까지 시뮬레이션 (실주문 없음)",
+    )
     parser.add_argument(
         "--backtest",
         action="store_true",
@@ -208,9 +214,9 @@ def main() -> None:
     # Plan SC NFR-01: --source 미지정 시 기존 뉴스 동작 유지
     parser.add_argument(
         "--source",
-        choices=["news", "reddit"],
+        choices=["news", "reddit", "kis"],
         default="news",
-        help="데이터 소스 (기본값: news)",
+        help="데이터 소스 (기본값: news). --report와 함께 'kis' 지정 시 KIS 동기화 후 출력",
     )
     parser.add_argument(
         "--ranking",
@@ -276,9 +282,23 @@ def main() -> None:
 
     elif args.report:
         import collector
-        from portfolio import load_portfolio, print_portfolio_report
+        from portfolio import load_portfolio, print_portfolio_report, save_portfolio
 
         portfolio = load_portfolio()
+
+        # Plan FR-13: --source kis 시 KIS 잔고를 Source of Truth로 동기화
+        if args.source == "kis":
+            from kis_broker import get_broker
+            from portfolio import sync_from_kis
+            try:
+                broker = get_broker()
+                broker.connect()
+                portfolio = sync_from_kis(portfolio, broker)
+                save_portfolio(portfolio)
+                logger.info("[KIS] 잔고 동기화 완료 — portfolio.json 갱신")
+            except Exception as e:
+                logger.error(f"[KIS] 동기화 실패 — 캐시 그대로 사용: {e}")
+
         current_prices = {}
         for symbol in portfolio.positions:
             price = collector.get_latest_open_price(symbol)
@@ -288,8 +308,9 @@ def main() -> None:
 
     elif args.order_now:
         from scheduler import order_processing_job
-        logger.info("즉시 주문 처리 실행")
-        order_processing_job()
+        label = "DRY-RUN" if args.dry_run else "LIVE"
+        logger.info(f"즉시 주문 처리 실행 ({label})")
+        order_processing_job(dry_run=args.dry_run)
 
     else:
         from scheduler import start_scheduler

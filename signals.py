@@ -115,8 +115,74 @@ def _save_articles_detail(symbol: str, article_details: list[dict]) -> None:
 
 
 def generate_signals_for_all(symbols: list[str]) -> dict[str, dict]:
+    """SIGNAL_ENGINE 디스패처 — config.SIGNAL_ENGINE에 따라 Provider를 선택한다.
+
+    Design Ref: §2.1, §3.3 — SignalProvider Protocol. 기존 호출부(scheduler/main/app)는
+    변경 없이 이 함수를 그대로 호출하며, 내부에서 신호 엔진을 분기한다 (Plan FR-10).
+
+    - SIGNAL_ENGINE="finbert" (기본값): FinbertProvider → _generate_signals_finbert
+      (기존 동작 100% 보존, Plan SC-08)
+    - SIGNAL_ENGINE="gpt5": NotImplementedError (Plan SC-09)
+
+    Args:
+        symbols: 종목 티커 목록
+
+    Returns:
+        {symbol: {...신호 데이터...}} — _generate_signals_finbert와 동일 스키마
     """
-    모든 종목에 대해 신호를 계산하고 결과를 반환한다.
+    # 지연 import — signal_provider ↔ signals 순환 import 방지
+    import signal_provider
+
+    # FR-14: KIS 모의투자 매매 가능 종목으로 필터링 (Design §2.1 step 2)
+    tradable_symbols = _filter_tradable_symbols(symbols)
+
+    provider = signal_provider.get_provider(config.SIGNAL_ENGINE)
+    logger.info(f"[Signal Engine] '{provider.name}' Provider로 신호 생성 시작")
+    return provider.generate_signals(tradable_symbols)
+
+
+def _filter_tradable_symbols(symbols: list[str]) -> list[str]:
+    """KIS 모의투자 매매 가능 종목으로 필터링한다 (Plan FR-14, SC-05).
+
+    data/kis_symbols.json 캐시와 교집합을 취한다. 캐시가 없으면 전체 종목을
+    그대로 통과시킨다 (폴백 — KIS 미설정 환경/첫 실행 호환).
+    제외된 종목은 WARNING 로그로 남긴다 (SC-05).
+
+    Args:
+        symbols: 신호 생성 후보 종목 목록 (보통 config.SYMBOLS)
+
+    Returns:
+        매매 가능 종목만 남긴 목록
+    """
+    # 지연 import — signals ↔ kis_broker 모듈 로드 순서 영향 최소화
+    import kis_broker
+
+    tradable = kis_broker.load_cached_tradable_symbols()
+    if tradable is None:
+        logger.info("[KIS] 매매 가능 종목 캐시 없음 — 전체 종목으로 신호 생성")
+        return symbols
+
+    tradable_set = set(tradable)
+    filtered: list[str] = []
+    for s in symbols:
+        if s in tradable_set:
+            filtered.append(s)
+        else:
+            logger.warning(f"[KIS] {s} 모의투자 매매 불가 — 신호 생성 제외")
+    if not filtered:
+        logger.warning(
+            "[KIS] 매매 가능 종목이 없습니다 — 전체 종목으로 폴백 (캐시 점검 필요)"
+        )
+        return symbols
+    return filtered
+
+
+def _generate_signals_finbert(symbols: list[str]) -> dict[str, dict]:
+    """
+    모든 종목에 대해 RSI + FinBERT 신호를 계산하고 결과를 반환한다.
+
+    FinbertProvider가 래핑하는 실제 구현 — generate_signals_for_all 디스패처가
+    SIGNAL_ENGINE="finbert"일 때 이 함수로 위임된다 (Design §3.3).
 
     프로세스:
     1. get_ohlcv() → get_latest_rsi() + calculate_volume_ma20()

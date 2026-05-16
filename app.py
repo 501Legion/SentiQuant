@@ -18,8 +18,78 @@ st.set_page_config(page_title="Auto-Stock Dashboard", layout="wide")
 
 def load_trades():
     if os.path.exists(config.TRADES_FILE):
-        return pd.read_csv(config.TRADES_FILE)
+        df = pd.read_csv(config.TRADES_FILE)
+        # FR-19: KIS 주문 추적 컬럼 — 구버전 trades.csv 호환 위해 없으면 빈 컬럼 추가
+        for col in ("order_no", "kis_status"):
+            if col not in df.columns:
+                df[col] = None
+        return df
     return pd.DataFrame()
+
+
+def _mask_account(account_no: str) -> str:
+    """KIS 계좌번호 마스킹 (Design §7) — '50123456-01' → '5012345*-01'."""
+    if not account_no:
+        return "미설정"
+    head, _, tail = account_no.partition("-")
+    if len(head) > 1:
+        head = head[:-1] + "*"
+    return f"{head}-{tail}" if tail else head
+
+
+def kis_sync():
+    """KIS 모의계좌 동기화 (FR-17) — 잔고를 Source of Truth로 portfolio.json 갱신.
+
+    추가로 보유 종목 현재가를 KIS 실시간 시세로 갱신 (FR-18, 실패 시 collector 폴백).
+
+    Returns:
+        (synced_portfolio, prices) 튜플
+    """
+    from kis_broker import get_broker
+
+    broker = get_broker()
+    broker.connect()
+    synced = portfolio.sync_from_kis(portfolio.load_portfolio(), broker)
+    portfolio.save_portfolio(synced)
+
+    # FR-18: 보유 종목 현재가는 KIS API 시세 우선, 실패 시 collector 폴백
+    prices = {}
+    for sym in synced.positions:
+        try:
+            prices[sym] = broker.get_quote(sym)
+        except Exception:
+            fallback = collector.get_latest_open_price(sym)
+            if fallback:
+                prices[sym] = fallback
+    return synced, prices
+
+
+def render_kis_panel(port, current_prices):
+    """KIS 모의투자 계좌 영역 (FR-16, FR-17) — 헤더 상단에 표시."""
+    st.markdown("##### 🏦 KIS 모의투자 계좌")
+    total_eval = port.cash + sum(
+        current_prices.get(sym, pos.avg_price) * pos.shares
+        for sym, pos in port.positions.items()
+    )
+    c_acct, c_cash, c_eval, c_sync = st.columns([1.2, 1, 1, 1])
+    with c_acct:
+        st.metric("계좌번호", _mask_account(config.KIS_ACCOUNT_NO))
+    with c_cash:
+        st.metric("USD 가용현금", f"${port.cash:,.2f}")
+    with c_eval:
+        st.metric("총 평가금액", f"${total_eval:,.2f}")
+    with c_sync:
+        st.write("")
+        if st.button("🔄 KIS 동기화", use_container_width=True):
+            try:
+                synced, prices = kis_sync()
+                if prices:
+                    st.session_state["current_prices"] = prices
+                st.success(f"KIS 동기화 완료 — {len(synced.positions)}개 포지션")
+                st.rerun()
+            except Exception as e:
+                st.error(f"KIS 동기화 실패: {e}")
+    st.divider()
 
 def get_current_prices(symbols):
     prices = {}
@@ -67,7 +137,10 @@ def main():
     # --- Header Area ---
     port = portfolio.load_portfolio()
     current_prices = st.session_state.get("current_prices", {})
-    
+
+    # --- KIS 모의투자 계좌 영역 (FR-16, FR-17) ---
+    render_kis_panel(port, current_prices)
+
     col_nav, col_total_info = st.columns([3, 1])
     with col_nav:
         st.caption("포트폴리오 / 상세 현황")

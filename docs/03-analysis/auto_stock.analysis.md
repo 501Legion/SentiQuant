@@ -1,198 +1,120 @@
-# auto_stock — Gap Analysis (ARCHITECTURE.md as Design)
+# auto_stock — Gap Analysis (Check Phase, re-run)
 
-> **Date**: 2026-05-02
+> **Date**: 2026-05-17
 > **Design Source**: `ARCHITECTURE.md` (v2026-04-22, branch `rsi_finBERT_combine`)
-> **Implementation Scope**: 핵심 11 + 백테스팅 4 + 실거래/스케줄러 3 = 18개 모듈
-> **Note**: 정식 `auto_stock.plan.md` / `auto_stock.design.md` 부재. 사용자 동의하에 Living Document인 ARCHITECTURE.md를 임시 Design으로 간주.
+> **Method**: Static Analysis (Structural + Functional + Contract). 런타임 없음 (Python 프로젝트, 서버 미가동).
+> **Note**: 정식 `auto_stock.plan.md` / `auto_stock.design.md` 부재 — Living Document인 ARCHITECTURE.md를 임시 Design으로 간주.
+> **이전 분석**: 2026-05-02 (Overall 94%). 본 재분석은 그 이후 병합된 `kis-paper-trading` 피처를 반영.
 
 ## Executive Summary
 
 | 차원 | Match Rate | 평가 |
 |------|-----------|------|
-| Structural | **100%** | 18개 명시 모듈 모두 존재, 진입점도 모두 정의됨 |
-| Functional | **96%** | §3 7단계 + §5 V3 5단계 청산 + Velocity 5종 모두 충실 구현, TODO 0건 |
-| Contract | **88%** | config 상수 21/21 일치. CLI `--ranking` 어휘 불일치 1건 |
-| **Overall (정적 only)** | **94%** | `0.2·100 + 0.4·96 + 0.4·88 = 93.6 → 94%` |
+| Structural | **90%** | ARCHITECTURE.md §2의 18개 모듈 전부 존재. 단, 신규 2개 모듈(`kis_broker.py`, `signal_provider.py`)이 §2에 미문서화 |
+| Functional | **85%** | 코드 자체는 건강(kis 분석 96.8%, 기존 코어 94%+). §3 신호 파이프라인이 디스패처+KIS 필터 계층으로 확장됐으나 §3 미반영 |
+| Contract | **80%** | KIS 상수 9개 + `SIGNAL_ENGINE`이 §7 미문서화, `--source kis`·`--order-now`·`--dry-run` CLI가 §6 미문서화, `--ranking` 불일치(이전 G1) 미수정 |
+| **Overall (정적 only)** | **84%** | `0.2·90 + 0.4·85 + 0.4·80 = 84.0` |
 
-ARCHITECTURE.md를 정식 Design으로 간주했을 때 구현은 매우 성숙. Critical 결함은 1건뿐 (CLI `--ranking sentiment` 옵션 불일치 — 실제는 `ratio`).
-
----
-
-## 1. Structural Match (100%)
-
-### 1.1 핵심 모듈 (11/11)
-
-| ARCHITECTURE.md §2 | 파일 존재 | 명시 진입점 정의 | 위치 |
-|------|:--:|:--:|------|
-| `main.py :: main()` | ✅ | ✅ | main.py:175 |
-| `config.py` (52개+ 상수) | ✅ | — | config.py:1-201 (실제 70+ 상수) |
-| `signals.py :: generate_signals_for_all()` | ✅ | ✅ | signals.py:117 |
-| `sentiment_provider.py :: get_provider(name)` | ✅ | ✅ | sentiment_provider.py:380 |
-| `wsb_preprocessor.py :: WSBPreprocessor.preprocess()` | ✅ | ⚠️ | 클래스 L6, 실제 메서드명 `preprocess_post()` |
-| `collector.py :: get_ohlcv(), get_news()` | ✅ | ✅ | collector.py:27, 160 |
-| `reddit_collector.py :: collect_wsb_posts()` | ✅ | ⚠️ | 실제 `RedditCollector.collect()` (L95) |
-| `market_filter.py :: apply_market_filter()` | ✅ | ✅ | market_filter.py:51 |
-| `indicators.py :: get_latest_rsi/get_ma/calculate_atr` | ✅ | ✅ | indicators.py:185, 122, 175 |
-| `position_sizer.py :: get_sizer(name)` | ✅ | ✅ | position_sizer.py:126 |
-| `wsb_state.py :: load_mention_history/load_position_scores` | ✅ | ✅ | wsb_state.py:16, 64 |
-
-### 1.2 백테스팅/실거래 (7/7)
-
-| 파일 | 존재 | 핵심 클래스/함수 |
-|------|:--:|------|
-| `backtester.py` | ✅ | `BacktestEngine` (L54), `run_all_models` (L295) |
-| `reddit_backtester.py` | ✅ | `RedditReplayBacktester` (L19), `run_all_reddit_strategies` (L244) |
-| `wsb_signal_engine.py` | ✅ | `WSBSignalEngine.run_pipeline` (L37), `check_exit` (L322) |
-| `reddit_portfolio.py` | ✅ | `RedditPortfolio` (L29), `Position` (L20) |
-| `portfolio.py` | ✅ | `Portfolio`, `apply_buy/apply_sell` |
-| `trader.py` | ✅ | `process_orders` (L15) |
-| `scheduler.py` | ✅ | `start_scheduler` (L120), `signal_calculation_job` (L42) |
-
-### 1.3 Drift
-
-- ARCHITECTURE.md §2/§5: Reddit **3 서브레딧**(wallstreetbets/stocks/investing) 명시 → 실제 `config.REDDIT_SUBREDDITS`는 **6개** (`wallstreetbets, investing, stocks, options, StockMarket, thetagang`, config.py:26-29). → **Important drift**
-- ARCHITECTURE.md §8 미반영 PDCA: `wsb-daily-comments` (plan + analysis), `kis-paper-trading` (신규 plan, untracked)
+**핵심 결론**: 코드 결함은 없습니다. Match Rate가 90% 아래로 떨어진 유일한 원인은 **ARCHITECTURE.md(설계 프록시)가 코드보다 약 3주·2개 피처만큼 뒤처진 문서 드리프트**입니다. `kis-paper-trading` 피처(별도 분석 96.8%)가 코드에는 완전히 병합됐으나 Living Document에 반영되지 않았습니다.
 
 ---
 
-## 2. Functional Depth (96%)
+## 1. Strategic Alignment Check
 
-### 2.1 §3 신호 결정 파이프라인 7단계 (signals.py:117-234)
-
-| 단계 | 위치 | 상태 |
+| 항목 | 판정 | 근거 |
 |------|------|------|
-| 1. OHLCV 수집 | signals.py:149 | ✅ |
-| 2. RSI 계산 | signals.py:150 | ✅ |
-| 3. 뉴스 수집 | signals.py:163 | ✅ |
-| 4. Provider별 감성 평균 | signals.py:167-178 | ✅ |
-| 5. determine_signal | signals.py:181 → L20-54 | ✅ 5단계 룰 정확 일치 |
-| 6. Volume Spike override | signals.py:184-191 → L68 | ✅ |
-| 7. Market Filter | signals.py:194 → market_filter.py:51 | ✅ |
+| 시스템 핵심 목적(뉴스·Reddit 감성 + RSI 페이퍼 트레이딩) 유지 | ✅ | 신호 파이프라인·Reddit V3·백테스팅 모두 보존 |
+| KIS 모의투자 통합이 ARCHITECTURE 의도와 정합 | ✅ | §9 "변경 시 가이드"의 PDCA 절차대로 kis-paper-trading 수행, plan/design/analysis/report 존재 |
+| Living Document 갱신 규약(§9) 준수 | ❌ | §9는 "완료 후 §2~5 갱신 + §8 한 줄 추가"를 요구 — kis-paper-trading 완료 후 미수행 |
 
-### 2.2 §4 감성 Provider 5종
+---
 
-| 모델 | 클래스 | 위치 | 비고 |
-|------|--------|------|------|
-| `textblob` | `TextBlobProvider` | sentiment_provider.py:38 | ✅ |
-| `finbert` | `FinBERTProvider(use_wsb=False)` | L84, 397 | ✅ |
-| `finbert-wsb` | `FinBERTProvider(use_wsb=True)` | L399-400 | ✅ |
-| `gpt4` | `GPTProvider` (sha256 캐시 + 배치10) | L241, 401 | ✅ |
-| `combined` | `signals._get_active_providers` 평균 | signals.py:57-65, 178 | ⚠️ Reddit Backtest 차단 (main.py:81) |
+## 2. Static Gap Analysis (3-axis)
 
-**Neutral 필터**: §4 표현 "positive_ratio >= 0.80" 모호. 실제 구현은 `neutral_score >= 0.80`인 기사를 제외 (sentiment_provider.py:184). 의미적으로 동등하나 **문서 모호성** (confidence 90%).
+### 2.1 Structural Match — 90%
 
-### 2.3 §5 Reddit V3 파이프라인 (wsb_signal_engine.py)
+ARCHITECTURE.md §2가 명시한 18개 모듈 (핵심 11 + 백테스팅 4 + 실거래/스케줄러 3)은 **전부 존재**. 2026-05-02 분석 이후 변동 없음.
 
-| 단계 | 위치 | 상태 |
+**미문서화 신규 모듈** (구현에는 존재, §2 파일 표에 없음):
+
+| 파일 | 역할 | 출처 피처 |
+|------|------|----------|
+| `kis_broker.py` (571 LOC) | KIS OpenAPI 브로커 어댑터 (OAuth·주문·계좌·시세) | kis-paper-trading |
+| `signal_provider.py` | `SignalProvider` Protocol + `SIGNAL_ENGINE` 디스패처 | kis-paper-trading |
+| `tests/` (`__init__.py`, `mock_broker.py`, `test_kis_paper_trading.py`) | 단위 테스트 (T1~T9) | kis-paper-trading Act |
+
+→ 문서화된 항목 일치율은 100%이나, 구현이 설계 문서의 상위집합(superset)이라 구조 점수 90%.
+
+### 2.2 Functional Depth — 85%
+
+- §3 신호 결정 파이프라인 7단계: 실제로는 `signals.generate_signals_for_all()`이 **디스패처**로 바뀌고, 7단계 본체는 `_generate_signals_finbert()`로 이동. 추가로 step 0에 `_filter_tradable_symbols()`(KIS 매매가능 종목 교집합)가 삽입됨. **§3 다이어그램은 이 계층을 반영하지 않음.**
+- §1 시스템 개요 다이어그램에 KIS 파이프라인(`kis_broker` → `trader.process_orders` 위임) 없음.
+- `trader.py`는 자체 시뮬레이션 → `broker.place_order` 위임으로 재작성(diff +227/-line). §2 trader.py 설명("주문 실행 (페이퍼 트레이딩)")은 표면적으로만 맞고 위임 구조 미설명.
+- 코드 품질 자체: `kis-paper-trading.analysis.md` 96.8%, TODO/FIXME 0건, 단위 테스트 9/9 통과. 기존 코어(뉴스/Reddit V3)는 2026-05-02 분석에서 96% 확인 후 무변경.
+
+### 2.3 API Contract — 80%
+
+| 계약 | 판정 | 근거 |
 |------|------|------|
-| `_score_posts` (bullish/bearish/neutral count) | L130-170 | ✅ |
-| `_apply_neutral_filter` (>0.70 → NEUTRAL) | L172-195 | ✅ `WSB_NEUTRAL_RATIO_MAX` |
-| `_apply_velocity` (5종 state) | L197-227 | ✅ HIGH/NORMAL/DECLINING/NEW_SPIKE/NEW_IGNORE |
-| `_determine_signal_v3` Velocity 보정 | L229-273 | ✅ NORMAL>70/55, HIGH ±5, DECLINING +5, NEW_SPIKE 65/50 |
-| `_filter_consensus` (≥1.5배) | L275-296 | ✅ + bearish=0 가드 |
-| `_rank` | L298-320 | ⚠️ `ranking="ratio"` (§6 명세 "sentiment"와 어휘 차) |
-
-**check_exit 5단계 우선순위** (wsb_signal_engine.py:322-428): 모두 정확 구현. TODO/FIXME/XXX 주석 0건.
-
-| # | 명세 | 위치 |
-|---|------|------|
-| 1. sentiment_reversal | L370-381 | ✅ `0.60`, `yesterday_below` flag |
-| 2. rsi_overbought + HIGH 1회 유예 | L384-400 | ✅ `rsi_held` flag |
-| 3. gap_down ≤-5% | L402-410 | ✅ |
-| 4. stop_loss pnl ≤-7% | L412-418 | ✅ |
-| 5. trailing_stop drawdown ≤-5% & pnl>0 | L420-426 | ✅ |
+| §7 config 상수 (뉴스 10 + WSB V3 11 = 21개) | ✅ | 2026-05-02 검증, 무변경 |
+| §7 KIS 상수 9개 (`KIS_APP_KEY`…`KIS_SYMBOLS_REFRESH_DAYS`, config.py:204-212) | ❌ | §7 표에 행 없음 |
+| §7 `SIGNAL_ENGINE` (config.py:215) | ❌ | §7 표에 행 없음 |
+| §6 CLI `--source` | ⚠️ | 실제 `choices=["news","reddit","kis"]` (main.py:217) — `kis` 미문서화 |
+| §6 CLI `--ranking` | ❌ | §6 예제 `[mentions\|sentiment]` vs 실제 `["mentions","ratio"]` (main.py:223) — **이전 분석 G1, 미수정** |
+| §6 CLI `--order-now` / `--dry-run` | ❌ | KIS 실주문 명령, §6 미문서화 |
 
 ---
 
-## 3. Contract Match (88%)
+## 3. Gap List (Severity 정렬)
 
-### 3.1 §7 config 상수 검증
+| ID | Severity | Category | Description | Evidence | Fix |
+|----|----------|----------|-------------|----------|-----|
+| G1 | **Important** | Doc drift | `kis_broker.py`·`signal_provider.py` §2 파일 표 누락 | ARCHITECTURE.md §2 | §2 핵심 모듈 표에 2행 추가 |
+| G2 | **Important** | Doc drift | §1 시스템 다이어그램·§3 파이프라인에 KIS 위임 계층·`SIGNAL_ENGINE` 디스패처·`_filter_tradable_symbols` 미반영 | ARCHITECTURE.md §1, §3 | §1·§3 갱신 |
+| G3 | **Important** | Contract | KIS 상수 9개 + `SIGNAL_ENGINE` §7 누락 | config.py:204-215 | §7에 "KIS / Signal Engine" 표 추가 |
+| G4 | **Important** | Contract | §8 기능 이력에 `kis-paper-trading` 없음 (§9 규약 위반) | ARCHITECTURE.md §8 | §8에 행 추가 + 마지막 업데이트 일자 갱신 |
+| G5 | **Critical→Important** | Contract / CLI | `--ranking` 명세("sentiment") ≠ 실제("ratio"). 이전 분석(2026-05-02) G1 — **미수정 잔존** | ARCHITECTURE.md §6 vs main.py:223 | §6를 `[mentions\|ratio]`로 수정 |
+| G6 | Minor | Doc drift | §6에 `--source kis`, `--order-now`, `--dry-run` 미문서화 | main.py:217 등 | §6 CLI 표/예제 보강 |
+| G7 | Minor | Doc drift | 이전 분석 미해소 잔존: §4 Neutral 필터 문구 모호(G3), `preprocess()`/`collect_wsb_posts()` 명칭(G6/G7), `wsb-daily-comments` §8 누락(G5) | 2026-05-02 분석 §4 | 일괄 sync 시 함께 처리 |
 
-뉴스/공통 상수 10개 (`RSI_OVERSOLD=30, RSI_OVERBOUGHT=70, SENTIMENT_BUY=50, SENTIMENT_STRONG_BUY=70, MA_ENTRY_PERIOD=30, COMMISSION_RATE=0.0025, COMMISSION_MIN_USD=2.0, VOLUME_SPIKE_MULTIPLIER=2.0, NEWS_MAX_ARTICLES=100, NEUTRAL_FILTER_MIN_ARTICLES=10`) 및 WSB V3 상수 11개 (`WSB_STRONG_BUY_SCORE=70, WSB_BUY_SCORE=55, WSB_NEUTRAL_RATIO_MAX=0.70, WSB_VELOCITY_LOOKBACK_DAYS=7, WSB_VELOCITY_HIGH_THRESHOLD=2.0, WSB_VELOCITY_LOW_THRESHOLD=0.5, WSB_VELOCITY_SCORE_ADJUST=5.0, WSB_NEW_SPIKE_MIN_MENTIONS=20, WSB_SENTIMENT_REVERSAL_RATIO=0.60, WSB_RSI_EXIT_OVERBOUGHT=70.0, WSB_GAP_DOWN_PCT=-5.0`) — **21/21 완전 일치** (config.py:115-190).
-
-### 3.2 §6 CLI 옵션 (main.py argparse)
-
-| ARCHITECTURE.md §6 | 실제 main.py | 상태 |
-|------|------|------|
-| `--backtest` | L197 | ✅ |
-| `--source reddit` | L208 | ✅ |
-| `--model [textblob|finbert|finbert-wsb|gpt4|combined]` | L201-206 | ✅ |
-| `--ranking [mentions|sentiment]` | L214 (`choices=["mentions","ratio"]`) | ❌ **불일치** |
-| `--sizing [equal|sentiment|volatility]` | L220 | ✅ |
-| `--from`, `--to` | L224, L230 | ✅ |
-| `--run-now` | L182 | ✅ |
-| `--reddit-run-now` | L237 | ✅ |
+> **Critical 없음**: 이전 G1(`--ranking`)은 ARCHITECTURE.md 예제대로 호출 시 argparse가 거부하지만, 실제 운영은 `ratio`를 사용 중이라 코드 동작에는 영향 없음 → Important로 하향. 모든 Gap이 문서 측이며 코드 측 결함은 0건.
 
 ---
 
-## 4. Gap List (Severity 정렬)
+## 4. Match Rate
 
-| ID | Severity | Category | Description | Evidence | Suggested Fix |
-|----|----------|----------|-------------|----------|---------------|
-| G1 | **Critical** | Contract / CLI | `--ranking` 명세("sentiment") ≠ 실제("ratio"). ARCHITECTURE.md §6 예제 그대로 호출 시 argparse 거부. confidence 100% | ARCHITECTURE.md:163 vs main.py:214 | ARCHITECTURE.md를 `ratio`로 수정하거나 argparse `choices`에 `sentiment` 별칭 추가 |
-| G2 | **Important** | Structural drift | Reddit subreddit 명세(3) ≠ 실제(6). `options/StockMarket/thetagang` 추가됨 | ARCHITECTURE.md:21,117 vs config.py:26-29 | §2/§5 다이어그램·텍스트 갱신 |
-| G3 | **Important** | Documentation 모호성 | §4 "FinBERT Neutral 필터: positive_ratio >= 0.80" 표현 모호. 실제 구현은 `neutral_score >= 0.80` 기사 제외. confidence 90% | ARCHITECTURE.md:110 vs sentiment_provider.py:184 | "기사별 neutral_score ≥ 0.80인 기사 제외"로 명확화 |
-| G4 | **Important** | Doc/Status drift | §8 `wsb-signal-v3` archive 경로 표기됐으나 plan/design은 `01-plan`/`02-design`에 잔존, archive 폴더 없음 | ARCHITECTURE.md:219 vs Glob 결과 | `/pdca archive wsb-signal-v3` 실행 |
-| G5 | **Important** | Documentation drift | wsb-daily-comments PDCA(plan + analysis 2건) §8 누락 | docs/01-plan/features/wsb-daily-comments.plan.md 등 | §8에 행 추가 |
-| G6 | Minor | Naming | §2 `wsb_preprocessor.preprocess()` → 실제 `preprocess_post()` | ARCHITECTURE.md:45 vs sentiment_provider.py:145 | §2 진입점명 정정 |
-| G7 | Minor | Naming | §2 `reddit_collector.collect_wsb_posts()` → 실제 `RedditCollector.collect()` | ARCHITECTURE.md:47 | §2 정정 |
-| G8 | Minor | Functional | `combined` Provider Reddit Backtest 차단(main.py:81). 의도된 설계라면 §4에 명시 권장 | main.py:81 | §4 `combined` 행에 "뉴스 모드 전용" 주석 |
-| G9 | Minor | Test coverage | `tests/` 디렉토리 또는 `test_*.py` 파일 부재 — 회귀 검증 자동화 불가 | Glob 결과 | 핵심 모듈에 unit test 도입 |
+```
+정적 분석 (런타임 미실행 — Python 프로젝트, 서버 없음):
+Overall = (Structural × 0.2) + (Functional × 0.4) + (Contract × 0.4)
+        = (90 × 0.2) + (85 × 0.4) + (80 × 0.4)
+        = 18.0 + 34.0 + 32.0
+        = 84.0%
+```
 
----
-
-## 5. Runtime Verification Plan
-
-### L1 — Unit Test 후보 (pytest 권장)
-
-| # | 대상 | 시나리오 | 기대 |
-|---|------|---------|------|
-| 1 | `signals.determine_signal` | (rsi=25, sent=75) | "STRONG_BUY" |
-| 2 | 〃 | (rsi=75, sent=25) | "STRONG_SELL" |
-| 3 | 〃 | (rsi=45, sent=55) | "NEUTRAL" |
-| 4 | 〃 | (rsi=35, sent=60) | "BUY" |
-| 5 | `market_filter.apply_market_filter` | ("STRONG_BUY", mkt_rsi=80) | "BUY" 다운그레이드 |
-| 6 | 〃 | ("BUY", mkt_rsi=25) | "NEUTRAL" |
-| 7 | `_determine_signal_v3` | (score=72, rsi=25, "NORMAL") | "STRONG_BUY" |
-| 8 | 〃 | (score=72, rsi=25, "DECLINING") | "NEUTRAL" |
-| 9 | 〃 | (score=66, rsi=25, "HIGH_MOMENTUM") | "STRONG_BUY" |
-| 10 | `_apply_neutral_filter` | bullish=2,bearish=2,neutral=10 | NEUTRAL 강제 |
-| 11 | `_apply_velocity` | 신규 mentions=25 | "NEW_SPIKE" |
-| 12 | 〃 | 신규 mentions=10 | "NEW_IGNORE" |
-| 13 | `check_exit` | gap=-6%, rsi=50, pnl=-2% | (True, "gap_down") |
-
-### L2 — 통합 시나리오 (cached fixture / dry-run)
-
-1. `python main.py --backtest --model finbert` → BacktestResult 생성
-2. `python main.py --backtest --source reddit --model finbert --ranking mentions --sizing equal --from 2026-04-17 --to 2026-04-22` → 12전략 replay
-3. `python main.py --run-now` → `data/signals.json` 생성
-
-### L3 — E2E (외부 API mock 권장)
-
-1. 스케줄러 → 신호생성 → 주문처리 전체 흐름 (collector mock)
-2. Reddit Forward Testing 1일 사이클 (PRAW MockReddit)
-3. check_exit 5단계 우선순위 회귀 테스트 (OHLCV fixture)
+| 축 | 2026-05-02 | 2026-05-17 | 변화 |
+|----|-----------|-----------|------|
+| Structural | 100% | 90% | ▼ 신규 모듈 미문서화 |
+| Functional | 96% | 85% | ▼ KIS 디스패처 계층 미반영 |
+| Contract | 88% | 80% | ▼ KIS 상수·CLI 미문서화 + G1 잔존 |
+| **Overall** | **94%** | **84%** | **▼ 10%p — 전량 문서 드리프트** |
 
 ---
 
-## 6. Recommended Next Action
+## 5. 결론 및 권장
 
-**Overall 94% ≥ 90% — 동기화 양호.** 코드 측 결함은 사실상 없고, 모든 gap은 **문서 측(ARCHITECTURE.md) drift**입니다.
+**Overall 84% (<90%)** — 단, **하락분 전체가 ARCHITECTURE.md 드리프트**이며 코드 결함은 0건입니다.
+`kis-paper-trading`은 별도 PDCA로 96.8% 검증·Report까지 완료됐고, 기존 코어는 무변경입니다.
 
-### 단기 권장 (문서 sync)
+이 Check에서 90% 미달의 의미는 "코드를 고쳐라"가 아니라 **"설계 프록시(ARCHITECTURE.md)를 코드에 맞춰 동기화하라"**입니다.
 
-1. **G1 (Critical)** — ARCHITECTURE.md §6의 `--ranking` 옵션을 `[mentions|ratio]`로 수정
-2. **G2 (Important)** — §2/§5 Reddit subreddit 6개로 갱신
-3. **G3 (Important)** — §4 Neutral 필터 문구 명확화
-4. **G4 (Important)** — `wsb-signal-v3` archive 정리 또는 §8 갱신
-5. **G5 (Important)** — `wsb-daily-comments` §8 행 추가
+### 권장 Act (iterate = ARCHITECTURE.md 문서 sync)
 
-### 중장기 권장
+1. G1 — §2에 `kis_broker.py`·`signal_provider.py` 추가
+2. G2 — §1 다이어그램·§3 파이프라인에 KIS 위임 + `SIGNAL_ENGINE` 디스패처 반영
+3. G3 — §7에 KIS 상수 9개 + `SIGNAL_ENGINE` 표 추가
+4. G4 — §8에 `kis-paper-trading` 행 추가, "마지막 업데이트" 2026-05-17로 갱신
+5. G5 — §6 `--ranking`을 `ratio`로 수정 (이전 분석 잔존 항목)
+6. G6/G7 — §6 CLI 보강 + 이전 분석 잔존 G3/G5/G6/G7 일괄 정리
 
-6. **G9** — `tests/` 디렉토리 신설, L1 단위 테스트 13건 도입
-7. auto_stock 정식 PDCA 문서 부재 — Living Document 정책 유지하되, 큰 리팩토링 시 `/pdca plan auto_stock` 가이드 적용
-
-### Flow
-
-- `/pdca iterate` 불필요 (94% — 코드 결함 없음)
-- ARCHITECTURE.md sync 후 `/pdca report` 형식 협의 (정식 plan/design 부재로 일반 report 템플릿 부적합. ARCHITECTURE.md + CHANGELOG가 더 적합할 수 있음)
+→ 위 6건 적용 시 Contract·Structural·Functional 모두 회복되어 Overall 95%+ 예상.
+**코드 변경 불필요** — `/pdca iterate`는 문서 수정만 수행.

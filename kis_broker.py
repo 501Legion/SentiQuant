@@ -89,8 +89,12 @@ _ORDER_RETRY_COUNT = 1
 # 모의투자 tr_id (KIS Developers 포털 — 해외주식주문/잔고/시세)
 _TR_ID_BUY_PAPER = "VTTT1002U"        # 미국주식 매수 — 모의
 _TR_ID_SELL_PAPER = "VTTT1001U"       # 미국주식 매도 — 모의
-_TR_ID_BALANCE_PAPER = "VTTS3012R"    # 미국주식 잔고 — 모의
+_TR_ID_BALANCE_PAPER = "VTTS3012R"    # 미국주식 잔고(보유종목) — 모의
+_TR_ID_PSAMOUNT_PAPER = "VTTS3007R"   # 미국주식 매수가능금액(가용현금) — 모의
 _TR_ID_QUOTE = "HHDFS00000300"        # 해외주식 현재가 (실전/모의 공통)
+
+# 같은 토큰으로 KIS는 "초당 거래건수" 제한 → 연속 호출 사이 짧은 sleep
+_INTER_CALL_DELAY_SECONDS = 1.1
 
 # 거래소 코드 (해외주식 미국 시장)
 # NAS=나스닥, NYS=뉴욕, AMS=아멕스. 종목별로 다름 — config.SYMBOLS 기본은 NASDAQ.
@@ -143,6 +147,9 @@ class KISBroker:
                 f"[KIS] KIS_ACCOUNT_NO product code missing - assuming '{account_no}-01'. "
                 f"If errors occur, specify 'NNNNNNNN-XX' format in .env"
             )
+
+        # KIS API '초당 거래건수' 회피용 last-call timestamp (EGW00201)
+        self._last_call_ts: float = 0.0
 
     # -------------------------------------------------------------------------
     # connect — Plan SC-01, SC-11
@@ -250,13 +257,22 @@ class KISBroker:
             "custtype": "P",  # 개인
         }
 
+    def _throttle(self) -> None:
+        """KIS '초당 거래건수 초과(EGW00201)' 회피 — 마지막 호출로부터 일정 간격 보장."""
+        elapsed = time.time() - self._last_call_ts
+        if elapsed < _INTER_CALL_DELAY_SECONDS:
+            time.sleep(_INTER_CALL_DELAY_SECONDS - elapsed)
+        self._last_call_ts = time.time()
+
     def _get(self, path: str, tr_id: str, params: dict[str, Any]) -> dict:
+        self._throttle()
         headers = self._auth_headers(tr_id)
         url = f"{self._base_url}{path}"
         resp = requests.get(url, headers=headers, params=params, timeout=config.REQUEST_TIMEOUT)
         return self._parse_response(resp, f"GET {path}")
 
     def _post(self, path: str, tr_id: str, body: dict[str, Any]) -> dict:
+        self._throttle()
         headers = self._auth_headers(tr_id)
         url = f"{self._base_url}{path}"
         resp = requests.post(url, headers=headers, json=body, timeout=config.REQUEST_TIMEOUT)
@@ -363,7 +379,24 @@ class KISBroker:
     # -------------------------------------------------------------------------
 
     def get_account(self) -> AccountSnapshot:
-        """KIS 해외주식 잔고 — Source of Truth (Design §1.2)."""
+        """KIS 해외주식 잔고 — Source of Truth (Design §1.2).
+
+        KIS는 잔고와 가용현금을 별도 endpoint로 분리 제공:
+          - inquire-balance: 보유종목 + 평가손익
+          - inquire-psamount: 외화 가용현금 (USD 예수금)
+        두 호출 사이 ~1초 spacing으로 'EGW00201 초당 거래건수' 회피.
+        """
+        # 두 API 모두 _throttle()이 자동 spacing 처리 (EGW00201 회피)
+        positions = self._fetch_positions()
+        cash_usd = self._fetch_buyable_cash()
+        return AccountSnapshot(
+            cash_usd=cash_usd,
+            positions=positions,
+            updated_at=_now_iso(),
+        )
+
+    def _fetch_positions(self) -> dict[str, PositionSnapshot]:
+        """해외주식 잔고조회 — 보유종목만."""
         params = {
             "CANO": self._cano,
             "ACNT_PRDT_CD": self._acnt_prdt_cd,
@@ -377,15 +410,6 @@ class KISBroker:
             _TR_ID_BALANCE_PAPER,
             params,
         )
-
-        # output1: 보유종목 리스트, output2: 외화예수금/평가금액 요약
-        output2 = data.get("output2", {}) or {}
-        cash_usd = float(
-            output2.get("frcr_dncl_amt1", 0)        # 외화예수금
-            or output2.get("frcr_evlu_amt2", 0)
-            or 0.0
-        )
-
         positions: dict[str, PositionSnapshot] = {}
         for row in data.get("output1", []) or []:
             sym = str(row.get("ovrs_pdno", "") or row.get("pdno", ""))
@@ -399,11 +423,27 @@ class KISBroker:
                 avg_price=float(row.get("pchs_avg_pric", 0) or 0),
                 current_price=float(row.get("now_pric2", 0) or row.get("ovrs_now_pric1", 0) or 0),
             )
+        return positions
 
-        return AccountSnapshot(
-            cash_usd=cash_usd,
-            positions=positions,
-            updated_at=_now_iso(),
+    def _fetch_buyable_cash(self) -> float:
+        """해외주식 매수가능금액조회 — USD 가용현금. ITEM_CD는 임의 종목(결과는 종목 무관)."""
+        params = {
+            "CANO": self._cano,
+            "ACNT_PRDT_CD": self._acnt_prdt_cd,
+            "OVRS_EXCG_CD": _DEFAULT_EXCHANGE,
+            "OVRS_ORD_UNPR": "0",
+            "ITEM_CD": "AAPL",
+        }
+        data = self._get(
+            "/uapi/overseas-stock/v1/trading/inquire-psamount",
+            _TR_ID_PSAMOUNT_PAPER,
+            params,
+        )
+        out = data.get("output", {}) or {}
+        return float(
+            out.get("ord_psbl_frcr_amt", 0)
+            or out.get("ovrs_ord_psbl_amt", 0)
+            or 0.0
         )
 
     # -------------------------------------------------------------------------
@@ -476,12 +516,8 @@ class KISBroker:
         raise RuntimeError("KIS 종목 마스터 직접 조회 미구현 — 폴백 경로 사용")
 
     def _load_symbols_cache(self, allow_stale: bool = False) -> list[str] | None:
-        if not self._symbols_cache_path.exists():
-            return None
-        try:
-            data = json.loads(self._symbols_cache_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as e:
-            logger.warning(f"[KIS] 종목 캐시 읽기 실패: {e}")
+        data = _read_symbols_cache(self._symbols_cache_path)
+        if data is None:
             return None
 
         if not allow_stale:
@@ -522,9 +558,40 @@ def get_broker() -> Broker:
     )
 
 
+def load_cached_tradable_symbols() -> list[str] | None:
+    """data/kis_symbols.json 캐시에서 매매 가능 종목 목록을 읽는다.
+
+    Plan FR-14: signals 디스패처가 SYMBOLS ∩ tradable 필터링에 사용한다.
+    Broker 인스턴스/토큰 없이 캐시 파일만 읽으므로 app.py 등 어디서나 호출 가능.
+
+    Returns:
+        매매 가능 종목 list — 캐시 미존재/손상/빈 목록이면 None (호출자는 무필터 폴백)
+    """
+    data = _read_symbols_cache(Path(config.KIS_SYMBOLS_FILE))
+    if data is None:
+        return None
+    tradable = data.get("tradable", [])
+    return list(tradable) if tradable else None
+
+
 # =============================================================================
 # Helpers
 # =============================================================================
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _read_symbols_cache(path: Path) -> dict | None:
+    """종목 캐시 파일을 읽어 JSON dict로 반환. 미존재/손상 시 None.
+
+    KISBroker._load_symbols_cache(만료 검사 포함)와 load_cached_tradable_symbols
+    (broker 불필요)가 공유하는 파일 I/O 레이어.
+    """
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        logger.warning(f"[KIS] 종목 캐시 읽기 실패: {e}")
+        return None

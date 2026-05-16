@@ -97,5 +97,14 @@
     "agentId": "a07e554668d39d39d",
     "agentType": null,
     "message": ""
+  },
+  {
+    "timestamp": "2026-05-16T09:42:05.628Z",
+    "errorType": "unknown",
+    "category": "unknown",
+    "severity": "low",
+    "agentId": null,
+    "agentType": null,
+    "message": ""
   }
 ]
