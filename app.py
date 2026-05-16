@@ -107,6 +107,27 @@ def run_signals_now():
             return True, "신호 계산 완료"
         return False, "신호 계산 실패"
 
+def profit_class(value):
+    if value > 0:
+        return "profit-pos"
+    if value < 0:
+        return "profit-neg"
+    return "profit-flat"
+
+def format_signed_money(value, decimals=2):
+    if value == 0:
+        sign = ""
+    else:
+        sign = "+" if value > 0 else "-"
+    return f"{sign}${abs(value):,.{decimals}f}"
+
+def format_signed_percent(value):
+    if value == 0:
+        sign = ""
+    else:
+        sign = "+" if value > 0 else "-"
+    return f"{sign}{abs(value):.2f}%"
+
 def main():
     # --- Custom CSS for Layout & Cards ---
     st.markdown("""
@@ -128,7 +149,8 @@ def main():
             transition: 0.3s;
         }
         .profit-pos { color: #2962ff; font-weight: bold; }
-        .profit-neg { color: #212121; font-weight: bold; }
+        .profit-neg { color: #d32f2f; font-weight: bold; }
+        .profit-flat { color: #616161; font-weight: bold; }
         .sub-text { color: #757575; font-size: 0.75rem; }
         .price-large { font-size: 2rem; font-weight: bold; }
         </style>
@@ -151,12 +173,13 @@ def main():
     for sym, pos in port.positions.items():
         p = current_prices.get(sym, pos.avg_price)
         total_unrealized_profit += (p - pos.avg_price) * pos.shares
+    total_profit_class = profit_class(total_unrealized_profit)
         
     with col_total_info:
         st.markdown(f"""
             <div style='text-align: right;'>
                 <span class='sub-text'>총 미실현 수익</span><br>
-                <h3 class='profit-pos'>+${total_unrealized_profit:,.2f}</h3>
+                <h3 class='{total_profit_class}'>{format_signed_money(total_unrealized_profit)}</h3>
                 <span class='sub-text'>UTC {datetime.now().strftime('%H:%M:%S')}</span>
             </div>
         """, unsafe_allow_html=True)
@@ -173,14 +196,14 @@ def main():
             pos = port.positions[sym]
             p = current_prices.get(sym, pos.avg_price)
             profit = (p - pos.avg_price) * pos.shares
-            p_class = "profit-pos" if profit >= 0 else "profit-neg"
+            p_class = profit_class(profit)
             
             with card_cols[i % 5]:
                 is_selected = (sym == st.session_state["selected_symbol"])
                 bg_color = "#eef4ff" if is_selected else "#ffffff"
                 border_color = "#2962ff" if is_selected else "#e0e0e0"
                 
-                if st.button(f"{sym}", key=f"btn_{sym}", use_container_width=True):
+                if st.button(f"{sym}", key=f"btn_{sym}", width="stretch"):
                     st.session_state["selected_symbol"] = sym
                     st.rerun()
                 
@@ -188,7 +211,7 @@ def main():
                     <div style='background-color: {bg_color}; border: 1px solid {border_color}; padding: 8px; border-radius: 4px;'>
                         <div class='sub-text' style='font-weight: bold;'>{sym}.US</div>
                         <div style='font-size: 0.85rem; margin-bottom: 5px;'>{config.COMPANY_NAMES.get(sym, sym)}</div>
-                        <div class='{p_class}' style='font-size: 1.1rem;'>{profit:+.0f}</div>
+                        <div class='{p_class}' style='font-size: 1.1rem;'>{format_signed_money(profit, 0)}</div>
                         <div style='text-align: right; font-size: 0.7rem; color: #9e9e9e;'>{pos.shares:,} sh</div>
                     </div>
                 """, unsafe_allow_html=True)
@@ -202,6 +225,11 @@ def main():
     if sel_sym and sel_sym in port.positions:
         pos = port.positions[sel_sym]
         price = current_prices.get(sel_sym, pos.avg_price)
+        price_delta = price - pos.avg_price
+        price_delta_rate = (price_delta / pos.avg_price * 100) if pos.avg_price else 0
+        selected_profit = price_delta * pos.shares
+        selected_profit_rate = price_delta_rate
+        selected_profit_class = profit_class(selected_profit)
         
         col_main, col_side = st.columns([2.2, 0.8])
         
@@ -216,12 +244,12 @@ def main():
                     <div style='text-align: right;'>
                         <span class='sub-text'>현재 가격</span><br>
                         <span class='price-large'>{price:,.2f}</span><br>
-                        <span class='profit-pos'>+1.24 (0.67%)</span>
+                        <span class='{profit_class(price_delta)}'>{format_signed_money(price_delta)} ({format_signed_percent(price_delta_rate)})</span>
                     </div>
                 """, unsafe_allow_html=True)
             
             chart_data = pd.DataFrame(np.random.randn(40, 1), columns=['Price'])
-            st.bar_chart(chart_data, height=220, use_container_width=True)
+            st.bar_chart(chart_data, height=220, width="stretch")
             
             m_col1, m_col2, m_col3 = st.columns(3)
             with m_col1:
@@ -232,14 +260,13 @@ def main():
                 st.subheader(f"${pos.avg_price:,.2f}")
             with m_col3:
                 st.write("미실현 수익")
-                prof = (price - pos.avg_price) * pos.shares
-                st.markdown(f"<h3 class='profit-pos'>+${prof:,.2f}</h3>", unsafe_allow_html=True)
+                st.markdown(f"<h3 class='{selected_profit_class}'>{format_signed_money(selected_profit)}</h3>", unsafe_allow_html=True)
             
             st.divider()
             st.write(f"{sel_sym} 최근 거래")
             trades = load_trades()
             if not trades.empty:
-                st.dataframe(trades[trades['symbol'] == sel_sym].head(5), use_container_width=True)
+                st.dataframe(trades[trades['symbol'] == sel_sym].head(5), width="stretch")
 
         with col_side:
             st.markdown(f"""
@@ -255,7 +282,7 @@ def main():
                     </div>
                     <div style='margin-bottom: 25px;'>
                         <span class='sub-text'>수익률</span><br>
-                        <span style='font-size: 1.6rem; font-weight: bold; color: #2962ff;'>+{(price - pos.avg_price) / pos.avg_price * 100:.2f}%</span>
+                        <span class='{profit_class(selected_profit_rate)}' style='font-size: 1.6rem;'>{format_signed_percent(selected_profit_rate)}</span>
                     </div>
                     <hr style='border-top: 1px solid #eee;'>
                     <div style='text-align: right; display: flex; align-items: center; justify-content: flex-end;'>
@@ -266,11 +293,11 @@ def main():
             """, unsafe_allow_html=True)
             
             st.write("")
-            if st.button("현재가 새로고침", use_container_width=True):
+            if st.button("현재가 새로고침", width="stretch"):
                 st.session_state["current_prices"] = get_current_prices(port.positions.keys())
                 st.rerun()
             
-            if st.button("실시간 신호 갱신", use_container_width=True):
+            if st.button("실시간 신호 갱신", width="stretch"):
                 run_signals_now()
                 st.rerun()
 
@@ -282,7 +309,7 @@ def main():
     if not all_trades.empty:
         st.dataframe(
             all_trades.sort_values("date", ascending=False),
-            use_container_width=True
+            width="stretch"
         )
     else:
         st.info("거래 내역이 없습니다.")
