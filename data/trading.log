@@ -6640,3 +6640,16 @@ ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.i
 2026-05-15 23:21:04,077 [INFO] reddit_collector: 유효 종목: 46/62개 -['MSFT', 'NVDA', 'AMZN', 'META', 'TSLA', 'SOFI', 'HOOD', 'AMD', 'GOOGL', 'VRT', 'RKLB', 'RDDT', 'INTC', 'SNDK', 'EOD', 'DRAM', 'USA', 'AAPL', 'NBIS', 'ASTS', 'F', 'LYFT', 'FIG', 'SOXS', 'GPRO', 'ORCL', 'GDC', 'PZZA', 'WOLF', 'UPST', 'POET', 'WAY', 'OUT', 'HAS', 'BACK', 'OPEX', 'GLP', 'QQQM', 'SMH', 'CBRS', 'CME', 'IRS', 'CVNA', 'STX', 'PAAS', 'ABAT']
 2026-05-15 23:21:04,080 [INFO] reddit_collector: wsb_posts.json 저장 완료: data/reddit\2026-05-15\wsb_posts.json (46개 종목)
 2026-05-15 23:21:04,081 [INFO] __main__: [Reddit] 수집 완료: 46개 종목 → data/reddit/2026-05-15/wsb_posts.json 저장
+2026-05-16 12:50:57,458 [INFO] __main__: 즉시 주문 처리 실행 (DRY-RUN)
+2026-05-16 12:50:57,461 [INFO] scheduler: === 주문 처리 잡 시작 (09:35 ET, DRY-RUN) ===
+2026-05-16 12:50:57,611 [INFO] portfolio: 포트폴리오 로드 완료 (현금=$51,515.20, 보유종목=3개)
+2026-05-16 12:50:59,584 [INFO] trader: [KIS] 잔고 조회: cash=$100,000.00, positions=0개
+2026-05-16 12:50:59,584 [INFO] trader: [AAPL] 주문 처리 시작 (신호=NEUTRAL)
+2026-05-16 12:50:59,920 [WARNING] kis_broker: [KIS] AAPL 현재가 조회 실패: [KIS] GET /uapi/overseas-price/v1/quotations/price HTTP 500: {"rt_cd":"1","msg1":"초당 거래건수를 초과하였습니다.","msg_cd":"EGW00201","message":"EGW00201"}
+2026-05-16 12:51:00,925 [INFO] collector: [AAPL] OHLCV 4일치 수집 완료
+2026-05-16 12:51:00,926 [INFO] collector: [AAPL] 최근 시가: $299.82
+2026-05-16 12:51:01,674 [INFO] scheduler: 주문 처리 완료: 0건 체결 (DRY-RUN)
+2026-05-16 12:51:01,675 [INFO] scheduler: === 주문 처리 잡 완료 (DRY-RUN) ===
+2026-05-16 13:15:27,278 [INFO] __main__: 즉시 주문 처리 실행 (DRY-RUN)
+2026-05-16 13:15:27,279 [INFO] scheduler: === 주문 처리 잡 시작 (09:35 ET, DRY-RUN) ===
+2026-05-16 13:15:27,419 [INFO] scheduler: 오늘은 NYSE 휴장일 — 주문 처리 잡 스킵

@@ -33,6 +33,9 @@ class Trade:
     amount: float          # price * shares
     net_profit_pct: float  # 매도 시 순수익률 (매수 시 0.0)
     net_profit_usd: float  # 매도 시 순수익 USD (매수 시 0.0)
+    # Plan FR-19: KIS 모의투자 주문 추적용. 백테스팅/non-KIS 경로에서는 None.
+    order_no: str | None = None
+    kis_status: str | None = None  # "FILLED" | "REJECTED" | None
 
 
 @dataclass
@@ -95,25 +98,61 @@ def save_portfolio(portfolio: Portfolio) -> None:
         logger.error(f"포트폴리오 저장 실패: {e}")
 
 
+_TRADES_FIELDNAMES = [
+    "date", "symbol", "action", "signal", "price",
+    "shares", "amount", "net_profit_pct", "net_profit_usd",
+    # Plan FR-19: KIS 모의투자 주문 추적
+    "order_no", "kis_status",
+]
+
+
 def record_trade(trade: Trade) -> None:
     """
     trades.csv에 거래 이력을 한 행 추가한다 (append 모드).
     파일이 없으면 헤더를 먼저 생성한다.
+    헤더가 기존 형식(9컬럼)이면 자동 백업 후 신규 헤더(11컬럼)로 재시작 (FR-19 마이그레이션).
     """
     os.makedirs(config.DATA_DIR, exist_ok=True)
-    fieldnames = [
-        "date", "symbol", "action", "signal", "price",
-        "shares", "amount", "net_profit_pct", "net_profit_usd",
-    ]
-    file_exists = os.path.exists(config.TRADES_FILE)
+    write_header = _ensure_trades_header_current()
     try:
         with open(config.TRADES_FILE, "a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            if not file_exists:
+            writer = csv.DictWriter(
+                f, fieldnames=_TRADES_FIELDNAMES, extrasaction="ignore"
+            )
+            if write_header:
                 writer.writeheader()
             writer.writerow(asdict(trade))
     except Exception as e:
         logger.error(f"거래 이력 저장 실패: {e}")
+
+
+def _ensure_trades_header_current() -> bool:
+    """trades.csv 헤더가 신규 스키마와 일치하는지 확인.
+    불일치 시 .bak 백업 후 신규 파일 생성 트리거. 반환값=헤더 작성 필요 여부.
+    """
+    if not os.path.exists(config.TRADES_FILE):
+        return True
+    try:
+        with open(config.TRADES_FILE, "r", encoding="utf-8") as f:
+            first_line = f.readline().strip()
+        if not first_line:
+            return True
+        existing = [c.strip() for c in first_line.split(",")]
+        if existing == _TRADES_FIELDNAMES:
+            return False
+        # 헤더 불일치 → 백업 후 신규 시작
+        backup_path = config.TRADES_FILE + ".bak"
+        if os.path.exists(backup_path):
+            # 기존 백업이 있으면 타임스탬프 붙여 중복 회피
+            backup_path = f"{config.TRADES_FILE}.{datetime.now().strftime('%Y%m%d%H%M%S')}.bak"
+        os.rename(config.TRADES_FILE, backup_path)
+        logger.warning(
+            f"[trades.csv] 헤더 마이그레이션 — 기존 파일을 {backup_path}로 백업 후 신규 헤더(FR-19) 시작"
+        )
+        return True
+    except Exception as e:
+        logger.error(f"trades.csv 헤더 확인 실패: {e} — 헤더 작성 진행")
+        return True
 
 
 def save_signals(signals: dict) -> None:
@@ -175,6 +214,32 @@ def apply_sell(portfolio: Portfolio, trade: Trade) -> None:
     portfolio.cash += trade.price * trade.shares
     if trade.symbol in portfolio.positions:
         del portfolio.positions[trade.symbol]
+
+
+# ---------- KIS 동기화 (Plan FR-11~13, Design §3.4) ----------
+
+def sync_from_kis(portfolio: Portfolio, broker) -> Portfolio:
+    """KIS 계좌 잔고를 Source of Truth로 Portfolio 객체 재구성.
+
+    Plan FR-11: KIS 계좌를 권위로 사용해 portfolio.json은 캐시로 격하.
+    buy_date 보존 정책 (Q1=a): KIS는 매수일을 알려주지 않으므로 기존 portfolio의
+      buy_date를 보존한다. 신규 종목은 now()를 사용 (14일 보유 룰 영향 최소).
+    """
+    snap = broker.get_account()
+    new_positions: dict[str, Position] = {}
+    now_iso = datetime.now().isoformat()
+    for symbol, p in snap.positions.items():
+        prior = portfolio.positions.get(symbol)
+        # KIS는 정확한 shares/avg_price를 알지만 buy_date는 모름 → 기존 보존
+        buy_date = prior.buy_date if prior else now_iso
+        new_positions[symbol] = Position(
+            symbol=symbol,
+            shares=p.shares,
+            avg_price=p.avg_price,
+            buy_date=buy_date,
+            total_cost=p.avg_price * p.shares,
+        )
+    return Portfolio(cash=snap.cash_usd, positions=new_positions)
 
 
 # ---------- 리포트 출력 ----------

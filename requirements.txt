@@ -17,3 +17,4 @@ torch>=2.2.0
 streamlit>=1.30.0
 watchdog>=3.0.0
 # KIS 모의투자: requests로 직접 OpenAPI 호출 (python-kis 미사용 — 실전 키 강제 요구 회피)
+pytest>=8.0.0   # 단위 테스트 (tests/test_kis_paper_trading.py)

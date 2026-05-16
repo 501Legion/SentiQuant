@@ -13,6 +13,7 @@ import config
 import collector
 import signals as sig_module
 import trader
+from kis_broker import get_broker
 from portfolio import (
     load_portfolio,
     load_signals,
@@ -20,6 +21,7 @@ from portfolio import (
     record_trade,
     save_portfolio,
     save_signals,
+    sync_from_kis,
 )
 
 logger = logging.getLogger(__name__)
@@ -53,6 +55,13 @@ def signal_calculation_job() -> None:
         return
 
     try:
+        # FR-14/SC-06: KIS 매매 가능 종목 마스터 갱신 — data/kis_symbols.json 캐시 생성/갱신.
+        # 신호 생성 시 generate_signals_for_all이 이 캐시로 종목을 필터링한다.
+        try:
+            get_broker().get_tradable_symbols()
+        except Exception as e:
+            logger.warning(f"[KIS] 종목 마스터 갱신 실패 — 기존 캐시/무필터로 진행: {e}")
+
         signals = sig_module.generate_signals_for_all(config.SYMBOLS)
         if signals:
             save_signals(signals)
@@ -66,15 +75,19 @@ def signal_calculation_job() -> None:
     logger.info("=== 신호 계산 잡 완료 ===")
 
 
-def order_processing_job() -> None:
+def order_processing_job(dry_run: bool = False) -> None:
     """
-    매일 09:35 ET 실행.
+    매일 09:35 ET 실행. Plan FR-05~07, FR-11~13, FR-20.
     1. NYSE 휴장일 체크
     2. 전날 신호 로드
-    3. 오늘 시가 기반 가상 주문 처리
-    4. 포트폴리오 저장 및 리포트 출력
+    3. KIS Broker 인스턴스화 + connect
+    4. trader.process_orders로 KIS에 주문 위임 (dry_run 옵션)
+    5. portfolio = sync_from_kis(broker) — Source of Truth 갱신
+    6. 캐시 저장 (save_portfolio) + 거래 이력 기록
+    7. 리포트 출력
     """
-    logger.info("=== 주문 처리 잡 시작 (09:35 ET) ===")
+    label = "DRY-RUN" if dry_run else "LIVE"
+    logger.info(f"=== 주문 처리 잡 시작 (09:35 ET, {label}) ===")
 
     if not is_trading_day():
         logger.info("오늘은 NYSE 휴장일 — 주문 처리 잡 스킵")
@@ -87,34 +100,51 @@ def order_processing_job() -> None:
             logger.warning("신호 없음 — 주문 처리 스킵 (전날 신호 계산이 실행됐는지 확인)")
             return
 
-        # 포트폴리오 로드
+        # 포트폴리오 캐시 로드 (buy_date 등 비즈니스 룰 추적용)
         portfolio = load_portfolio()
 
-        # 가상 주문 처리
-        trades = trader.process_orders(signals, portfolio)
+        # KIS Broker 인스턴스화 + 토큰 발급. 실패 시 잡 중단 (graceful degradation: 캐시는 그대로)
+        try:
+            broker = get_broker()
+            broker.connect()
+        except Exception as e:
+            logger.error(f"[KIS] Broker 초기화 실패 — 주문 처리 중단: {e}", exc_info=True)
+            return
 
-        # 체결된 거래 저장
+        # KIS Adapter로 주문 위임 (Plan SC-03)
+        trades = trader.process_orders(signals, portfolio, broker, dry_run=dry_run)
+
+        # 체결된 거래 기록 (FR-19: order_no/kis_status 포함)
         for trade in trades:
             record_trade(trade)
 
-        # 포트폴리오 저장
-        save_portfolio(portfolio)
+        # Plan FR-11~13, SC-10: KIS 계좌를 Source of Truth로 portfolio.json 갱신
+        # dry_run 시에는 실제 체결이 없으므로 sync도 skip (캐시 유지)
+        if not dry_run:
+            try:
+                portfolio = sync_from_kis(portfolio, broker)
+                save_portfolio(portfolio)
+            except Exception as e:
+                logger.warning(f"[KIS] sync_from_kis 실패 — 캐시 유지: {e}")
 
         # 현재가 수집 (리포트용, 실패해도 무방)
         current_prices = {}
         for symbol in portfolio.positions:
-            price = collector.get_latest_open_price(symbol)
-            if price:
-                current_prices[symbol] = price
+            try:
+                current_prices[symbol] = broker.get_quote(symbol)
+            except Exception:
+                # 폴백: collector
+                price = collector.get_latest_open_price(symbol)
+                if price:
+                    current_prices[symbol] = price
 
-        # 리포트 출력
         print_portfolio_report(portfolio, current_prices)
-        logger.info(f"주문 처리 완료: {len(trades)}건 체결")
+        logger.info(f"주문 처리 완료: {len(trades)}건 체결 ({label})")
 
     except Exception as e:
         logger.error(f"주문 처리 잡 실패: {e}", exc_info=True)
 
-    logger.info("=== 주문 처리 잡 완료 ===")
+    logger.info(f"=== 주문 처리 잡 완료 ({label}) ===")
 
 
 def start_scheduler() -> None:
