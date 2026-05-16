@@ -1,1005 +1,2007 @@
 {
-  "date": "2026-04-06",
-  "AAPL": [
+  "date": "2026-05-16",
+  "NVDA": [
     {
-      "title": "A Crude Awakening For the Global Economy",
+      "title": "Stock Market Today: Dow, Nasdaq Drop As Oil Prices, Yields Jump; Nvidia, Cerebras Slide (Live Coverage)",
       "finbert_label": "negative",
       "scores": {
-        "positive": 0.0138,
-        "negative": 0.9248,
-        "neutral": 0.0614
+        "positive": 0.0074,
+        "negative": 0.9517,
+        "neutral": 0.0409
       },
       "included": true
     },
     {
-      "title": "Foxconn Q1 revenue jumps 30% on AI tailwinds; cautions on Middle East \"volatility\"",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.945,
-        "negative": 0.0329,
-        "neutral": 0.0221
-      },
-      "included": true
-    },
-    {
-      "title": "Nvidia Partner Hon Hai’s Sales Meet Estimates on Solid AI Demand",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.9455,
-        "negative": 0.0334,
-        "neutral": 0.0211
-      },
-      "included": true
-    },
-    {
-      "title": "Foxconn first-quarter revenue jumps 30% y/y",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.9385,
-        "negative": 0.0389,
-        "neutral": 0.0226
-      },
-      "included": true
-    },
-    {
-      "title": "Apple's Unusual Market Dominance, Iran Retaliation List And More: This Week In Appleverse",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.1183,
-        "negative": 0.4458,
-        "neutral": 0.4359
-      },
-      "included": true
-    },
-    {
-      "title": "How Much Would You Have if You Had Invested $2,000 In Apple When It Went Public?",
+      "title": "Mastech Digital, Inc. Q1 2026 Earnings Call Summary",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.0584,
-        "negative": 0.0178,
-        "neutral": 0.9238
+        "positive": 0.0203,
+        "negative": 0.1323,
+        "neutral": 0.8474
       },
       "included": false
     },
     {
-      "title": "Jim Cramer Thinks New Apple (AAPL) CFO Is Settling Well In His Role",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0323,
-        "negative": 0.0803,
-        "neutral": 0.8873
-      },
-      "included": false
-    },
-    {
-      "title": "Globalstar: Don't Buy Amazon's Possible Takeover Deal",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.6198,
-        "negative": 0.1177,
-        "neutral": 0.2625
-      },
-      "included": true
-    },
-    {
-      "title": "Amazon Globalstar Interest Puts Apple Satellite Story Under Fresh Review",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0305,
-        "negative": 0.1155,
-        "neutral": 0.854
-      },
-      "included": false
-    },
-    {
-      "title": "Will Qualcomm’s US$20 Billion Buyback And Dividend Hike Change QUALCOMM's (QCOM) Narrative?",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.9466,
-        "negative": 0.026,
-        "neutral": 0.0274
-      },
-      "included": true
-    },
-    {
-      "title": "Arm Holdings: The Chip Designer Drawing NVIDIA Comparisons—Is It Justified?",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.6107,
-        "negative": 0.0446,
-        "neutral": 0.3447
-      },
-      "included": true
-    },
-    {
-      "title": "Apple Turns 50: From Garage Startup To $3.73 Trillion Giant—Here's How Much A $1,000 Investment At Its IPO Would Be Worth Today",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.1592,
-        "negative": 0.0134,
-        "neutral": 0.8274
-      },
-      "included": false
-    },
-    {
-      "title": "Apple's 50th Anniversary Was April 1. Is the Tech Giant's Stock Worth Buying and Holding for Another 50 Years?",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.6937,
-        "negative": 0.0121,
-        "neutral": 0.2942
-      },
-      "included": true
-    },
-    {
-      "title": "Gavin Newsom Hails Apple's '50 Years Of Innovation' As Tesla, Chevron, McKesson Leave California",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.6576,
-        "negative": 0.0174,
-        "neutral": 0.325
-      },
-      "included": true
-    },
-    {
-      "title": "Russia’s VPN Crackdown Caused Bank Outage, Telegram Founder Says",
+      "title": "Nvidia Stock Sank Today. Is It a Buy With Earnings Due Next Week?",
       "finbert_label": "negative",
       "scores": {
-        "positive": 0.0284,
-        "negative": 0.5525,
-        "neutral": 0.419
+        "positive": 0.0826,
+        "negative": 0.8942,
+        "neutral": 0.0232
       },
       "included": true
     },
     {
-      "title": "Amazon Vs. Starlink: The $9 Billion Globalstar Deal That Could Change Everything",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.3262,
-        "negative": 0.5272,
-        "neutral": 0.1466
-      },
-      "included": true
-    },
-    {
-      "title": "Consumer Tech News (Mar 30-Apr 2): Tesla, Nio, XPeng Drive EV Growth, Apple iPhone 17, Meta Ray-Ban Launches & More",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.846,
-        "negative": 0.0091,
-        "neutral": 0.1449
-      },
-      "included": true
-    },
-    {
-      "title": "Buffett may end donations to Gates charity over Bill's ties to Epstein",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0105,
-        "negative": 0.9585,
-        "neutral": 0.0309
-      },
-      "included": true
-    },
-    {
-      "title": "Amazon Globalstar Talks Raise Questions For Project Kuiper And Valuation",
+      "title": "This 1 Exxon Income ETF Is Paying Up Big, But There Is A Catch",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.1164,
-        "negative": 0.0289,
-        "neutral": 0.8547
+        "positive": 0.1381,
+        "negative": 0.0642,
+        "neutral": 0.7978
+      },
+      "included": true
+    },
+    {
+      "title": "Is Canopy Growth Stock Finally Setting Up for a Real Turnaround?",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.7715,
+        "negative": 0.1533,
+        "neutral": 0.0752
+      },
+      "included": true
+    },
+    {
+      "title": "Stock Market Today, May 15: High Yields and Inflation Fears Weigh on Stocks at Midday",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.2707,
+        "negative": 0.6993,
+        "neutral": 0.03
+      },
+      "included": true
+    },
+    {
+      "title": "Nvidia price target boosted ahead of expected first quarter revenue beat",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9558,
+        "negative": 0.0182,
+        "neutral": 0.026
+      },
+      "included": true
+    },
+    {
+      "title": "Super League Enterprise, Inc. Q1 2026 Earnings Call Summary",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0223,
+        "negative": 0.1767,
+        "neutral": 0.801
       },
       "included": false
     },
     {
-      "title": "Is the \"Magnificent Seven\" Era Over? Here Are the Stocks That Replace Them",
+      "title": "Why Bit Digital Stock Is Plummeting Today",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0147,
+        "negative": 0.9697,
+        "neutral": 0.0156
+      },
+      "included": true
+    },
+    {
+      "title": "Italy’s AI Dark Horse Hits a Grand Slam",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.7016,
+        "negative": 0.1486,
+        "neutral": 0.1498
+      },
+      "included": true
+    },
+    {
+      "title": "Volkswagen's Identity Crisis: Rockets, Red Lines, and China",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.1491,
+        "positive": 0.0425,
+        "negative": 0.334,
+        "neutral": 0.6235
+      },
+      "included": true
+    },
+    {
+      "title": "The Smartest Stock to Buy With $1,000 Right Now",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2155,
+        "negative": 0.0163,
+        "neutral": 0.7682
+      },
+      "included": true
+    },
+    {
+      "title": "Why Globant Stock Is Skyrocketing Today",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9369,
+        "negative": 0.0213,
+        "neutral": 0.0418
+      },
+      "included": true
+    },
+    {
+      "title": "Microsoft Rises 4%, Resists NASDAQ Downtrend",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5188,
+        "negative": 0.4553,
+        "neutral": 0.0259
+      },
+      "included": true
+    },
+    {
+      "title": "Is Intuit Stock Oversold Now, Finally Making It a Buy?",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0149,
+        "negative": 0.9554,
+        "neutral": 0.0297
+      },
+      "included": true
+    },
+    {
+      "title": "Nvidia raises share stake in Coreweave by 94.5%, SEC filing shows",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6994,
+        "negative": 0.0194,
+        "neutral": 0.2812
+      },
+      "included": true
+    },
+    {
+      "title": "Oil Prices Are Rising. Here Are the 3 Best Energy Stocks to Buy Right Now.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2641,
+        "negative": 0.0154,
+        "neutral": 0.7205
+      },
+      "included": true
+    },
+    {
+      "title": "Why Did Sandisk Stock Pop Today?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1905,
+        "negative": 0.0259,
+        "neutral": 0.7836
+      },
+      "included": true
+    },
+    {
+      "title": "Sector Update: Tech Stocks Fall in Afternoon Trading",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0078,
+        "negative": 0.9732,
+        "neutral": 0.019
+      },
+      "included": true
+    },
+    {
+      "title": "Quantum Computing Stock Shock: IonQ, Rigetti, D-Wave, and Quantum Computing Inc. Fall 6% to 9%",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0077,
+        "negative": 0.9733,
+        "neutral": 0.0189
+      },
+      "included": true
+    },
+    {
+      "title": "Sandisk Price Prediction: Has the Rally Gone Too Far?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.3461,
+        "negative": 0.0394,
+        "neutral": 0.6145
+      },
+      "included": true
+    },
+    {
+      "title": "Money Pit? Zuckerberg Just Exposed Why Hyperscaler AI Spending Keeps Going Up",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5637,
+        "negative": 0.3592,
+        "neutral": 0.0771
+      },
+      "included": true
+    },
+    {
+      "title": "ARM's Powerful Ecosystem Advantage Drives Market Leadership",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9446,
         "negative": 0.0118,
-        "neutral": 0.8392
-      },
-      "included": false
-    },
-    {
-      "title": "Apple at 50: The iPhone maker 'blew a 5-year lead' on AI, but former insiders say it can still win",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.2374,
-        "negative": 0.1304,
-        "neutral": 0.6322
+        "neutral": 0.0436
       },
       "included": true
     },
     {
-      "title": "IHD: This Fund Has A Lot Going For It, But The Price Is Above Average",
+      "title": "Microsoft vs Palantir: Two AI Plays, One Winner",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.1105,
-        "negative": 0.0115,
-        "neutral": 0.8781
+        "positive": 0.05,
+        "negative": 0.0326,
+        "neutral": 0.9175
       },
       "included": false
     },
     {
-      "title": "Trump warns Iran '48 hours before all Hell will reign down,' while search for missing crew member intensifies",
+      "title": "Discover the most active stocks in Friday's session.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0476,
+        "negative": 0.0217,
+        "neutral": 0.9307
+      },
+      "included": false
+    },
+    {
+      "title": "These S&P500 stocks are the most active in today's session",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0364,
+        "negative": 0.0261,
+        "neutral": 0.9375
+      },
+      "included": false
+    },
+    {
+      "title": "Why York Space Systems Stock Just Crashed",
       "finbert_label": "negative",
       "scores": {
-        "positive": 0.0212,
-        "negative": 0.8789,
-        "neutral": 0.0999
+        "positive": 0.031,
+        "negative": 0.7294,
+        "neutral": 0.2396
       },
       "included": true
     },
     {
-      "title": "The Stock Market Is More Expensive Than It Looks. Tread Carefully.",
+      "title": "Bill Ackman is Pretty Sure He Just Bought Microsoft at a 26% Discount",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.0333,
-        "negative": 0.053,
-        "neutral": 0.9137
+        "positive": 0.0601,
+        "negative": 0.0403,
+        "neutral": 0.8996
       },
       "included": false
     },
     {
-      "title": "Why investors are so eager for the SpaceX IPO countdown",
-      "finbert_label": "neutral",
+      "title": "S&P 500 and Nasdaq Retreat as Treasury Yields Hit Multi-Month Highs",
+      "finbert_label": "negative",
       "scores": {
-        "positive": 0.1483,
-        "negative": 0.046,
-        "neutral": 0.8057
+        "positive": 0.0147,
+        "negative": 0.9658,
+        "neutral": 0.0195
       },
-      "included": false
+      "included": true
     },
     {
-      "title": "Amazon.com, Inc. (AMZN) Advances AI and Satellite Expansion Plans",
+      "title": "Women's Empowerment ETF (WOMN) Touches a New 52-Week High",
       "finbert_label": "positive",
       "scores": {
-        "positive": 0.8898,
-        "negative": 0.0089,
-        "neutral": 0.1012
+        "positive": 0.9456,
+        "negative": 0.0272,
+        "neutral": 0.0273
       },
       "included": true
     },
     {
-      "title": "Apple Just Showed Me 50 Years of History That Nobody Has Ever Seen",
-      "finbert_label": "neutral",
+      "title": "Argentum AI Signs $2.5 Billion, 300MW AI Data Center Agreement with Boosteroid and DL Invest Group",
+      "finbert_label": "positive",
       "scores": {
-        "positive": 0.0419,
-        "negative": 0.0288,
-        "neutral": 0.9293
+        "positive": 0.9269,
+        "negative": 0.0106,
+        "neutral": 0.0625
       },
-      "included": false
+      "included": true
     },
     {
-      "title": "Is IBM a good investment in 2026? Its buy-and-hold prospects explained",
+      "title": "Cerebras Stock Slides After Explosive IPO. 2 Reasons to Be Wary.",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.009,
+        "negative": 0.9744,
+        "neutral": 0.0166
+      },
+      "included": true
+    },
+    {
+      "title": "Why Nano Nuclear Energy Stock Just Crashed",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0166,
+        "negative": 0.7498,
+        "neutral": 0.2336
+      },
+      "included": true
+    },
+    {
+      "title": "SolarEdge Pops 22%, Enphase Gains 11%: Two-Day Solar Surge Tops 40% for SEDG",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9426,
+        "negative": 0.0253,
+        "neutral": 0.0321
+      },
+      "included": true
+    },
+    {
+      "title": "Bloom Energy Stock: Buy, Sell, or Hold?",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.483,
+        "positive": 0.1922,
+        "negative": 0.0213,
+        "neutral": 0.7865
+      },
+      "included": true
+    },
+    {
+      "title": "Investing.com’s stocks of the week",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.007,
+        "negative": 0.9727,
+        "neutral": 0.0203
+      },
+      "included": true
+    },
+    {
+      "title": "Delivery Divergence: Why DoorDash Is Down 30% This Year but Amazon Is Up 14%",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.025,
+        "negative": 0.9261,
+        "neutral": 0.0488
+      },
+      "included": true
+    },
+    {
+      "title": "Eric Trump Pushes Back at Warren Over Nvidia Stake Tied to China Trip",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0159,
+        "negative": 0.8995,
+        "neutral": 0.0846
+      },
+      "included": true
+    },
+    {
+      "title": "Mortgage Applications Are Up 21% Year Over Year Despite Rising Interest Rates. These Homebuilder Stocks Could Benefit.",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9255,
         "negative": 0.0139,
-        "neutral": 0.5032
+        "neutral": 0.0606
       },
       "included": true
     },
     {
-      "title": "SpaceX Targets Over $2 Trillion Valuation in Potential IPO",
+      "title": "A $900,000 Portfolio With 47 Percent in One Tech Stock Is the Retirement Time Bomb Most Couples Refuse to Defuse",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.2002,
-        "negative": 0.0098,
-        "neutral": 0.7901
-      },
-      "included": true
-    },
-    {
-      "title": "What markets have learned since Trump's Liberation Day tariffs",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0312,
-        "negative": 0.2161,
-        "neutral": 0.7527
-      },
-      "included": true
-    },
-    {
-      "title": "Amplify’s QDVO Turned Magnificent Seven Stocks Into a 10.7% Income Machine",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0497,
-        "negative": 0.0292,
-        "neutral": 0.9211
+        "positive": 0.0248,
+        "negative": 0.1625,
+        "neutral": 0.8127
       },
       "included": false
     },
     {
-      "title": "Fidelity’s Active Large-Cap Growth ETF FFLG Is Winning the Battle but Losing the War",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0734,
-        "negative": 0.2812,
-        "neutral": 0.6454
-      },
-      "included": true
-    },
-    {
-      "title": "The S&P 500 Without Big Tech Is Quietly Beating the Full Index in 2026",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.1719,
-        "negative": 0.0365,
-        "neutral": 0.7916
-      },
-      "included": true
-    },
-    {
-      "title": "YMAG ETF Pays Weekly but the Share Price Tells a Harder Story",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0484,
-        "negative": 0.0337,
-        "neutral": 0.9179
-      },
-      "included": false
-    },
-    {
-      "title": "Is Trending Stock Apple Inc. (AAPL) a Buy Now?",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0817,
-        "negative": 0.0152,
-        "neutral": 0.9031
-      },
-      "included": false
-    },
-    {
-      "title": "Cloud AI Update - Hidden Costs Surge In Global Enterprise AI Operations",
+      "title": "Sector Update: Tech Stocks Fall Late Afternoon",
       "finbert_label": "negative",
       "scores": {
-        "positive": 0.0553,
-        "negative": 0.8251,
-        "neutral": 0.1196
-      },
-      "included": true
-    },
-    {
-      "title": "Amazon’s Globalstar play about spectrum, not just hardware",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0703,
-        "negative": 0.0128,
-        "neutral": 0.917
-      },
-      "included": false
-    },
-    {
-      "title": "The Magnificent 7 Stock Crash's Toll Reaches $2.1 Trillion",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0236,
-        "negative": 0.549,
-        "neutral": 0.4274
-      },
-      "included": true
-    },
-    {
-      "title": "Big Tech H-1B Filings Plunge As Amazon, Google, Meta And Microsoft Slash Jobs Amid Rising Immigration Costs",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.008,
-        "negative": 0.975,
-        "neutral": 0.017
-      },
-      "included": true
-    },
-    {
-      "title": "1 Reason Why April 10 Could Be Huge for Taiwan Semiconductor Manufacturing",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0489,
-        "negative": 0.8075,
-        "neutral": 0.1436
-      },
-      "included": true
-    },
-    {
-      "title": "PayPal transformed digital payments. Why the California fintech giant is now struggling",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0105,
-        "negative": 0.964,
-        "neutral": 0.0255
-      },
-      "included": true
-    },
-    {
-      "title": "SpaceX Is Worth $2 Trillion? What That Might Mean.",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.9301,
-        "negative": 0.0162,
-        "neutral": 0.0537
-      },
-      "included": true
-    },
-    {
-      "title": "'Chasing vibes' — OpenAI's M&A strategy gets more confusing with TBPN purchase",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0895,
-        "negative": 0.0762,
-        "neutral": 0.8343
-      },
-      "included": false
-    },
-    {
-      "title": "7 Dividend Increases Expected In April 2026",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.931,
-        "negative": 0.0195,
-        "neutral": 0.0495
-      },
-      "included": true
-    },
-    {
-      "title": "Apple At 50 Weighs AI Partnerships Satellite Ties And Succession",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.8031,
-        "negative": 0.0116,
-        "neutral": 0.1853
-      },
-      "included": true
-    },
-    {
-      "title": "Early Apple stock investors now earn a 5.2 percent dividend yield",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.1061,
-        "negative": 0.0179,
-        "neutral": 0.876
-      },
-      "included": false
-    },
-    {
-      "title": "Apple Just Turned 50 Years Old. Is the AAPL Stock Cake Stale or Sweet?",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0964,
-        "negative": 0.0193,
-        "neutral": 0.8843
-      },
-      "included": false
-    },
-    {
-      "title": "Sector Update: Tech Stocks Rise Late Afternoon",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.9382,
-        "negative": 0.0287,
-        "neutral": 0.033
-      },
-      "included": true
-    },
-    {
-      "title": "Amazon is Considering a $9 Billion Deal to Acquire Satellite Communications Company Globalstar. Here's Why Amazon, Apple, and Tesla Investors Should Pay Attention.",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.4765,
-        "negative": 0.0096,
-        "neutral": 0.5139
-      },
-      "included": true
-    },
-    {
-      "title": "Saudi Business Hubs Shift to Remote Work After Iran Threats to U.S. Firms",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0103,
-        "negative": 0.9609,
-        "neutral": 0.0288
-      },
-      "included": true
-    },
-    {
-      "title": "Apple Turns 50 — From Near Bankruptcy To $3.6T, Now The AI Test Begins",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.213,
-        "negative": 0.0132,
-        "neutral": 0.7738
-      },
-      "included": true
-    },
-    {
-      "title": "Warren Buffett Says He'd Buy 'A Whole Lot' Of Apple If It Gets Cheaper— And He's Not Losing Sleep Over Cashing Out $100 Billion Stake",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.2429,
-        "negative": 0.0532,
-        "neutral": 0.7039
-      },
-      "included": true
-    },
-    {
-      "title": "Apple, Nvidia and Microsoft: Buy the Dip in Big Tech?",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0739,
-        "negative": 0.189,
-        "neutral": 0.7371
-      },
-      "included": true
-    },
-    {
-      "title": "Iran Identifies Palantir as a ‘Legitimate Target’ for Threatened Attacks: Should You Sell PLTR Stock Now?",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0846,
-        "negative": 0.3334,
-        "neutral": 0.582
-      },
-      "included": true
-    },
-    {
-      "title": "Apple's AI Strategy Is Pivoting. Here's Why That Could Be Great News for the Stock.",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.7864,
-        "negative": 0.0248,
-        "neutral": 0.1887
-      },
-      "included": true
-    },
-    {
-      "title": "Apple at 50 is fighting for the future of software",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0231,
-        "negative": 0.5105,
-        "neutral": 0.4664
-      },
-      "included": true
-    },
-    {
-      "title": "DELL Stock Jumps 17% in a Month: Here Are 3 Reasons Why It Is a Buy",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.3204,
-        "negative": 0.2631,
-        "neutral": 0.4165
-      },
-      "included": true
-    },
-    {
-      "title": "Deal Talks With Amazon Have This Satellite Internet Provider's Stock Popping",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.8423,
-        "negative": 0.1029,
-        "neutral": 0.0548
-      },
-      "included": true
-    },
-    {
-      "title": "Nvidia, Apple Are Outgunning Defense Stocks During A War — That's Weird",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.3434,
-        "negative": 0.4078,
-        "neutral": 0.2488
-      },
-      "included": true
-    },
-    {
-      "title": "The Epic 50-Year Story of Apple, Told Through the WSJ Archive",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0802,
-        "negative": 0.0138,
-        "neutral": 0.9061
-      },
-      "included": false
-    },
-    {
-      "title": "Intel: The Easy Money Is Gone",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.8416,
-        "negative": 0.0146,
-        "neutral": 0.1438
-      },
-      "included": true
-    },
-    {
-      "title": "Top Midday Stories: Iran, Oman Drafting Hormuz Strait Traffic Protocol; Blue Owl Caps Redemptions at 5% for Two Private Credit Funds",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0081,
-        "negative": 0.9712,
-        "neutral": 0.0207
-      },
-      "included": true
-    },
-    {
-      "title": "Is Apple Stock Overvalued Or Undervalued?",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0086,
-        "negative": 0.9746,
+        "positive": 0.0097,
+        "negative": 0.9734,
         "neutral": 0.0168
       },
       "included": true
     },
     {
-      "title": "Can Qualcomm's Snapdragon Innovations for Wearables Drive Growth?",
-      "finbert_label": "positive",
+      "title": "The global memory shortage is coming for Nintendo",
+      "finbert_label": "negative",
       "scores": {
-        "positive": 0.8637,
-        "negative": 0.0072,
-        "neutral": 0.1291
+        "positive": 0.0233,
+        "negative": 0.6134,
+        "neutral": 0.3633
       },
       "included": true
     },
     {
-      "title": "Amazon in talks to acquire satellite firm Globalstar in $8.8B deal",
+      "title": "Nvidia Reports Earnings Wednesday. Here's How Much Traders Expect The AI Chipmaker's Stock to Move",
       "finbert_label": "positive",
       "scores": {
-        "positive": 0.9404,
+        "positive": 0.6859,
+        "negative": 0.0415,
+        "neutral": 0.2726
+      },
+      "included": true
+    },
+    {
+      "title": "NVIDIA-linked stock sinks after $3 billion capital raise",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9149,
         "negative": 0.0114,
-        "neutral": 0.0482
+        "neutral": 0.0737
       },
       "included": true
     },
     {
-      "title": "Microsoft vs. Apple: $30B AI Buildout vs $85B iPhone Surge",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.1055,
-        "negative": 0.0639,
-        "neutral": 0.8307
-      },
-      "included": false
-    },
-    {
-      "title": "Amazon vs. Apple: Which Is the Better Artificial Intelligence (AI) Stock to Buy Today?",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0471,
-        "negative": 0.0353,
-        "neutral": 0.9176
-      },
-      "included": false
-    },
-    {
-      "title": "Apple Investors Face New Risk as Amazon Eyes Takeover of iPhone’s Satellite Partner",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.1039,
-        "negative": 0.1149,
-        "neutral": 0.7812
-      },
-      "included": true
-    },
-    {
-      "title": "AAPL Stock on Watch: Iran Threatens Retaliatory Strikes Could Hit Apple Next",
+      "title": "US Equity Markets End Lower as Rising Oil, Bond Yields Stoke Inflation Concerns",
       "finbert_label": "negative",
       "scores": {
-        "positive": 0.0232,
-        "negative": 0.8819,
-        "neutral": 0.095
+        "positive": 0.0132,
+        "negative": 0.9709,
+        "neutral": 0.0158
       },
       "included": true
     },
     {
-      "title": "The bull market is still strong thanks to these 'dual tailwinds'",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.3219,
-        "negative": 0.019,
-        "neutral": 0.6592
-      },
-      "included": true
-    },
-    {
-      "title": "ROKU Slumps 12% YTD: Here's Why It Is Time to Buy the Stock",
+      "title": "Where Will Palantir Stock Be in 5 Years?",
       "finbert_label": "negative",
       "scores": {
-        "positive": 0.0388,
-        "negative": 0.9378,
-        "neutral": 0.0235
+        "positive": 0.022,
+        "negative": 0.8063,
+        "neutral": 0.1717
       },
       "included": true
     },
     {
-      "title": "Amazon.com (AMZN) Planning a Smartphone Comeback, Here’s What You Should Know",
+      "title": "Marvell’s AI Partnerships With AMD Google And Amazon Test Lofty Valuation",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9228,
+        "negative": 0.0082,
+        "neutral": 0.069
+      },
+      "included": true
+    },
+    {
+      "title": "Stock Market Today: Dow Loses 500 Points As Yields, Oil Rally; Nvidia Falls (Live Coverage)",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0081,
+        "negative": 0.9628,
+        "neutral": 0.0292
+      },
+      "included": true
+    },
+    {
+      "title": "Why Wix.com Stock Plummeted by 31% This Week",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0185,
+        "negative": 0.944,
+        "neutral": 0.0375
+      },
+      "included": true
+    },
+    {
+      "title": "Dow Jones Futures: S&P 500, Nasdaq Hold Near Highs; Nvidia, Walmart Earnings Loom",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.1056,
+        "negative": 0.7707,
+        "neutral": 0.1237
+      },
+      "included": true
+    },
+    {
+      "title": "Why Tower Semiconductor Stock Skyrocketed This Week",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9433,
+        "negative": 0.0213,
+        "neutral": 0.0354
+      },
+      "included": true
+    },
+    {
+      "title": "SalesCloser Deepens Conversational AI Moat with Dedicated GPU Inference Cluster, Enabling Custom Model Fine-Tuning, Agentic Workflows, and Regulated-Industry Readiness",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6698,
+        "negative": 0.007,
+        "neutral": 0.3232
+      },
+      "included": true
+    },
+    {
+      "title": "Lument Finance Trust, Inc. Q1 2026 Earnings Call Summary",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.0571,
-        "negative": 0.0273,
-        "neutral": 0.9155
+        "positive": 0.0211,
+        "negative": 0.1629,
+        "neutral": 0.816
       },
       "included": false
     },
     {
-      "title": "Globalstar Soars 10%: Amazon’s Reported Takeover Bid Ignites a Spectrum War With SpaceX",
-      "finbert_label": "positive",
+      "title": "Nvidia Sells the Shovels, Alphabet Digs the Mine: Two Paths to AI Dominance",
+      "finbert_label": "neutral",
       "scores": {
-        "positive": 0.8756,
-        "negative": 0.0814,
-        "neutral": 0.043
+        "positive": 0.2069,
+        "negative": 0.0438,
+        "neutral": 0.7493
       },
       "included": true
     },
     {
-      "title": "OpenAI Announces The Roll Out Of ChatGPT In Apple CarPlay",
+      "title": "Nvidia Stock Investors Just Got Fantastic News from Wall Street",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0097,
+        "negative": 0.9531,
+        "neutral": 0.0372
+      },
+      "included": true
+    },
+    {
+      "title": "This Quantum Computing Company Is Already Making Waves in Industry",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.0638,
-        "negative": 0.0164,
-        "neutral": 0.9199
+        "positive": 0.1269,
+        "negative": 0.0092,
+        "neutral": 0.864
       },
       "included": false
     },
     {
-      "title": "Apple Turned 50 Years Old. Here's What Its Earliest Investor Saw in the Company and What It Shows About Investing",
+      "title": "Why Vuzix Stock Sank Today",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0367,
+        "negative": 0.9223,
+        "neutral": 0.041
+      },
+      "included": true
+    },
+    {
+      "title": "Jim Cramer Says Buy Nvidia for Valuation, Not China Bet. Stock Trades Cheaper Than Intel and AMD.",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.142,
-        "negative": 0.0158,
-        "neutral": 0.8421
+        "positive": 0.1703,
+        "negative": 0.0306,
+        "neutral": 0.7992
+      },
+      "included": true
+    },
+    {
+      "title": "SharonAI Holdings, Inc. Class A Common Stock Q1 Earnings Call Highlights",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8179,
+        "negative": 0.0078,
+        "neutral": 0.1743
+      },
+      "included": true
+    },
+    {
+      "title": "Why Charles Schwab Stock Bumped Higher on Friday",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.7596,
+        "negative": 0.0401,
+        "neutral": 0.2003
+      },
+      "included": true
+    },
+    {
+      "title": "Why This \"Boring\" Stock Is a Strong Buy Right Now",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0503,
+        "negative": 0.0937,
+        "neutral": 0.856
       },
       "included": false
     },
     {
-      "title": "Alcatraz Raises $50 Million to Replace the Badge With Your Face -- Without Sacrificing Privacy",
-      "finbert_label": "positive",
+      "title": "Arm Holdings to face US antitrust probe over chip tech, Bloomberg News reports",
+      "finbert_label": "negative",
       "scores": {
-        "positive": 0.5343,
-        "negative": 0.0097,
-        "neutral": 0.456
+        "positive": 0.0109,
+        "negative": 0.9267,
+        "neutral": 0.0625
       },
       "included": true
     },
     {
-      "title": "Globalstar Stock Jumps After Report Amazon Is In Talks To Acquire Satellite Firm",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.723,
-        "negative": 0.1942,
-        "neutral": 0.0827
-      },
-      "included": true
-    },
-    {
-      "title": "Globalstar Stock Rises on Amazon Deal Report. Why Apple Could Scuttle the Launch.",
+      "title": "Big earnings on deck: What to watch next week",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.3787,
-        "negative": 0.1613,
-        "neutral": 0.46
-      },
-      "included": true
-    },
-    {
-      "title": "Amazon in Talks to Buy Globalstar in $9 Billion Satellite Deal",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.6043,
-        "negative": 0.0789,
-        "neutral": 0.3168
-      },
-      "included": true
-    },
-    {
-      "title": "Why Investors Own VOOG for Growth Not Its Tiny 0.46% Dividend",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0383,
-        "negative": 0.0217,
-        "neutral": 0.9399
+        "positive": 0.038,
+        "negative": 0.0347,
+        "neutral": 0.9273
       },
       "included": false
     },
     {
-      "title": "Coca-Cola vs. Apple: Which Warren Buffett Favorite Belongs in Your Portfolio Forever?",
+      "title": "Poet Technologies Sank Today -- Is The Stock a Buy Right Now?",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9389,
+        "negative": 0.0159,
+        "neutral": 0.0452
+      },
+      "included": true
+    },
+    {
+      "title": "Eaton Refocuses On Electrical And Aerospace As AI Power Bet Grows",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9231,
+        "negative": 0.0104,
+        "neutral": 0.0665
+      },
+      "included": true
+    },
+    {
+      "title": "Why KinderCare Learning Stock Flopped on Friday",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0183,
+        "negative": 0.971,
+        "neutral": 0.0106
+      },
+      "included": true
+    },
+    {
+      "title": "Starbucks is Set to Lay Off 300 Corporate Employees as Part of Its Turnaround Strategy",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0157,
+        "negative": 0.9437,
+        "neutral": 0.0406
+      },
+      "included": true
+    },
+    {
+      "title": "This Week's Market Wrap: Narrow Leadership, Oil And China Trip, And Hot Inflation",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9337,
+        "negative": 0.038,
+        "neutral": 0.0282
+      },
+      "included": true
+    },
+    {
+      "title": "Review & Preview: AI Isn’t Forever",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0148,
+        "negative": 0.9677,
+        "neutral": 0.0175
+      },
+      "included": true
+    },
+    {
+      "title": "Why Dogecoin Was a dog of an Investment on Friday",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0555,
+        "negative": 0.0306,
+        "neutral": 0.9139
+      },
+      "included": false
+    },
+    {
+      "title": "The NUA Strategy Retiring Executives Use to Cut Taxes on $500,000 of Company Stock in Their 401(k)",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0206,
+        "negative": 0.6154,
+        "neutral": 0.3641
+      },
+      "included": true
+    },
+    {
+      "title": "A Look At Nova (NVMI) Valuation After Record Q1 2026 Beat And Upgraded Outlook",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0213,
+        "negative": 0.9608,
+        "neutral": 0.0179
+      },
+      "included": true
+    },
+    {
+      "title": "Nvidia surpasses Germany: How the market caps of tech giants compare to top economies",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2062,
+        "negative": 0.0221,
+        "neutral": 0.7717
+      },
+      "included": true
+    },
+    {
+      "title": "This Tech Stock Doesn't Need AI to Win. That's Exactly Why It's My Top Pick Right Now.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1195,
+        "negative": 0.0183,
+        "neutral": 0.8621
+      },
+      "included": false
+    },
+    {
+      "title": "What Moved Markets This Week",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0438,
+        "negative": 0.3454,
+        "neutral": 0.6107
+      },
+      "included": true
+    },
+    {
+      "title": "Trump returns from China with stability and a stalemate",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8364,
+        "negative": 0.0188,
+        "neutral": 0.1448
+      },
+      "included": true
+    },
+    {
+      "title": "Market Crash: The Financial Stocks I'd Buy Without Hesitation",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0474,
+        "negative": 0.0323,
+        "neutral": 0.9203
+      },
+      "included": false
+    },
+    {
+      "title": "Nvidia vs. Alphabet: Which Will Be the World's Biggest Company By the End of 2026?",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5338,
+        "negative": 0.0138,
+        "neutral": 0.4524
+      },
+      "included": true
+    },
+    {
+      "title": "5 Signs Of A Market Top",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0265,
+        "negative": 0.7539,
+        "neutral": 0.2196
+      },
+      "included": true
+    },
+    {
+      "title": "Will Nvidia Stock Soar After May 20? The Evidence is Piling Up, and Here's What It Shows.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0852,
+        "negative": 0.0167,
+        "neutral": 0.8981
+      },
+      "included": false
+    },
+    {
+      "title": "Why 90% of Professional Fund Managers Lose to the S&P 500. Here’s the One Strategy That Works",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.054,
+        "negative": 0.1582,
+        "neutral": 0.7878
+      },
+      "included": true
+    },
+    {
+      "title": "Iran War Fallout: Qatar Needs $4 Billion Worth of Patriot Missiles",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0927,
+        "negative": 0.2158,
+        "neutral": 0.6916
+      },
+      "included": true
+    },
+    {
+      "title": "Space Stock Face-Off: Is Rocket Lab or AST SpaceMobile Worth Your Money Right Now?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1206,
+        "negative": 0.0875,
+        "neutral": 0.7919
+      },
+      "included": true
+    },
+    {
+      "title": "Prediction: Bitcoin Will Hit $1 Million -- Here's the Timeline",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0312,
+        "negative": 0.8687,
+        "neutral": 0.1001
+      },
+      "included": true
+    },
+    {
+      "title": "Nvidia’s China H200 Approval Raises New Questions For Valuation And Risk",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0369,
+        "negative": 0.4216,
+        "neutral": 0.5415
+      },
+      "included": true
+    },
+    {
+      "title": "Alibaba AI Cloud Growth, Chip Access And Legal Shifts Reshape Valuation",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.919,
+        "negative": 0.0112,
+        "neutral": 0.0698
+      },
+      "included": true
+    },
+    {
+      "title": "Prediction: Here's What a $5,000 Investment in NuScale Power (SMR) Stock Will Be Worth in 10 Years",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1319,
+        "negative": 0.0109,
+        "neutral": 0.8572
+      },
+      "included": false
+    },
+    {
+      "title": "3 Reasons XRP Could Still Have 177% Upside From Here",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0761,
+        "negative": 0.0215,
+        "neutral": 0.9024
+      },
+      "included": false
+    },
+    {
+      "title": "Wells Fargo Raises NVIDIA (NVDA) Price Target – Here’s Why",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.892,
+        "negative": 0.0126,
+        "neutral": 0.0954
+      },
+      "included": true
+    },
+    {
+      "title": "Eli Lilly (LLY) Reports New Late-Stage Weight Loss Trial Results",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.3529,
+        "negative": 0.0109,
+        "neutral": 0.6361
+      },
+      "included": true
+    },
+    {
+      "title": "Yikes! The Federal Reserve's May Inflation Forecast Is In, and It Has Big Implications for Social Security's 2027 COLA.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1111,
+        "negative": 0.2459,
+        "neutral": 0.643
+      },
+      "included": true
+    },
+    {
+      "title": "The Cryptocurrency XRP Is Down 60%. Ripple Is Booming. Here's Why.",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0149,
+        "negative": 0.9433,
+        "neutral": 0.0417
+      },
+      "included": true
+    },
+    {
+      "title": "Gold Or Oil? This ETF Decides For You When Inflation Strikes",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.3037,
+        "negative": 0.1286,
+        "neutral": 0.5677
+      },
+      "included": true
+    },
+    {
+      "title": "SpaceX, OpenAI, and Anthropic: Here are the most anticipated IPOs in 2026",
       "finbert_label": "neutral",
       "scores": {
         "positive": 0.1758,
-        "negative": 0.0148,
-        "neutral": 0.8094
+        "negative": 0.0261,
+        "neutral": 0.7981
+      },
+      "included": true
+    },
+    {
+      "title": "Forget Utility Dividends. Kevin Warsh Just Made the 30-Year Treasury a Better Income Play",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1046,
+        "negative": 0.0195,
+        "neutral": 0.8758
       },
       "included": false
     },
     {
-      "title": "VYMI vs. VIG vs. VYM: Which Vanguard Dividend ETF Pays You Most?",
+      "title": "Oklo vs. Uranium Energy: Both Are Volatile in 2026, but Only One Is Worth Buying Now",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.1159,
-        "negative": 0.0114,
-        "neutral": 0.8726
+        "positive": 0.0907,
+        "negative": 0.0564,
+        "neutral": 0.8529
       },
       "included": false
     },
     {
-      "title": "EXCLUSIVE: Top 12 Most-Searched Tickers On Benzinga Pro In March – Where Do Tesla, Nvidia, Micron Stocks Rank?",
+      "title": "Buy Nvidia Under $250 on Trump’s China Visit and Warsh’s Dovish AI Signals",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.1576,
-        "negative": 0.0168,
-        "neutral": 0.8256
+        "positive": 0.1336,
+        "negative": 0.027,
+        "neutral": 0.8393
       },
       "included": false
     },
     {
-      "title": "These Stocks Are Today’s Movers: Tesla, Globalstar, Amazon, Exxon Mobil, Penguin Solutions, and More",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.1192,
-        "negative": 0.5855,
-        "neutral": 0.2953
-      },
-      "included": true
-    },
-    {
-      "title": "Where Will Apple Stock Be in 5 Years?",
+      "title": "Stock Market Week Ahead: Nvidia, Alphabet, Atlanta Fed Lead A Charged Week",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.2239,
-        "negative": 0.0104,
-        "neutral": 0.7656
+        "positive": 0.0334,
+        "negative": 0.0363,
+        "neutral": 0.9303
       },
-      "included": true
+      "included": false
     },
     {
-      "title": "Tech, Chip Stocks Slide As Trump's Iran Warning Rattles Markets",
-      "finbert_label": "negative",
+      "title": "Prediction: NuScale Power Stock Is a Buy Before 2027 Due to This $1.75 Trillion Opportunity",
+      "finbert_label": "positive",
       "scores": {
-        "positive": 0.0101,
-        "negative": 0.9422,
-        "neutral": 0.0478
+        "positive": 0.8685,
+        "negative": 0.0081,
+        "neutral": 0.1234
       },
       "included": true
     },
     {
-      "title": "Apple looks behind in AI. History says don’t count it out.",
+      "title": "6 Words From Now-Former Fed Chair Jerome Powell That Will Echo Through Wall Street for Years to Come",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.1806,
-        "negative": 0.0459,
-        "neutral": 0.7734
+        "positive": 0.0442,
+        "negative": 0.0486,
+        "neutral": 0.9072
       },
-      "included": true
-    },
+      "included": false
+    }
+  ],
+  "TSLA": [
     {
-      "title": "Stocks to Watch Thursday: Apple, Exxon, Delta Air Lines",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0075,
-        "negative": 0.9733,
-        "neutral": 0.0192
-      },
-      "included": true
-    },
-    {
-      "title": "Amazon Lines Up Deal to Rival SpaceX’s Starlink: Report. Why Apple Could Be a Problem.",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.7601,
-        "negative": 0.1051,
-        "neutral": 0.1348
-      },
-      "included": true
-    },
-    {
-      "title": "Samsung Still Leads — But Foldable Rivals Are Closing In Fast",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.5775,
-        "negative": 0.0302,
-        "neutral": 0.3923
-      },
-      "included": true
-    },
-    {
-      "title": "Elon Musk's SpaceX Files FCC Complaint Against Amazon Over Orbital Debris Violations",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.0154,
-        "negative": 0.8966,
-        "neutral": 0.088
-      },
-      "included": true
-    },
-    {
-      "title": "Goldman Sachs Highlights AT&T’s OneConnect Push into Value Segment",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.7712,
-        "negative": 0.0078,
-        "neutral": 0.221
-      },
-      "included": true
-    },
-    {
-      "title": "Goldman Sachs Initiates Qualcomm (QCOM) at Neutral, Notes Mixed Growth Outlook",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.7262,
-        "negative": 0.0093,
-        "neutral": 0.2646
-      },
-      "included": true
-    },
-    {
-      "title": "CNBC Daily Open: Trump threatens to put Iran in 'stone ages,' dampening ceasefire hopes",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.024,
-        "negative": 0.9582,
-        "neutral": 0.0178
-      },
-      "included": true
-    },
-    {
-      "title": "Amazon Globalstar Talks Put Satellite Push And Valuation In New Focus",
+      "title": "J-Star Holding Announces Return Of Jonathan Chiang As CEO Effective March 31",
       "finbert_label": "neutral",
       "scores": {
-        "positive": 0.396,
-        "negative": 0.0107,
-        "neutral": 0.5933
+        "positive": 0.0283,
+        "negative": 0.0738,
+        "neutral": 0.8979
       },
-      "included": true
+      "included": false
     },
     {
-      "title": "Globalstar Rallies on Report That Amazon Is in Buyout Talks",
+      "title": "Tesla Stock Rises. China FSD Hopes Are Driving a Rally.",
       "finbert_label": "positive",
       "scores": {
-        "positive": 0.93,
-        "negative": 0.0336,
-        "neutral": 0.0364
-      },
-      "included": true
-    },
-    {
-      "title": "Mark Gurman Dismisses Apple Intelligence China Launch As Error, Points To Missing Approval And Unusual Timing",
-      "finbert_label": "negative",
-      "scores": {
-        "positive": 0.026,
-        "negative": 0.8118,
-        "neutral": 0.1622
-      },
-      "included": true
-    },
-    {
-      "title": "Amazon in talks to buy $9 billion satellite group Globalstar, FT reports",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.8929,
-        "negative": 0.0103,
-        "neutral": 0.0968
-      },
-      "included": true
-    },
-    {
-      "title": "Globalstar Stock Pops More Than 15% After Report Claims Amazon In Talks To Acquire Apple-Backed Satellite Communications Company",
-      "finbert_label": "positive",
-      "scores": {
-        "positive": 0.9435,
-        "negative": 0.0322,
-        "neutral": 0.0243
-      },
-      "included": true
-    },
-    {
-      "title": "Apple's next chapter: Who succeeds Tim Cook?",
-      "finbert_label": "neutral",
-      "scores": {
-        "positive": 0.0481,
+        "positive": 0.9408,
         "negative": 0.0203,
-        "neutral": 0.9317
+        "neutral": 0.0389
+      },
+      "included": true
+    },
+    {
+      "title": "5 Companies Are Betting on Trump’s China Pivot. Here’s Who’s Best Positioned.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1052,
+        "negative": 0.0252,
+        "neutral": 0.8696
       },
       "included": false
+    },
+    {
+      "title": "Here's When Tesla's Robotaxi Rollout Will Really Ramp Up",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1178,
+        "negative": 0.0284,
+        "neutral": 0.8538
+      },
+      "included": false
+    },
+    {
+      "title": "I helped design the original Tesla battery. Here’s how America can lead the world again",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0619,
+        "negative": 0.0494,
+        "neutral": 0.8887
+      },
+      "included": false
+    },
+    {
+      "title": "Musk's China trip during OpenAI trial prompts apology from his lawyer for CEO's absence",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0194,
+        "negative": 0.9168,
+        "neutral": 0.0638
+      },
+      "included": true
+    },
+    {
+      "title": "Cisco Adds to AI Fever; Optimism About Trump's China Visit; 30-Year Bond Over 5%",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8889,
+        "negative": 0.0805,
+        "neutral": 0.0306
+      },
+      "included": true
+    },
+    {
+      "title": "Elon Musk's SpaceX IPO Gets Blowback From Pension Funds: Here's What Prediction Markets Are Watching",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0373,
+        "negative": 0.6402,
+        "neutral": 0.3225
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla Stock Wobbles. Full Self-Driving in China Is a Hot Topic.",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.7911,
+        "negative": 0.0795,
+        "neutral": 0.1294
+      },
+      "included": true
+    },
+    {
+      "title": "Are retail investors leaning away from software amid tech rally?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0894,
+        "negative": 0.0498,
+        "neutral": 0.8608
+      },
+      "included": false
+    },
+    {
+      "title": "xAI Rolls Out Grok Build Coding Agent",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0515,
+        "negative": 0.0125,
+        "neutral": 0.9361
+      },
+      "included": false
+    },
+    {
+      "title": "Trump Brought 17 CEOs to China. Only Two Got Seats on Air Force One: Elon Musk and Jensen Huang",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0486,
+        "negative": 0.04,
+        "neutral": 0.9114
+      },
+      "included": false
+    },
+    {
+      "title": "Ford Zooms 8% Higher, Easily Outpaces General Motors and Tesla",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9531,
+        "negative": 0.022,
+        "neutral": 0.0249
+      },
+      "included": true
+    },
+    {
+      "title": "Can Tesla's $250M Berlin Expansion Strengthen Its EV Lead?",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9539,
+        "negative": 0.0147,
+        "neutral": 0.0315
+      },
+      "included": true
+    },
+    {
+      "title": "Ford Stock Is Ripping Again. Suddenly, It’s a AI Data Center Stock.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0479,
+        "negative": 0.1153,
+        "neutral": 0.8368
+      },
+      "included": false
+    },
+    {
+      "title": "Retail investors make a surprising move on Palantir, Microsoft, and other software stocks",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5141,
+        "negative": 0.151,
+        "neutral": 0.3349
+      },
+      "included": true
+    },
+    {
+      "title": "Top Midday Stories: Cisco Shares Soar as Guidance Tops Consensus; Alibaba, JD Reportedly Cleared to Buy Nvidia H200 AI Chips",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9329,
+        "negative": 0.0295,
+        "neutral": 0.0376
+      },
+      "included": true
+    },
+    {
+      "title": "Panasonic Raises EV Battery Outlook Based On Tesla's Sales Bounce",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9539,
+        "negative": 0.0246,
+        "neutral": 0.0215
+      },
+      "included": true
+    },
+    {
+      "title": "European Stocks Advancing in Thursday Trading; Tech Stocks Rally After Xi Says China Will 'Open Wider'",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9106,
+        "negative": 0.0638,
+        "neutral": 0.0256
+      },
+      "included": true
+    },
+    {
+      "title": "Elon Musk vs. Jeff Bezos: The Three-Way War for the Future of Space-Based AI",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5204,
+        "negative": 0.01,
+        "neutral": 0.4696
+      },
+      "included": true
+    },
+    {
+      "title": "Is Lucid Under $7 a Bargain or a Trap? Here's the Honest Answer.",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0083,
+        "negative": 0.9745,
+        "neutral": 0.0172
+      },
+      "included": true
+    },
+    {
+      "title": "'SpaceX IPO prospectus could land as soon as next week, sources say'- CNBC",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0286,
+        "negative": 0.0262,
+        "neutral": 0.9452
+      },
+      "included": false
+    },
+    {
+      "title": "8 Months Ago, Trump Called Elon Musk “Susceptible” on China — Now He’s Riding Shotgun on Air Force One",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1163,
+        "negative": 0.0531,
+        "neutral": 0.8306
+      },
+      "included": false
+    },
+    {
+      "title": "KBRA Assigns Preliminary Ratings to Tesla Sustainable Energy Business Trust 2026-1",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.151,
+        "negative": 0.0156,
+        "neutral": 0.8334
+      },
+      "included": false
+    },
+    {
+      "title": "Q1 Earnings Highs And Lows: Tesla (NASDAQ:TSLA) Vs The Rest Of The Automobile Manufacturing Stocks",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0542,
+        "negative": 0.2543,
+        "neutral": 0.6914
+      },
+      "included": true
+    },
+    {
+      "title": "Sector Update: Tech Stocks Mixed Thursday Afternoon",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0292,
+        "negative": 0.9271,
+        "neutral": 0.0437
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla at $445: Buy, Sell or Hold?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1016,
+        "negative": 0.0215,
+        "neutral": 0.8769
+      },
+      "included": false
+    },
+    {
+      "title": "Most active S&P500 stocks in Thursday's session",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0402,
+        "negative": 0.0232,
+        "neutral": 0.9366
+      },
+      "included": false
+    },
+    {
+      "title": "Here's How Much You Would Have Made Owning Tesla Stock In The Last 15 Years",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.044,
+        "negative": 0.0186,
+        "neutral": 0.9375
+      },
+      "included": false
+    },
+    {
+      "title": "Equities Rise Intraday Amid Cisco-Led Tech Rally; Trump-Xi Summit in Focus",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9436,
+        "negative": 0.0324,
+        "neutral": 0.024
+      },
+      "included": true
+    },
+    {
+      "title": "Elon Musk’s Terafab Could Make Intel Stock More Exciting for Long-Term Investors Than Wall Street Ever Thought Was Possible",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.931,
+        "negative": 0.0163,
+        "neutral": 0.0527
+      },
+      "included": true
+    },
+    {
+      "title": "Sector Update: Consumer Stocks Advance Late Afternoon",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.928,
+        "negative": 0.0237,
+        "neutral": 0.0484
+      },
+      "included": true
+    },
+    {
+      "title": "AI hyperscalers are 'falling behind' if they're not spending: Strategist",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0771,
+        "negative": 0.4132,
+        "neutral": 0.5097
+      },
+      "included": true
+    },
+    {
+      "title": "Tech Gains Lift Nasdaq, S&P 500 to New Highs",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.928,
+        "negative": 0.0347,
+        "neutral": 0.0373
+      },
+      "included": true
+    },
+    {
+      "title": "How Lucid Went From Near-Term Upside to Major Disappointment",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.2642,
+        "negative": 0.5125,
+        "neutral": 0.2233
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla robotaxi rollout features long wait times, safety concerns",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0077,
+        "negative": 0.9673,
+        "neutral": 0.025
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla China Talks Put FSD Prospects And Valuation Risks In Focus",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.622,
+        "negative": 0.0111,
+        "neutral": 0.3669
+      },
+      "included": true
+    },
+    {
+      "title": "Australian judge criticises Tesla for 'gobsmacking' slow progress in class action lawsuit",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0257,
+        "negative": 0.9526,
+        "neutral": 0.0218
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla Stock Wobbles as China Self-Driving Talks Heat Up Again",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0475,
+        "negative": 0.5792,
+        "neutral": 0.3733
+      },
+      "included": true
+    },
+    {
+      "title": "Elon Musk's Tesla Launches Affordable Financing Plan After Dropping Out Of China's Top EV 10 Makers",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0084,
+        "negative": 0.9729,
+        "neutral": 0.0187
+      },
+      "included": true
+    },
+    {
+      "title": "We're in a period where both the U.S. and China are incentivized to do business together: Analyst",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2789,
+        "negative": 0.0128,
+        "neutral": 0.7083
+      },
+      "included": true
+    },
+    {
+      "title": "Trump's FCC Chair Warns Elon Musk Critics: Betting Against Him Has Cost People 'A Lot Of Money'",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.1751,
+        "negative": 0.4157,
+        "neutral": 0.4092
+      },
+      "included": true
+    },
+    {
+      "title": "Elon Musk's Wealth Eclipsed By Michael Saylor? Bitcoin Maxi Says It Could Happen If BTC Hits This Level — Here's The Fuller Picture",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0776,
+        "negative": 0.0296,
+        "neutral": 0.8928
+      },
+      "included": false
+    },
+    {
+      "title": "Xi signals support on Hormuz, yet China's next move is unclear: Expert",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5489,
+        "negative": 0.0754,
+        "neutral": 0.3758
+      },
+      "included": true
+    },
+    {
+      "title": "Elon Musk's Dinner Table Antics Go Viral At Xi Jinping-Hosted State Event, Tesla CEO Gets Clicked With Tim Cook And Xiaomi's Lei Jun",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0449,
+        "negative": 0.0971,
+        "neutral": 0.8581
+      },
+      "included": false
+    },
+    {
+      "title": "Trump Traded Nvidia, Boeing, Intel in Flurry of Transactions",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1242,
+        "negative": 0.0494,
+        "neutral": 0.8264
+      },
+      "included": false
+    },
+    {
+      "title": "Why are so many U.S. CEOs in China with Trump, and what do they want?",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0766,
+        "negative": 0.0501,
+        "neutral": 0.8733
+      },
+      "included": false
+    },
+    {
+      "title": "Tesla, Toyota expose surprising auto industry truth",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.2267,
+        "negative": 0.0119,
+        "neutral": 0.7614
+      },
+      "included": true
+    },
+    {
+      "title": "Trump-Xi summit: The 3 big takeaways from historic meeting in Beijing",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6318,
+        "negative": 0.024,
+        "neutral": 0.3442
+      },
+      "included": true
+    },
+    {
+      "title": "The \"Magnificent Seven\" Has Gained $4.8 Trillion Since the Start of April. Here's Why That's a Risk to the S&P 500 and Nasdaq-100.",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.254,
+        "negative": 0.3569,
+        "neutral": 0.3891
+      },
+      "included": true
+    },
+    {
+      "title": "Uber-Waymo Partnership On The Rocks? Exec Shares 'Scary' SF Robotaxi Moment, Slam AV Rollout",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.068,
+        "negative": 0.7252,
+        "neutral": 0.2068
+      },
+      "included": true
+    },
+    {
+      "title": "Understanding Tesla's Position In Automobiles Industry Compared To Competitors",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.3304,
+        "negative": 0.0194,
+        "neutral": 0.6502
+      },
+      "included": true
+    },
+    {
+      "title": "SpaceX governance concerns grow as mega IPO risks reshape markets",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0184,
+        "negative": 0.9356,
+        "neutral": 0.0459
+      },
+      "included": true
+    },
+    {
+      "title": "The Tech Download: Trump’s China visit sparks fresh questions over chip exports and rare earths access",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.5349,
+        "negative": 0.0859,
+        "neutral": 0.3792
+      },
+      "included": true
+    },
+    {
+      "title": "Canada's pursuit of Chinese EVs: Here's what to know",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0532,
+        "negative": 0.0236,
+        "neutral": 0.9232
+      },
+      "included": false
+    },
+    {
+      "title": "Elon Musk Says 'Space Is The Only Way' After Jensen Huang Warns AI Could Soon Need 1,000x More Energy",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.4098,
+        "negative": 0.0264,
+        "neutral": 0.5639
+      },
+      "included": true
+    },
+    {
+      "title": "CFOs On the Move: Week ending May 15",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1003,
+        "negative": 0.0205,
+        "neutral": 0.8792
+      },
+      "included": false
+    },
+    {
+      "title": "Detroit automakers have cut more than 20,000 U.S. salaried jobs as AI threat looms",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0084,
+        "negative": 0.9618,
+        "neutral": 0.0298
+      },
+      "included": true
+    },
+    {
+      "title": "Cerebras IPO, Trump-Xi summit takeaways, automaker layoffs and more in Morning Squawk",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0296,
+        "negative": 0.1908,
+        "neutral": 0.7796
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla to Invest $250 Million in Berlin Gigafactory",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1451,
+        "negative": 0.0086,
+        "neutral": 0.8463
+      },
+      "included": false
+    },
+    {
+      "title": "Market Chatter: Australian Judge Warns Tesla Over Document Production in Consumer Lawsuit",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0173,
+        "negative": 0.9618,
+        "neutral": 0.0209
+      },
+      "included": true
+    },
+    {
+      "title": "What's Going On With Ford Stock Friday?",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0087,
+        "negative": 0.9629,
+        "neutral": 0.0285
+      },
+      "included": true
+    },
+    {
+      "title": "Broadcom Slides As Trump-Xi Summit Ends Without Chip Deal",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0087,
+        "negative": 0.9618,
+        "neutral": 0.0295
+      },
+      "included": true
+    },
+    {
+      "title": "Latest News In Electric Vehicles - Driving Growth Hybrid Vehicles Revolutionize Global Markets",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9273,
+        "negative": 0.0096,
+        "neutral": 0.063
+      },
+      "included": true
+    },
+    {
+      "title": "SpaceX IPO Prospectus Could Reportedly Drop Next Week—Here's A Peek Into What Investors May Be Buying At Astronomical Valuations",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0186,
+        "negative": 0.8637,
+        "neutral": 0.1177
+      },
+      "included": true
+    },
+    {
+      "title": "Former Ford CEO Mark Fields calls company’s AI-energy pivot a 'smart move'",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1273,
+        "negative": 0.0551,
+        "neutral": 0.8177
+      },
+      "included": false
+    },
+    {
+      "title": "Rising Oil And Yields Getting In The Way Of Dual Market Manias",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1805,
+        "negative": 0.2234,
+        "neutral": 0.5961
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla Stock Aims For 3 Weekly Gains. Trump’s China Trip Could Stop It.",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.939,
+        "negative": 0.0264,
+        "neutral": 0.0346
+      },
+      "included": true
+    },
+    {
+      "title": "Canada welcomes Chinese EVs to its market",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6591,
+        "negative": 0.0107,
+        "neutral": 0.3302
+      },
+      "included": true
+    },
+    {
+      "title": "UBS warns AI stocks are overheating as growth expectations collide with history",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0894,
+        "negative": 0.6639,
+        "neutral": 0.2467
+      },
+      "included": true
+    },
+    {
+      "title": "Nvidia Stock Tops Robinhood's Most Traded List For First Four Months Of 2026: Here's The Top 10",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0642,
+        "negative": 0.0185,
+        "neutral": 0.9173
+      },
+      "included": false
+    },
+    {
+      "title": "Trump discloses hundreds of millions of dollars in trades in first quarter",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0543,
+        "negative": 0.1293,
+        "neutral": 0.8163
+      },
+      "included": false
+    },
+    {
+      "title": "Trump’s disclosure shows hundreds of millions of dollars in US securities traded in first quarter",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0636,
+        "negative": 0.1059,
+        "neutral": 0.8305
+      },
+      "included": false
+    },
+    {
+      "title": "Even GoPro is pivoting to defense",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1043,
+        "negative": 0.0131,
+        "neutral": 0.8827
+      },
+      "included": false
+    },
+    {
+      "title": "Exchange-Traded Funds, Equity Futures Lower Pre-Bell Friday Amid Oil Surge, Higher Yields, Geopolitical Uncertainty",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0098,
+        "negative": 0.9749,
+        "neutral": 0.0153
+      },
+      "included": true
+    },
+    {
+      "title": "7 Consumer Discretionary Stocks With Whale Alerts In Today's Session",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0608,
+        "negative": 0.0594,
+        "neutral": 0.8798
+      },
+      "included": false
+    },
+    {
+      "title": "Exchange Traded Concepts Announces Launch of xETFs NVDA Daily Income ETF (NYSE: NYYY) and xETFs TSLA Daily Income ETF (NYSE: TYYY) with xETFs",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1002,
+        "negative": 0.0088,
+        "neutral": 0.891
+      },
+      "included": false
+    },
+    {
+      "title": "Nasdaq 100 Drops, Intel Crashes 7% On Rate-Hike Panic: Stock Market Today",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.1229,
+        "negative": 0.8566,
+        "neutral": 0.0205
+      },
+      "included": true
+    },
+    {
+      "title": "Ford soars 20% on battery storage push",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8778,
+        "negative": 0.0605,
+        "neutral": 0.0617
+      },
+      "included": true
+    },
+    {
+      "title": "Market Chatter: Twitter Investors' Stake in SpaceX Could Be Worth $100 Billion",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0625,
+        "negative": 0.0123,
+        "neutral": 0.9252
+      },
+      "included": false
+    },
+    {
+      "title": "SpaceX Has a Huge Week Ahead",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0354,
+        "negative": 0.0253,
+        "neutral": 0.9393
+      },
+      "included": false
+    },
+    {
+      "title": "Wall Street's Next ETF Arms Race May Be About SpaceX — And Cerebras Just Showed The Blueprint",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1878,
+        "negative": 0.0276,
+        "neutral": 0.7846
+      },
+      "included": true
+    },
+    {
+      "title": "Chip Stocks Slide After U.S.-China Summit Ends Without Major Tech Deals",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0089,
+        "negative": 0.9686,
+        "neutral": 0.0226
+      },
+      "included": true
+    },
+    {
+      "title": "'SpaceX Picks Nasdaq As Listing Venue For Its Initial Public Offering; SpaceX To Price Initial Public Offering As Early As June 11, Set To List Shares On June 12; SpaceX Shares Set To Trade Under Ticker 'SPCX', Sources Say'",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0665,
+        "negative": 0.0109,
+        "neutral": 0.9226
+      },
+      "included": false
+    },
+    {
+      "title": "Car Wreck: Ford Falls 7%, Tesla Slides 4%",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0098,
+        "negative": 0.9729,
+        "neutral": 0.0173
+      },
+      "included": true
+    },
+    {
+      "title": "I Made $18,000 in ‘Free Money’ Selling Call Options on 200 Tesla Shares: Here’s How the Strategy Works",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0567,
+        "negative": 0.0213,
+        "neutral": 0.922
+      },
+      "included": false
+    },
+    {
+      "title": "SpaceX Could Become A $30 Trillion Monster, Ron Baron Says — And He Wants $1 Billion More",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.4064,
+        "negative": 0.0118,
+        "neutral": 0.5817
+      },
+      "included": true
+    },
+    {
+      "title": "These New Nvidia And Tesla ETFs Want To Deliver Weekly Income Without Fully Sacrificing Upside",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.1179,
+        "negative": 0.0086,
+        "neutral": 0.8736
+      },
+      "included": false
+    },
+    {
+      "title": "Citi Cuts Lucid Price Target to $14: Q1 Miss, Pulled Guidance Test the Saudi-Backed EV Maker",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.1322,
+        "negative": 0.8032,
+        "neutral": 0.0646
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla Robotaxi Concerns Grow: Is TSLA Stock Still Worth Holding?",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.016,
+        "negative": 0.9509,
+        "neutral": 0.033
+      },
+      "included": true
+    },
+    {
+      "title": "What Baron Capital Plans to Do in the ETF Space",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0573,
+        "negative": 0.0122,
+        "neutral": 0.9305
+      },
+      "included": false
+    },
+    {
+      "title": "Tesla Slips After China Trip Disappoints",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0888,
+        "negative": 0.844,
+        "neutral": 0.0673
+      },
+      "included": true
+    },
+    {
+      "title": "Coatue Management cuts share stake in Tesla by 96.4%, SEC filing shows",
+      "finbert_label": "negative",
+      "scores": {
+        "positive": 0.0353,
+        "negative": 0.8004,
+        "neutral": 0.1643
+      },
+      "included": true
+    },
+    {
+      "title": "These S&P500 stocks are the most active in today's session",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.0364,
+        "negative": 0.0261,
+        "neutral": 0.9375
+      },
+      "included": false
+    },
+    {
+      "title": "Elon Musk Sees $15 Trillion Optimus Upside — Tesla Investors Could Get A Piece For 'Free'",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.6041,
+        "negative": 0.0179,
+        "neutral": 0.378
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla China Financing Push Tests Growth, Margins And Rich Valuation",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8476,
+        "negative": 0.089,
+        "neutral": 0.0634
+      },
+      "included": true
+    },
+    {
+      "title": "SpaceX Holders Sign Off on 5-for-1 Stock Split Ahead of IPO",
+      "finbert_label": "neutral",
+      "scores": {
+        "positive": 0.136,
+        "negative": 0.4034,
+        "neutral": 0.4606
+      },
+      "included": true
+    },
+    {
+      "title": "Automotive Properties Real Est Invt TR Q1 Earnings Call Highlights",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.8584,
+        "negative": 0.1248,
+        "neutral": 0.0168
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla raises prices of Model Y cars in the US",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9134,
+        "negative": 0.0119,
+        "neutral": 0.0747
+      },
+      "included": true
+    },
+    {
+      "title": "Tesla raises prices of Model Y cars in the US for the first time in two years",
+      "finbert_label": "positive",
+      "scores": {
+        "positive": 0.9261,
+        "negative": 0.0117,
+        "neutral": 0.0622
+      },
+      "included": true
     }
   ]
 }

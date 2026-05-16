@@ -101,11 +101,15 @@ def get_current_prices(symbols):
 
 def run_signals_now():
     with st.spinner("신호 계산 중..."):
-        result = sig_module.generate_signals_for_all(config.SYMBOLS)
-        if result:
-            portfolio.save_signals(result)
-            return True, "신호 계산 완료"
-        return False, "신호 계산 실패"
+        try:
+            result = sig_module.generate_signals_for_all(config.SYMBOLS)
+            if result:
+                portfolio.save_signals(result)
+                return True, "신호 계산 완료"
+            return False, "신호 계산 실패"
+        except Exception as exc:
+            logging.exception("Signal refresh failed")
+            return False, f"신호 계산 실패: {exc}"
 
 def profit_class(value):
     if value > 0:
@@ -127,6 +131,9 @@ def format_signed_percent(value):
     else:
         sign = "+" if value > 0 else "-"
     return f"{sign}{abs(value):.2f}%"
+
+def format_money(value):
+    return f"${value:,.2f}"
 
 def main():
     # --- Custom CSS for Layout & Cards ---
@@ -170,19 +177,38 @@ def main():
     
     # 상단 총 미실현 수익 계산
     total_unrealized_profit = 0
+    priced_symbols = []
+    missing_price_symbols = []
     for sym, pos in port.positions.items():
-        p = current_prices.get(sym, pos.avg_price)
-        total_unrealized_profit += (p - pos.avg_price) * pos.shares
+        if sym in current_prices:
+            p = current_prices[sym]
+            total_unrealized_profit += (p - pos.avg_price) * pos.shares
+            priced_symbols.append(sym)
+        else:
+            missing_price_symbols.append(sym)
     total_profit_class = profit_class(total_unrealized_profit)
+    price_status = f"{len(priced_symbols)}/{len(port.positions)} 종목 가격 반영"
         
     with col_total_info:
-        st.markdown(f"""
-            <div style='text-align: right;'>
-                <span class='sub-text'>총 미실현 수익</span><br>
-                <h3 class='{total_profit_class}'>{format_signed_money(total_unrealized_profit)}</h3>
-                <span class='sub-text'>UTC {datetime.now().strftime('%H:%M:%S')}</span>
-            </div>
-        """, unsafe_allow_html=True)
+        if port.positions and not priced_symbols:
+            st.markdown(f"""
+                <div style='text-align: right;'>
+                    <span class='sub-text'>총 미실현 수익</span><br>
+                    <h3 class='profit-flat'>가격 미조회</h3>
+                    <span class='sub-text'>{price_status}</span>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+                <div style='text-align: right;'>
+                    <span class='sub-text'>총 미실현 수익</span><br>
+                    <h3 class='{total_profit_class}'>{format_signed_money(total_unrealized_profit)}</h3>
+                    <span class='sub-text'>{price_status}</span>
+                </div>
+            """, unsafe_allow_html=True)
+
+    if port.positions and missing_price_symbols:
+        st.info(f"가격을 아직 조회하지 않은 종목: {', '.join(missing_price_symbols)}. 현재가 새로고침 후 손익이 계산됩니다.")
 
     # --- 1. Top Horizontal Stock Cards ---
     if port.positions:
@@ -194,9 +220,15 @@ def main():
             
         for i, sym in enumerate(symbols):
             pos = port.positions[sym]
-            p = current_prices.get(sym, pos.avg_price)
-            profit = (p - pos.avg_price) * pos.shares
-            p_class = profit_class(profit)
+            has_price = sym in current_prices
+            if has_price:
+                p = current_prices[sym]
+                profit = (p - pos.avg_price) * pos.shares
+                p_class = profit_class(profit)
+                profit_text = format_signed_money(profit, 0)
+            else:
+                p_class = "profit-flat"
+                profit_text = "가격 미조회"
             
             with card_cols[i % 5]:
                 is_selected = (sym == st.session_state["selected_symbol"])
@@ -211,7 +243,7 @@ def main():
                     <div style='background-color: {bg_color}; border: 1px solid {border_color}; padding: 8px; border-radius: 4px;'>
                         <div class='sub-text' style='font-weight: bold;'>{sym}.US</div>
                         <div style='font-size: 0.85rem; margin-bottom: 5px;'>{config.COMPANY_NAMES.get(sym, sym)}</div>
-                        <div class='{p_class}' style='font-size: 1.1rem;'>{format_signed_money(profit, 0)}</div>
+                        <div class='{p_class}' style='font-size: 1.1rem;'>{profit_text}</div>
                         <div style='text-align: right; font-size: 0.7rem; color: #9e9e9e;'>{pos.shares:,} sh</div>
                     </div>
                 """, unsafe_allow_html=True)
@@ -224,12 +256,28 @@ def main():
     sel_sym = st.session_state.get("selected_symbol")
     if sel_sym and sel_sym in port.positions:
         pos = port.positions[sel_sym]
+        has_selected_price = sel_sym in current_prices
         price = current_prices.get(sel_sym, pos.avg_price)
         price_delta = price - pos.avg_price
         price_delta_rate = (price_delta / pos.avg_price * 100) if pos.avg_price else 0
         selected_profit = price_delta * pos.shares
         selected_profit_rate = price_delta_rate
         selected_profit_class = profit_class(selected_profit)
+        price_label = "최근 시가" if has_selected_price else "매입 단가"
+        selected_value_label = "시장 가치" if has_selected_price else "매입 기준 금액"
+        selected_value = price * pos.shares
+        selected_delta_html = (
+            f"<span class='{profit_class(price_delta)}'>{format_signed_money(price_delta)} ({format_signed_percent(price_delta_rate)})</span>"
+            if has_selected_price
+            else "<span class='sub-text'>가격 미조회 · 손익 계산 대기</span>"
+        )
+        selected_profit_html = (
+            f"<h3 class='{selected_profit_class}'>{format_signed_money(selected_profit)}</h3>"
+            if has_selected_price
+            else "<h3 class='profit-flat'>가격 미조회</h3>"
+        )
+        selected_rate_text = format_signed_percent(selected_profit_rate) if has_selected_price else "가격 미조회"
+        selected_rate_class = profit_class(selected_profit_rate) if has_selected_price else "profit-flat"
         
         col_main, col_side = st.columns([2.2, 0.8])
         
@@ -242,9 +290,9 @@ def main():
             with c_price_info:
                 st.markdown(f"""
                     <div style='text-align: right;'>
-                        <span class='sub-text'>현재 가격</span><br>
+                        <span class='sub-text'>{price_label}</span><br>
                         <span class='price-large'>{price:,.2f}</span><br>
-                        <span class='{profit_class(price_delta)}'>{format_signed_money(price_delta)} ({format_signed_percent(price_delta_rate)})</span>
+                        {selected_delta_html}
                     </div>
                 """, unsafe_allow_html=True)
             
@@ -253,14 +301,14 @@ def main():
             
             m_col1, m_col2, m_col3 = st.columns(3)
             with m_col1:
-                st.write("명목 가치")
-                st.subheader(f"${price * pos.shares:,.2f}")
+                st.write(selected_value_label)
+                st.subheader(format_money(selected_value))
             with m_col2:
                 st.write("매입 단가")
-                st.subheader(f"${pos.avg_price:,.2f}")
+                st.subheader(format_money(pos.avg_price))
             with m_col3:
                 st.write("미실현 수익")
-                st.markdown(f"<h3 class='{selected_profit_class}'>{format_signed_money(selected_profit)}</h3>", unsafe_allow_html=True)
+                st.markdown(selected_profit_html, unsafe_allow_html=True)
             
             st.divider()
             st.write(f"{sel_sym} 최근 거래")
@@ -277,12 +325,12 @@ def main():
                         <span style='font-size: 1.6rem; font-weight: bold;'>{pos.shares:,} 주</span>
                     </div>
                     <div style='margin-bottom: 25px;'>
-                        <span class='sub-text'>시장 가치</span><br>
-                        <span style='font-size: 1.6rem; font-weight: bold;'>${price * pos.shares:,.2f}</span>
+                        <span class='sub-text'>{selected_value_label}</span><br>
+                        <span style='font-size: 1.6rem; font-weight: bold;'>{format_money(selected_value)}</span>
                     </div>
                     <div style='margin-bottom: 25px;'>
                         <span class='sub-text'>수익률</span><br>
-                        <span class='{profit_class(selected_profit_rate)}' style='font-size: 1.6rem;'>{format_signed_percent(selected_profit_rate)}</span>
+                        <span class='{selected_rate_class}' style='font-size: 1.6rem;'>{selected_rate_text}</span>
                     </div>
                     <hr style='border-top: 1px solid #eee;'>
                     <div style='text-align: right; display: flex; align-items: center; justify-content: flex-end;'>
@@ -294,12 +342,47 @@ def main():
             
             st.write("")
             if st.button("현재가 새로고침", width="stretch"):
-                st.session_state["current_prices"] = get_current_prices(port.positions.keys())
+                refreshed_prices = get_current_prices(port.positions.keys())
+                st.session_state["current_prices"] = refreshed_prices
+                failed_symbols = [symbol for symbol in port.positions if symbol not in refreshed_prices]
+                st.session_state["last_price_refresh"] = {
+                    "ok": not failed_symbols,
+                    "message": (
+                        f"{len(refreshed_prices)}개 종목 가격 조회 완료"
+                        if refreshed_prices
+                        else "가격 조회 실패"
+                    ),
+                    "failed_symbols": failed_symbols,
+                    "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                }
                 st.rerun()
+
+            last_price_refresh = st.session_state.get("last_price_refresh")
+            if last_price_refresh:
+                price_refresh_text = f"{last_price_refresh['message']} · {last_price_refresh['time']}"
+                if last_price_refresh["failed_symbols"]:
+                    price_refresh_text += f" · 미조회: {', '.join(last_price_refresh['failed_symbols'])}"
+                if last_price_refresh["ok"]:
+                    st.success(price_refresh_text)
+                else:
+                    st.warning(price_refresh_text)
             
             if st.button("실시간 신호 갱신", width="stretch"):
-                run_signals_now()
+                ok, message = run_signals_now()
+                st.session_state["last_signal_refresh"] = {
+                    "ok": ok,
+                    "message": message,
+                    "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                }
                 st.rerun()
+
+            last_signal_refresh = st.session_state.get("last_signal_refresh")
+            if last_signal_refresh:
+                status_text = f"{last_signal_refresh['message']} · {last_signal_refresh['time']}"
+                if last_signal_refresh["ok"]:
+                    st.success(status_text)
+                else:
+                    st.error(status_text)
 
     st.divider()
 
