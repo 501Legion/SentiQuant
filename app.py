@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import json
 import logging
+import base64
 from datetime import datetime
 import subprocess
 import numpy as np
@@ -15,6 +16,15 @@ from backtester import BacktestEngine
 
 # --- Page Config ---
 st.set_page_config(page_title="SentiQuant Dashboard", layout="wide")
+
+def get_logo_data_uri():
+    logo_path = os.path.join(os.path.dirname(__file__), "assets", "sentiquant-logo.jpeg")
+    try:
+        with open(logo_path, "rb") as logo_file:
+            encoded = base64.b64encode(logo_file.read()).decode("ascii")
+        return f"data:image/jpeg;base64,{encoded}"
+    except OSError:
+        return None
 
 def load_trades():
     if os.path.exists(config.TRADES_FILE):
@@ -66,7 +76,7 @@ def kis_sync():
 
 def render_kis_panel(port, current_prices):
     """KIS 모의투자 계좌 영역 (FR-16, FR-17) — 헤더 상단에 표시."""
-    st.markdown("##### 🏦 KIS 모의투자 계좌")
+    st.markdown("### 🏦 계좌 현황")
     total_eval = port.cash + sum(
         current_prices.get(sym, pos.avg_price) * pos.shares
         for sym, pos in port.positions.items()
@@ -75,7 +85,7 @@ def render_kis_panel(port, current_prices):
     with c_acct:
         st.metric("계좌번호", _mask_account(config.KIS_ACCOUNT_NO))
     with c_cash:
-        st.metric("USD 가용 현금", f"${port.cash:,.2f}")
+        st.metric("예수금", f"${port.cash:,.2f}")
     with c_eval:
         st.metric("총 평가금액", f"${total_eval:,.2f}")
     with c_sync:
@@ -171,6 +181,14 @@ def main():
             font-size: 0.95rem;
             font-weight: 800;
         }
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            display: block;
+            border-radius: 9px;
+            object-fit: cover !important;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+        }
         .brand-name {
             color: #f8fafc;
             font-size: 1.55rem;
@@ -189,6 +207,54 @@ def main():
             margin-bottom: 10px;
             background-color: white;
             transition: 0.3s;
+        }
+        div[class*="st-key-stock_card_"] {
+            position: relative;
+        }
+        .stock-card-panel {
+            border-radius: 6px;
+            min-height: 116px;
+            padding: 12px;
+            transition: border-color 0.18s ease, transform 0.18s ease, background-color 0.18s ease;
+        }
+        div[class*="st-key-stock_card_"]:hover .stock-card-panel {
+            border-color: #3b82f6 !important;
+        }
+        .stock-card-symbol {
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stock-card-name {
+            color: #f8fafc;
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+        }
+        .stock-card-profit {
+            font-size: 1.1rem;
+        }
+        .stock-card-shares {
+            bottom: 12px;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            position: absolute;
+            right: 12px;
+        }
+        div[class*="st-key-stock_card_btn_"] {
+            inset: 0;
+            position: absolute;
+            z-index: 2;
+        }
+        div[class*="st-key-stock_card_btn_"] button {
+            background: transparent !important;
+            border: 0 !important;
+            color: transparent !important;
+            cursor: pointer;
+            min-height: 116px;
+            opacity: 0;
+            padding: 0;
+            width: 100%;
         }
         .profit-pos { color: #ef4444; font-weight: bold; }
         .profit-neg { color: #3b82f6; font-weight: bold; }
@@ -223,9 +289,15 @@ def main():
     """, unsafe_allow_html=True)
 
     # --- Header Area ---
-    st.markdown("""
+    logo_uri = get_logo_data_uri()
+    logo_html = (
+        f'<img class="brand-logo" src="{logo_uri}" alt="SentiQuant logo">'
+        if logo_uri
+        else '<div class="brand-mark">SQ</div>'
+    )
+    st.markdown(f"""
         <div class="brand-bar">
-            <div class="brand-mark">SQ</div>
+            {logo_html}
             <div>
                 <div class="brand-name">SentiQuant</div>
                 <div class="brand-subtitle">Sentiment 분석 기반의 투자 지원</div>
@@ -241,8 +313,7 @@ def main():
 
     col_nav, col_total_info = st.columns([3, 1])
     with col_nav:
-        st.caption("포트폴리오 / 상세 현황")
-        st.subheader(f"보유 주식 개요 ({len(port.positions)}개 포지션)")
+        st.subheader(f"📊보유 주식 개요 ({len(port.positions)}개 포지션)")
     
     # 상단 총 미실현 수익 계산
     total_unrealized_profit = 0
@@ -256,7 +327,7 @@ def main():
         else:
             missing_price_symbols.append(sym)
     total_profit_class = profit_class(total_unrealized_profit)
-    price_status = f"{len(priced_symbols)}/{len(port.positions)} 종목 가격 반영"
+    price_status = f"총 {len(priced_symbols)}개 종목 가격 반영"
         
     with col_total_info:
         if port.positions and not priced_symbols:
@@ -277,13 +348,16 @@ def main():
             """, unsafe_allow_html=True)
 
     if port.positions and missing_price_symbols:
-        st.info(f"가격을 아직 조회하지 않은 종목: {', '.join(missing_price_symbols)}. 현재가 새로고침 후 손익이 계산됩니다.")
+        st.info(
+            f"가격을 아직 조회하지 않은 종목: {', '.join(missing_price_symbols)}\n\n"
+            "현재가 새로고침 후 손익이 계산됩니다."
+        )
 
     # --- 1. Top Horizontal Stock Cards ---
     if port.positions:
         symbols = list(port.positions.keys())
         card_cols = st.columns(max(len(symbols), 5))
-        
+
         if "selected_symbol" not in st.session_state:
             st.session_state["selected_symbol"] = symbols[0]
             
@@ -294,28 +368,32 @@ def main():
                 p = current_prices[sym]
                 profit = (p - pos.avg_price) * pos.shares
                 p_class = profit_class(profit)
-                profit_text = format_signed_money(profit, 0)
+                profit_text = format_signed_money(profit)
             else:
                 p_class = "profit-flat"
                 profit_text = "가격 미조회"
             
             with card_cols[i % 5]:
                 is_selected = (sym == st.session_state["selected_symbol"])
-                bg_color = "#172033" if is_selected else "#171b22"
-                border_color = "#2563eb" if is_selected else "#2f3744"
                 
                 if len(symbols) > 1 and st.button(f"{sym}", key=f"btn_{sym}", width="stretch"):
                     st.session_state["selected_symbol"] = sym
                     st.rerun()
-                
-                st.markdown(f"""
-                    <div style='background-color: {bg_color}; border: 1px solid {border_color}; padding: 10px; border-radius: 6px; min-height: 92px;'>
-                        <div style='color: #cbd5e1; font-size: 0.75rem; font-weight: 700;'>{sym}.US</div>
-                        <div style='color: #f8fafc; font-size: 0.85rem; margin-bottom: 8px;'>{config.COMPANY_NAMES.get(sym, sym)}</div>
-                        <div class='{p_class}' style='font-size: 1.1rem;'>{profit_text}</div>
-                        <div style='text-align: right; font-size: 0.7rem; color: #94a3b8;'>{pos.shares:,} sh</div>
-                    </div>
-                """, unsafe_allow_html=True)
+
+                bg_color = "#172033" if is_selected else "#171b22"
+                border_color = "#2563eb" if is_selected else "#2f3744"
+                with st.container(key=f"stock_card_{sym}"):
+                    st.markdown(f"""
+                        <div class='stock-card-panel' style='background-color: {bg_color}; border: 1px solid {border_color};'>
+                            <div class='stock-card-symbol'>{sym}.US</div>
+                            <div class='stock-card-name'>{config.COMPANY_NAMES.get(sym, sym)}</div>
+                            <div class='stock-card-profit {p_class}'>{profit_text}</div>
+                            <div class='stock-card-shares'>보유 {pos.shares:,}주</div>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    if st.button("종목 선택", key=f"stock_card_btn_{sym}", width="stretch"):
+                        st.session_state["selected_symbol"] = sym
+                        st.rerun()
     else:
         st.info("보유 종목이 없습니다.")
 
