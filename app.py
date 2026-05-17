@@ -14,7 +14,7 @@ import signals as sig_module
 from backtester import BacktestEngine
 
 # --- Page Config ---
-st.set_page_config(page_title="Auto-Stock Dashboard", layout="wide")
+st.set_page_config(page_title="SentiQuant Dashboard", layout="wide")
 
 def load_trades():
     if os.path.exists(config.TRADES_FILE):
@@ -75,7 +75,7 @@ def render_kis_panel(port, current_prices):
     with c_acct:
         st.metric("계좌번호", _mask_account(config.KIS_ACCOUNT_NO))
     with c_cash:
-        st.metric("USD 가용현금", f"${port.cash:,.2f}")
+        st.metric("USD 가용 현금", f"${port.cash:,.2f}")
     with c_eval:
         st.metric("총 평가금액", f"${total_eval:,.2f}")
     with c_sync:
@@ -141,12 +141,47 @@ def main():
         <style>
         .main { background-color: #fcfcfc; }
         .stMetric {
-            background-color: #ffffff;
+            background-color: #171b22;
+            color: #f8fafc;
             padding: 10px;
             border-radius: 5px;
-            border: 1px solid #eee;
+            border: 1px solid #2f3744;
         }
-        [data-testid="stMetricValue"] { font-size: 1.5rem !important; }
+        [data-testid="stMetric"] * { color: #f8fafc !important; }
+        [data-testid="stMetricLabel"] * { color: #cbd5e1 !important; }
+        [data-testid="stMetricValue"] {
+            color: #ffffff !important;
+            font-size: 1.5rem !important;
+        }
+        .brand-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 4px 0 28px 0;
+        }
+        .brand-mark {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+        .brand-name {
+            color: #f8fafc;
+            font-size: 1.55rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .brand-subtitle {
+            color: #94a3b8;
+            font-size: 0.78rem;
+            margin-top: 2px;
+        }
         
         .stock-card {
             border-radius: 5px;
@@ -155,15 +190,49 @@ def main():
             background-color: white;
             transition: 0.3s;
         }
-        .profit-pos { color: #2962ff; font-weight: bold; }
-        .profit-neg { color: #d32f2f; font-weight: bold; }
-        .profit-flat { color: #616161; font-weight: bold; }
+        .profit-pos { color: #ef4444; font-weight: bold; }
+        .profit-neg { color: #3b82f6; font-weight: bold; }
+        .profit-flat { color: #94a3b8; font-weight: bold; }
         .sub-text { color: #757575; font-size: 0.75rem; }
         .price-large { font-size: 2rem; font-weight: bold; }
+        .total-summary {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            text-align: right;
+            width: max-content;
+            margin-left: auto;
+        }
+        .total-summary-label,
+        .total-summary-status {
+            color: #757575;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .total-summary-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            line-height: 1;
+            margin: 0;
+            white-space: nowrap;
+        }
+        .total-summary-value.profit-flat { color: #f8fafc; }
         </style>
     """, unsafe_allow_html=True)
 
     # --- Header Area ---
+    st.markdown("""
+        <div class="brand-bar">
+            <div class="brand-mark">SQ</div>
+            <div>
+                <div class="brand-name">SentiQuant</div>
+                <div class="brand-subtitle">Sentiment 분석 기반의 투자 지원</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
     port = portfolio.load_portfolio()
     current_prices = st.session_state.get("current_prices", {})
 
@@ -192,18 +261,18 @@ def main():
     with col_total_info:
         if port.positions and not priced_symbols:
             st.markdown(f"""
-                <div style='text-align: right;'>
-                    <span class='sub-text'>총 미실현 수익</span><br>
-                    <h3 class='profit-flat'>가격 미조회</h3>
-                    <span class='sub-text'>{price_status}</span>
+                <div class='total-summary'>
+                    <div class='total-summary-label'>총 미실현 수익</div>
+                    <div class='total-summary-value profit-flat'>가격 미조회</div>
+                    <div class='total-summary-status'>{price_status}</div>
                 </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown(f"""
-                <div style='text-align: right;'>
-                    <span class='sub-text'>총 미실현 수익</span><br>
-                    <h3 class='{total_profit_class}'>{format_signed_money(total_unrealized_profit)}</h3>
-                    <span class='sub-text'>{price_status}</span>
+                <div class='total-summary'>
+                    <div class='total-summary-label'>총 미실현 수익</div>
+                    <div class='total-summary-value {total_profit_class}'>{format_signed_money(total_unrealized_profit)}</div>
+                    <div class='total-summary-status'>{price_status}</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -232,19 +301,19 @@ def main():
             
             with card_cols[i % 5]:
                 is_selected = (sym == st.session_state["selected_symbol"])
-                bg_color = "#eef4ff" if is_selected else "#ffffff"
-                border_color = "#2962ff" if is_selected else "#e0e0e0"
+                bg_color = "#172033" if is_selected else "#171b22"
+                border_color = "#2563eb" if is_selected else "#2f3744"
                 
-                if st.button(f"{sym}", key=f"btn_{sym}", width="stretch"):
+                if len(symbols) > 1 and st.button(f"{sym}", key=f"btn_{sym}", width="stretch"):
                     st.session_state["selected_symbol"] = sym
                     st.rerun()
                 
                 st.markdown(f"""
-                    <div style='background-color: {bg_color}; border: 1px solid {border_color}; padding: 8px; border-radius: 4px;'>
-                        <div class='sub-text' style='font-weight: bold;'>{sym}.US</div>
-                        <div style='font-size: 0.85rem; margin-bottom: 5px;'>{config.COMPANY_NAMES.get(sym, sym)}</div>
+                    <div style='background-color: {bg_color}; border: 1px solid {border_color}; padding: 10px; border-radius: 6px; min-height: 92px;'>
+                        <div style='color: #cbd5e1; font-size: 0.75rem; font-weight: 700;'>{sym}.US</div>
+                        <div style='color: #f8fafc; font-size: 0.85rem; margin-bottom: 8px;'>{config.COMPANY_NAMES.get(sym, sym)}</div>
                         <div class='{p_class}' style='font-size: 1.1rem;'>{profit_text}</div>
-                        <div style='text-align: right; font-size: 0.7rem; color: #9e9e9e;'>{pos.shares:,} sh</div>
+                        <div style='text-align: right; font-size: 0.7rem; color: #94a3b8;'>{pos.shares:,} sh</div>
                     </div>
                 """, unsafe_allow_html=True)
     else:
@@ -318,24 +387,24 @@ def main():
 
         with col_side:
             st.markdown(f"""
-                <div style='border: 1px dashed #bdbdbd; padding: 20px; border-radius: 8px; background-color: #fafafa;'>
-                    <div class='sub-text' style='font-size: 0.9rem; margin-bottom: 20px;'>포지션 상태</div>
+                <div style='border: 1px solid #2f3744; padding: 20px; border-radius: 8px; background-color: #171b22;'>
+                    <div style='color: #cbd5e1; font-size: 0.9rem; margin-bottom: 20px;'>포지션 상태</div>
                     <div style='margin-bottom: 25px;'>
-                        <span class='sub-text'>보유 수량</span><br>
-                        <span style='font-size: 1.6rem; font-weight: bold;'>{pos.shares:,} 주</span>
+                        <span style='color: #94a3b8; font-size: 0.75rem;'>보유 수량</span><br>
+                        <span style='color: #f8fafc; font-size: 1.6rem; font-weight: bold;'>{pos.shares:,} 주</span>
                     </div>
                     <div style='margin-bottom: 25px;'>
-                        <span class='sub-text'>{selected_value_label}</span><br>
-                        <span style='font-size: 1.6rem; font-weight: bold;'>{format_money(selected_value)}</span>
+                        <span style='color: #94a3b8; font-size: 0.75rem;'>{selected_value_label}</span><br>
+                        <span style='color: #f8fafc; font-size: 1.6rem; font-weight: bold;'>{format_money(selected_value)}</span>
                     </div>
                     <div style='margin-bottom: 25px;'>
-                        <span class='sub-text'>수익률</span><br>
+                        <span style='color: #94a3b8; font-size: 0.75rem;'>수익률</span><br>
                         <span class='{selected_rate_class}' style='font-size: 1.6rem;'>{selected_rate_text}</span>
                     </div>
-                    <hr style='border-top: 1px solid #eee;'>
+                    <hr style='border-top: 1px solid #2f3744;'>
                     <div style='text-align: right; display: flex; align-items: center; justify-content: flex-end;'>
-                        <span style='color: #2962ff; font-size: 0.8rem; margin-right: 5px;'>●</span>
-                        <span style='color: #2962ff; font-size: 0.8rem;'>자동 거래 활성화</span>
+                        <span style='color: #60a5fa; font-size: 0.8rem; margin-right: 5px;'>●</span>
+                        <span style='color: #60a5fa; font-size: 0.8rem;'>자동 거래 활성화</span>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
