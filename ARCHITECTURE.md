@@ -3,7 +3,7 @@
 > 이 문서는 현재 시스템의 전체 구조를 한눈에 파악하기 위한 Living Document입니다.
 > 기능 추가/변경 시 반드시 업데이트하세요.
 >
-> **마지막 업데이트**: 2026-04-22
+> **마지막 업데이트**: 2026-05-17
 > **브랜치**: rsi_finBERT_combine
 
 ---
@@ -21,14 +21,27 @@ sentiment_provider.py                 wsb_signal_engine.py  [V3]
 (TextBlob / FinBERT / GPT-5.4 Mini)   (Velocity 보정 → 중립필터 → TopN)
     ↓                                     ↓
 signals.generate_signals_for_all()    reddit_portfolio.py
-(RSI + Sentiment → Signal)            (포지션 추적 / Stop-Loss / Trailing)
+(SIGNAL_ENGINE 디스패처               (포지션 추적 / Stop-Loss / Trailing)
+ → RSI + Sentiment → Signal)
     ↓
 market_filter.apply_market_filter()
 (QQQ RSI → 시장 과열 시 다운그레이드)
     ↓
 portfolio.py / trader.py
-(포지션 관리 / 주문 실행)
+(포지션 관리 / 주문 실행 → kis_broker 위임)
+    ↓
+kis_broker.py
+(KIS OpenAPI 모의투자 — OAuth / 주문 / 계좌 / 시세)
 ```
+
+> **신호 엔진 추상화** (kis-paper-trading): `signals.generate_signals_for_all()`은
+> `config.SIGNAL_ENGINE` 값으로 Provider를 선택하는 디스패처다. 기본값 `"finbert"`는
+> `signal_provider.FinbertProvider` → `signals._generate_signals_finbert()`로 위임하며
+> 기존 동작과 100% 동일하다. 디스패처는 신호 생성 전 `_filter_tradable_symbols()`로
+> KIS 매매 가능 종목과 교집합을 취한다.
+>
+> **주문 실행 위임** (kis-paper-trading): `trader.process_orders()`는 자체 시뮬레이션
+> 대신 `Broker` Protocol(`kis_broker.KISBroker`)의 `place_order()`에 위임한다.
 
 ---
 
@@ -40,11 +53,13 @@ portfolio.py / trader.py
 |------|------|------------|
 | `main.py` | CLI 진입점, 모든 실행 모드 라우팅 | `main()` |
 | `config.py` | 전체 상수 정의 (52개+) | — |
-| `signals.py` | 신호 결정 5단계 파이프라인 | `generate_signals_for_all()` |
+| `signals.py` | SIGNAL_ENGINE 디스패처 + 신호 결정 5단계 파이프라인 + KIS 매매가능 필터 | `generate_signals_for_all()`, `_generate_signals_finbert()` |
+| `signal_provider.py` | `SignalProvider` Protocol + `SIGNAL_ENGINE` Provider 디스패처 | `get_provider(name)` |
+| `kis_broker.py` | KIS OpenAPI 모의투자 브로커 어댑터 (OAuth 24h / 주문 / 계좌 / 시세 / 매매가능 종목) | `KISBroker`, `place_order()`, `get_account()` |
 | `sentiment_provider.py` | TextBlob/FinBERT/GPT-5.4 Mini Provider ABC | `get_provider(name)` |
 | `wsb_preprocessor.py` | WSB 슬랭/이모지/반어법 → FinBERT 친화적 변환 | `WSBPreprocessor.preprocess()` |
 | `collector.py` | OHLCV(Polygon) + 뉴스(Finnhub) 수집 | `get_ohlcv()`, `get_news()` |
-| `reddit_collector.py` | Reddit PRAW 6서브레딧 수집 + Daily Thread | `collect_wsb_posts()` |
+| `reddit_collector.py` | Reddit PRAW 6서브레딧 수집 + Daily Thread | `RedditCollector.collect()` |
 | `market_filter.py` | QQQ RSI 기반 시장 상태 필터 | `apply_market_filter()` |
 | `indicators.py` | RSI, MA, ATR, VolumeMA20 계산 | `get_latest_rsi()`, `get_ma()`, `calculate_atr()` |
 | `position_sizer.py` | Equal/Sentiment/Volatility 사이징 ABC | `get_sizer(name)` |
@@ -63,16 +78,21 @@ portfolio.py / trader.py
 
 | 파일 | 역할 |
 |------|------|
-| `portfolio.py` | 뉴스 모델 포지션 관리 |
-| `trader.py` | 주문 실행 (페이퍼 트레이딩) |
-| `scheduler.py` | 크론탭 연동 스케줄러 |
+| `portfolio.py` | 뉴스 모델 포지션 관리 + `sync_from_kis()` KIS 잔고 동기화 |
+| `trader.py` | 주문 실행 — `Broker` Protocol(`kis_broker`)에 `place_order` 위임 (`--dry-run` 지원) |
+| `scheduler.py` | 크론탭 연동 스케줄러 + 신호 계산 전 KIS 매매가능 종목 갱신 |
 
 ---
 
 ## 3. 신호 결정 파이프라인 (뉴스 모델)
 
 ```python
-# signals.generate_signals_for_all() 내부 흐름
+# signals.generate_signals_for_all() = SIGNAL_ENGINE 디스패처
+0a. 매매가능 필터      _filter_tradable_symbols() — config.SYMBOLS ∩ kis_symbols.json
+0b. Provider 선택      signal_provider.get_provider(config.SIGNAL_ENGINE)
+                       "finbert"(기본) → _generate_signals_finbert() 위임
+
+# signals._generate_signals_finbert() 내부 흐름 (7단계 본체)
 1. OHLCV 수집          collector.get_ohlcv(symbol)
 2. RSI 계산             indicators.get_latest_rsi()
 3. 뉴스 수집            collector.get_news(symbol)
@@ -168,7 +188,14 @@ python main.py --run-now
 
 # Reddit Forward Testing (스케줄러)
 python main.py --reddit-run-now
+
+# KIS 모의투자 주문 처리 (kis-paper-trading)
+python main.py --order-now              # 신호 기반 KIS 모의투자 실주문 처리
+python main.py --order-now --dry-run    # KIS 주문 직전까지 시뮬레이션 (실주문 없음)
+python main.py --run-now --source kis   # KIS 잔고 동기화 후 신호 생성
 ```
+
+> `--source`는 `[news|reddit|kis]`, `--ranking`은 `[mentions|ratio]` (argparse 실제 값 기준).
 
 ---
 
@@ -203,6 +230,20 @@ python main.py --reddit-run-now
 | `WSB_RSI_EXIT_OVERBOUGHT` | 70.0 | RSI 과매수 청산 기준 |
 | `WSB_GAP_DOWN_PCT` | -5.0 | Gap Down 청산 기준 (%) |
 
+**KIS / Signal Engine 상수** (kis-paper-trading):
+
+| 상수 | 기본값 | 설명 |
+|------|--------|------|
+| `SIGNAL_ENGINE` | `"finbert"` | 신호 엔진 선택 (`finbert` \| `gpt5`). `gpt5`는 `NotImplementedError` |
+| `KIS_APP_KEY` / `KIS_APP_SECRET` | `""` (env) | KIS OpenAPI 인증 키 |
+| `KIS_ACCOUNT_NO` | `""` (env) | 계좌번호 `"12345678-01"` 형식 |
+| `KIS_PAPER_TRADING` | `true` | 모의투자 강제 플래그 — `false` 시 `connect()` 차단 (FR-20) |
+| `KIS_BASE_URL_PAPER` | `openapivts…:29443` | 모의투자 API 도메인 |
+| `KIS_BASE_URL_REAL` | `openapi…:9443` | 실전 도메인 — FR-20으로 차단 |
+| `KIS_TOKEN_CACHE_FILE` | `data/kis_token.json` | OAuth 토큰 24h 캐시 |
+| `KIS_SYMBOLS_FILE` | `data/kis_symbols.json` | 매매 가능 종목 캐시 |
+| `KIS_SYMBOLS_REFRESH_DAYS` | 7 | 종목 마스터 갱신 주기 (일) |
+
 ---
 
 ## 8. 기능 이력 (완료된 PDCA)
@@ -217,7 +258,8 @@ python main.py --reddit-run-now
 | `daily-thread-collector` | 2026-04-18 | Daily Thread 댓글 수집 | `docs/archive/2026-04/daily-thread-collector/` |
 | `wsb-finbert-preprocessor` | 2026-04-18 | WSB 전처리 + finbert-wsb 옵션 | `docs/archive/2026-04/wsb-finbert-preprocessor/` |
 | `wsb-signal-v3` | 2026-04-22 | 30MA 제거 + Velocity 보정 매트릭스 + 5단계 청산 | `docs/archive/2026-04/wsb-signal-v3/` |
-| `wsb-daily-comments` | 2026-04 | Daily Thread 댓글 수집 보강 (plan + analysis) | `docs/01-plan/`, `docs/03-analysis/` (진행 중) |
+| `wsb-daily-comments` | 2026-05 | Daily Thread 댓글 수집 보강 | `docs/archive/2026-05/wsb-daily-comments/` |
+| `kis-paper-trading` | 2026-05-16 | KIS OpenAPI 모의투자 연동 (`kis_broker.py`·`signal_provider.py` 신규) + SIGNAL_ENGINE 추상화 + 매매가능 종목 필터 | `docs/01-plan/`·`docs/02-design/`·`docs/03-analysis/`·`docs/04-report/` (미아카이브) |
 
 ---
 

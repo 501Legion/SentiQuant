@@ -1,33 +1,33 @@
 {
-  "date": "2026-05-16",
+  "date": "2026-05-28",
   "signals": {
     "NVDA": {
-      "rsi": 65.38,
-      "rsi_ma": 69.62,
-      "sentiment": 49.84,
-      "sentiment_textblob": 53.92,
-      "sentiment_finbert": 45.76,
-      "volume_ma20": 153573240.0,
+      "rsi": 51.28,
+      "rsi_ma": 57.31,
+      "sentiment": 49.56,
+      "sentiment_textblob": 55.73,
+      "sentiment_finbert": 43.4,
+      "volume_ma20": 162019475.0,
       "volume_spike": false,
-      "market_rsi": 71.87,
+      "market_rsi": 74.89,
       "market_filter_applied": false,
       "signal": "NEUTRAL",
       "signal_original": "NEUTRAL",
-      "timestamp": "2026-05-16T23:39:43.849561"
+      "timestamp": "2026-05-28T23:44:41.908867"
     },
     "TSLA": {
-      "rsi": 58.47,
-      "rsi_ma": 68.21,
-      "sentiment": 53.19,
-      "sentiment_textblob": 55.43,
-      "sentiment_finbert": 50.94,
-      "volume_ma20": 59955125.0,
+      "rsi": 63.18,
+      "rsi_ma": 56.65,
+      "sentiment": 61.38,
+      "sentiment_textblob": 54.25,
+      "sentiment_finbert": 68.52,
+      "volume_ma20": 53523299.0,
       "volume_spike": false,
-      "market_rsi": 71.87,
+      "market_rsi": 74.89,
       "market_filter_applied": false,
       "signal": "NEUTRAL",
       "signal_original": "NEUTRAL",
-      "timestamp": "2026-05-16T23:39:43.849561"
+      "timestamp": "2026-05-28T23:44:41.908867"
     }
   }
 }

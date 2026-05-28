@@ -1,0 +1,46 @@
+{
+  "date": "2026-05-22",
+  "strategy_key": "finbert_mentions_equal",
+  "cash": 73004.25,
+  "total_value": 100221.07,
+  "positions": {
+    "BWMN": {
+      "entry_date": "2026-05-20",
+      "entry_price": 30.68,
+      "shares": 325,
+      "highest_price": 31.73
+    },
+    "RDDT": {
+      "entry_date": "2026-05-22",
+      "entry_price": 145.23,
+      "shares": 61,
+      "highest_price": 145.23
+    },
+    "XPEV": {
+      "entry_date": "2026-05-22",
+      "entry_price": 15.28,
+      "shares": 530,
+      "highest_price": 15.28
+    }
+  },
+  "daily_trades": [
+    {
+      "type": "buy",
+      "symbol": "RDDT",
+      "date": "2026-05-22",
+      "price": 145.23,
+      "shares": 61,
+      "trade_value": 8859.03,
+      "commission": 22.15
+    },
+    {
+      "type": "buy",
+      "symbol": "XPEV",
+      "date": "2026-05-22",
+      "price": 15.28,
+      "shares": 530,
+      "trade_value": 8098.4,
+      "commission": 20.25
+    }
+  ]
+}

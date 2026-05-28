@@ -45,9 +45,11 @@ REDDIT_DATA_DIR = "data/reddit"     # data/reddit/YYYY-MM-DD/ 루트
 # 수동 제외 티커 — 실제 종목이 아닌 단어가 수집될 때 여기에 추가
 REDDIT_TICKER_BLACKLIST: set[str] = {
     "WTF", "WAR", "YOU", "ARE", "TACO", "USO",
+    "ALL", "EOD", "WAY", "OUT", "AMA",
 }
 REDDIT_MODE = False                 # True: Reddit 실시간 모드 활성화
 REDDIT_BACKTEST_MIN_DAYS = 14       # 최소 거래일 미만 시 경고
+REDDIT_BACKTEST_FETCH_THROTTLE = 12.0  # replay OHLCV 사전수집 시 캐시 미스당 대기(초, 무료 플랜 5req/min)
 
 # --- Reddit 신호 파라미터 (Design Ref: §2.5 WSBSignalEngine) ---
 WSB_CONSENSUS_RATIO = 1.5           # bullish/bearish 진입 기준
