@@ -87,18 +87,18 @@ def render_kis_panel(port, current_prices):
     with c_cash:
         st.metric("예수금", f"${port.cash:,.2f}")
     with c_eval:
-        st.metric("총 평가금액", f"${total_eval:,.2f}")
+        st.metric("총 평가 금액", f"${total_eval:,.2f}")
     with c_sync:
         st.write("")
-        if st.button("🔄 KIS 동기화", use_container_width=True):
+        if st.button("새로고침", use_container_width=True):
             try:
                 synced, prices = kis_sync()
                 if prices:
                     st.session_state["current_prices"] = prices
-                st.success(f"KIS 동기화 완료 — {len(synced.positions)}개 포지션")
+                st.success(f"동기화 완료 — {len(synced.positions)}개 포지션")
                 st.rerun()
             except Exception as e:
-                st.error(f"KIS 동기화 실패: {e}")
+                st.error(f"동기화 실패: {e}")
     st.divider()
 
 def get_current_prices(symbols):
@@ -503,6 +503,15 @@ def main():
                     "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 }
                 st.rerun()
+            
+            if st.button("실시간 신호 갱신", width="stretch"):
+                ok, message = run_signals_now()
+                st.session_state["last_signal_refresh"] = {
+                    "ok": ok,
+                    "message": message,
+                    "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                }
+                st.rerun()
 
             last_price_refresh = st.session_state.get("last_price_refresh")
             if last_price_refresh:
@@ -513,15 +522,6 @@ def main():
                     st.success(price_refresh_text)
                 else:
                     st.warning(price_refresh_text)
-            
-            if st.button("실시간 신호 갱신", width="stretch"):
-                ok, message = run_signals_now()
-                st.session_state["last_signal_refresh"] = {
-                    "ok": ok,
-                    "message": message,
-                    "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                }
-                st.rerun()
 
             last_signal_refresh = st.session_state.get("last_signal_refresh")
             if last_signal_refresh:
