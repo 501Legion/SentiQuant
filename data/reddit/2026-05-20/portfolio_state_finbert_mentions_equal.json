@@ -1,0 +1,25 @@
+{
+  "date": "2026-05-20",
+  "strategy_key": "finbert_mentions_equal",
+  "cash": 90004.07,
+  "total_value": 100069.32,
+  "positions": {
+    "BWMN": {
+      "entry_date": "2026-05-20",
+      "entry_price": 30.68,
+      "shares": 325,
+      "highest_price": 30.68
+    }
+  },
+  "daily_trades": [
+    {
+      "type": "buy",
+      "symbol": "BWMN",
+      "date": "2026-05-20",
+      "price": 30.68,
+      "shares": 325,
+      "trade_value": 9971.0,
+      "commission": 24.93
+    }
+  ]
+}
