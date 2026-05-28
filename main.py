@@ -31,6 +31,13 @@ import sys
 
 import config
 
+# Windows 콘솔(cp949)에서 em대시(—) 등 출력 시 UnicodeEncodeError 방지 — UTF-8 강제
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 # 로깅 설정 (Design Ref: §9)
 os.makedirs("data", exist_ok=True)
 logging.basicConfig(

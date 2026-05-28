@@ -3,10 +3,20 @@
 # Plan SC NFR-06: 유효 거래일 < REDDIT_BACKTEST_MIN_DAYS 시 경고
 # Plan SC NFR-07: 수수료 RedditPortfolio._calc_commission()으로 처리
 import logging
+from datetime import datetime, timedelta
 
 import config
+import indicators
 import wsb_state
-from backtester import BacktestResult, TradeRecord, _summarize_trades, _calc_total_return, _calc_win_rate, _calc_mdd
+from backtester import (
+    BacktestResult,
+    TradeRecord,
+    _summarize_trades,
+    _calc_total_return,
+    _calc_win_rate,
+    _calc_mdd,
+    _get_ohlcv_snapshot,
+)
 from position_sizer import get_sizer
 from reddit_collector import RedditCollector
 from reddit_portfolio import RedditPortfolio
@@ -93,22 +103,26 @@ class RedditReplayBacktester:
             f" ({self.from_date} ~ {self.to_date}, {len(dates)}일)"
         )
 
+        # 전체 기간 OHLCV 사전 수집 (snapshot 캐시) — replay 첫 실행만 Polygon 호출
+        posts_by_date = {d: RedditCollector.load_posts(d) for d in dates}
+        all_symbols = {s for posts in posts_by_date.values() for s in posts}
+        self._prefetch_ohlcv(all_symbols)
+
         for date_str in dates:
-            posts_by_symbol = RedditCollector.load_posts(date_str)
+            posts_by_symbol = posts_by_date.get(date_str) or {}
             if not posts_by_symbol:
                 logger.debug(f"[{date_str}] wsb_posts.json 없음 — 스킵")
                 continue
 
-            # OHLCV: 이미 수집된 데이터 재사용 (replay이므로 API 호출 불필요)
-            # wsb_signals.json에서 저장된 OHLCV를 읽거나, Polygon 호출 최소화
-            ohlcv_cache = self._load_ohlcv_for_replay(posts_by_symbol, date_str)
-            if not ohlcv_cache:
+            # RSI/신호용: 종목별 date_str 이하 OHLCV DataFrame 슬라이스
+            df_cache = self._slice_cache(posts_by_symbol.keys(), date_str)
+            if not df_cache:
                 logger.debug(f"[{date_str}] OHLCV 없음 — 스킵")
                 continue
 
             # 파이프라인: top_n 계산
             top_n, signal_details = engine.run_pipeline(
-                posts_by_symbol, ohlcv_cache, date_str
+                posts_by_symbol, df_cache, date_str
             )
 
             # 청산 신호 계산 — signal_details에서 scored + velocity_state 추출
@@ -118,12 +132,16 @@ class RedditReplayBacktester:
                 for d in signal_details
             }
 
+            # 체결/청산용: date_str 당일 스칼라 OHLCV (보유 종목 포함, 거래일만)
+            exec_symbols = set(posts_by_symbol) | set(portfolio.positions)
+            today_ohlcv = self._today_cache(exec_symbols, date_str)
+
             # Design Ref: §wsb-signal-v3 §3.5 — position_scores 로드 후 check_exit 전달
             position_scores = wsb_state.load_position_scores()
 
             exit_signals = {}
             for symbol in list(portfolio.positions.keys()):
-                sym_ohlcv = ohlcv_cache.get(symbol, {})
+                sym_ohlcv = today_ohlcv.get(symbol, {})
                 should_exit, reason = engine.check_exit(
                     position={
                         "symbol": symbol,
@@ -133,7 +151,7 @@ class RedditReplayBacktester:
                     },
                     today_ohlcv=sym_ohlcv,
                     scored=scored,
-                    ohlcv_cache=ohlcv_cache,
+                    ohlcv_cache=df_cache,
                     position_scores=position_scores,
                     velocity_state=velocity_map.get(symbol, "NORMAL"),
                 )
@@ -143,13 +161,13 @@ class RedditReplayBacktester:
             wsb_state.save_position_scores(position_scores)
 
             # ATR cache for VolatilitySizer
-            atr_cache = self._calc_atr_cache(ohlcv_cache)
+            atr_cache = self._calc_atr_cache(today_ohlcv)
 
             portfolio.process_day(
                 date_str=date_str,
                 top_n=top_n,
                 exit_signals=exit_signals,
-                ohlcv=ohlcv_cache,
+                ohlcv=today_ohlcv,
                 sizer=sizer,
                 scored=scored,
                 atr_cache=atr_cache,
@@ -198,49 +216,80 @@ class RedditReplayBacktester:
             trades=trade_records,
         )
 
-    def _load_ohlcv_for_replay(
-        self,
-        posts_by_symbol: dict,
-        date_str: str,
-    ) -> dict[str, dict]:
+    def _prefetch_ohlcv(self, symbols: set[str]) -> None:
         """
-        Replay용 OHLCV 로드.
-        wsb_signals.json에 저장된 OHLCV 사용. 없으면 빈 dict 반환.
-        실제 실행 시 collector.get_ohlcv()를 호출할 수 있으나
-        replay 의도에 맞게 저장 데이터 우선 사용.
+        전략 universe 종목의 OHLCV를 from_date-100일 ~ to_date 범위로 1회 수집.
+        backtester._get_ohlcv_snapshot 재사용 → CSV 스냅샷 캐시(재실행 시 오프라인).
+        RSI 계산 버퍼 확보를 위해 시작일을 100일 앞당긴다.
+        무료 플랜 rate limit 대응: 캐시 미스(실제 API 호출) 때만 throttle.
         """
-        import json, os
+        import os
+        import time
+        from backtester import _snapshot_path
 
-        signals_file = os.path.join(
-            config.REDDIT_DATA_DIR, date_str, "wsb_signals.json"
-        )
-        ohlcv = {}
+        start_dt = datetime.strptime(self.from_date, "%Y-%m-%d")
+        ohlcv_start = (start_dt - timedelta(days=100)).strftime("%Y-%m-%d")
 
-        if os.path.exists(signals_file):
+        self._ohlcv_full: dict[str, "pd.DataFrame"] = {}
+        for symbol in sorted(symbols):
+            snap = _snapshot_path("ohlcv", f"{symbol}_{ohlcv_start}_{self.to_date}.csv")
+            cached = os.path.exists(snap)
             try:
-                with open(signals_file, "r", encoding="utf-8") as f:
-                    signals = json.load(f)
-                # wsb_signals.json의 signal_details에 prev_close, ma30 저장됨
-                for detail in signals.get("signal_details", []):
-                    sym = detail["symbol"]
-                    ohlcv[sym] = {
-                        "open": detail.get("prev_close"),   # replay: open ≈ prev_close
-                        "close": detail.get("prev_close"),
-                        "prev_close": detail.get("prev_close"),
-                    }
+                df = _get_ohlcv_snapshot(symbol, ohlcv_start, self.to_date)
             except Exception as e:
-                logger.debug(f"[{date_str}] wsb_signals.json 로드 실패: {e}")
+                logger.warning(f"[{symbol}] OHLCV 수집 실패: {e} — 제외")
+                df = None
+            if df is not None and not df.empty:
+                self._ohlcv_full[symbol] = df
+            if not cached:
+                time.sleep(config.REDDIT_BACKTEST_FETCH_THROTTLE)
 
-        # OHLCV DataFrame도 만들기 (30MA 계산용) — 없으면 pass
-        ohlcv_df_cache: dict[str, "pd.DataFrame"] = {}
-        return ohlcv  # check_exit에서 ohlcv_cache도 필요 → _calc_atr_cache로 분리
+    def _slice_cache(self, symbols, date_str: str) -> dict:
+        """run_pipeline용: 종목별 date_str 이하 OHLCV DataFrame 슬라이스."""
+        cache = {}
+        for symbol in symbols:
+            full = self._ohlcv_full.get(symbol)
+            if full is None or full.empty:
+                continue
+            sliced = full[full["date"] <= date_str]
+            if not sliced.empty:
+                cache[symbol] = sliced
+        return cache
+
+    def _today_cache(self, symbols, date_str: str) -> dict[str, dict]:
+        """
+        process_day/check_exit용: date_str 당일 스칼라 OHLCV.
+        date_str가 거래일이 아니면(주말/휴장) 해당 종목 제외 → 당일 체결 없음.
+        prev_close는 직전 거래일 종가, rsi는 date_str 까지의 슬라이스로 계산.
+        """
+        cache: dict[str, dict] = {}
+        for symbol in symbols:
+            full = self._ohlcv_full.get(symbol)
+            if full is None or full.empty:
+                continue
+            sliced = full[full["date"] <= date_str].reset_index(drop=True)
+            if sliced.empty:
+                continue
+            last = sliced.iloc[-1]
+            if last["date"] != date_str:
+                continue  # date_str는 거래일 아님 — 당일 체결 데이터 없음
+            prev_close = (
+                float(sliced.iloc[-2]["close"]) if len(sliced) >= 2 else None
+            )
+            rsi, _ = indicators.get_latest_rsi(symbol, sliced)
+            cache[symbol] = {
+                "open": float(last["open"]),
+                "close": float(last["close"]),
+                "prev_close": prev_close,
+                "rsi": rsi,
+            }
+        return cache
 
     def _calc_atr_cache(self, ohlcv_cache: dict) -> dict[str, float]:
         """
-        VolatilitySizer용 ATR. replay 시 근사값 없으면 빈 dict 반환.
-        실시간 모드에서는 collector.get_ohlcv()로 계산.
+        VolatilitySizer용 ATR. replay 시 미산출 — Equal/Sentiment sizing 권장.
         """
-        return {}  # replay에서는 Equal/Sentiment 사용 권장
+        return {}
 
 
 def run_all_reddit_strategies(

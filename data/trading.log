@@ -6653,3 +6653,1637 @@ ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.i
 2026-05-16 13:15:27,278 [INFO] __main__: 즉시 주문 처리 실행 (DRY-RUN)
 2026-05-16 13:15:27,279 [INFO] scheduler: === 주문 처리 잡 시작 (09:35 ET, DRY-RUN) ===
 2026-05-16 13:15:27,419 [INFO] scheduler: 오늘은 NYSE 휴장일 — 주문 처리 잡 스킵
+2026-05-28 22:20:09,935 [WARNING] reddit_backtester: [RedditBacktest] 유효 거래일 9일 < 최소 14일 — 결과 신뢰도 낮음
+2026-05-28 22:20:09,935 [INFO] reddit_backtester: [RedditBacktest] 시작 — finbert_mentions_equal (2026-05-17 ~ 2026-05-25, 9일)
+2026-05-28 22:20:10,049 [INFO] reddit_backtester: [RedditBacktest] 완료 — finbert_mentions_equal | 수익률=+0.0% | 거래=0회 | 승률=0.0% | MDD=0.0%
+2026-05-28 22:20:24,032 [WARNING] reddit_backtester: [RedditBacktest] 유효 거래일 9일 < 최소 14일 — 결과 신뢰도 낮음
+2026-05-28 22:20:24,033 [INFO] reddit_backtester: [RedditBacktest] 시작 — finbert_mentions_equal (2026-05-17 ~ 2026-05-25, 9일)
+2026-05-28 22:20:24,038 [INFO] reddit_backtester: [RedditBacktest] 완료 — finbert_mentions_equal | 수익률=+0.0% | 거래=0회 | 승률=0.0% | MDD=0.0%
+2026-05-28 22:53:52,816 [WARNING] reddit_backtester: [RedditBacktest] 유효 거래일 9일 < 최소 14일 — 결과 신뢰도 낮음
+2026-05-28 22:53:52,817 [INFO] reddit_backtester: [RedditBacktest] 시작 — finbert_mentions_equal (2026-05-17 ~ 2026-05-25, 9일)
+2026-05-28 22:53:53,733 [INFO] collector: [AAPL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:53:53,744 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\AAPL_2026-02-06_2026-05-25.csv
+2026-05-28 22:54:06,050 [INFO] collector: [AMC] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:54:06,053 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\AMC_2026-02-06_2026-05-25.csv
+2026-05-28 22:54:18,417 [INFO] collector: [AMZN] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:54:18,422 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\AMZN_2026-02-06_2026-05-25.csv
+2026-05-28 22:54:30,721 [INFO] collector: [API] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:54:30,728 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\API_2026-02-06_2026-05-25.csv
+2026-05-28 22:54:42,994 [INFO] collector: [APLD] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:54:42,997 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\APLD_2026-02-06_2026-05-25.csv
+2026-05-28 22:54:55,350 [INFO] collector: [ARM] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:54:55,355 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\ARM_2026-02-06_2026-05-25.csv
+2026-05-28 22:55:21,311 [INFO] collector: [ASML] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:55:21,315 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\ASML_2026-02-06_2026-05-25.csv
+2026-05-28 22:55:45,855 [INFO] collector: [ASTS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:55:45,859 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\ASTS_2026-02-06_2026-05-25.csv
+2026-05-28 22:55:58,131 [INFO] collector: [BACK] OHLCV range 56일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:55:58,134 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\BACK_2026-02-06_2026-05-25.csv
+2026-05-28 22:56:10,546 [INFO] collector: [BGDE] OHLCV range 17일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:56:10,549 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\BGDE_2026-02-06_2026-05-25.csv
+2026-05-28 22:56:22,793 [INFO] collector: [BKNG] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:56:22,796 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\BKNG_2026-02-06_2026-05-25.csv
+2026-05-28 22:56:35,076 [INFO] collector: [BOT] OHLCV range 10일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:56:35,082 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\BOT_2026-02-06_2026-05-25.csv
+2026-05-28 22:56:47,344 [INFO] collector: [BOXX] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:56:47,349 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\BOXX_2026-02-06_2026-05-25.csv
+2026-05-28 22:56:59,615 [INFO] collector: [BWMN] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:56:59,618 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\BWMN_2026-02-06_2026-05-25.csv
+2026-05-28 22:57:11,910 [INFO] collector: [BWXT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:57:11,912 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\BWXT_2026-02-06_2026-05-25.csv
+2026-05-28 22:57:24,219 [INFO] collector: [CAN] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:57:24,221 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CAN_2026-02-06_2026-05-25.csv
+2026-05-28 22:57:36,491 [INFO] collector: [CAR] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:57:36,493 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CAR_2026-02-06_2026-05-25.csv
+2026-05-28 22:57:50,008 [INFO] collector: [CAVA] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:57:50,010 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CAVA_2026-02-06_2026-05-25.csv
+2026-05-28 22:58:02,315 [INFO] collector: [CBRS] OHLCV range 7일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:58:02,318 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CBRS_2026-02-06_2026-05-25.csv
+2026-05-28 22:58:14,955 [INFO] collector: [CEG] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:58:14,960 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CEG_2026-02-06_2026-05-25.csv
+2026-05-28 22:58:27,606 [INFO] collector: [COHR] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:58:27,610 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\COHR_2026-02-06_2026-05-25.csv
+2026-05-28 22:58:39,913 [INFO] collector: [COIN] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:58:39,916 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\COIN_2026-02-06_2026-05-25.csv
+2026-05-28 22:58:52,180 [INFO] collector: [COST] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:58:52,183 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\COST_2026-02-06_2026-05-25.csv
+2026-05-28 22:59:04,711 [INFO] collector: [CRDO] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:59:04,714 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CRDO_2026-02-06_2026-05-25.csv
+2026-05-28 22:59:17,470 [INFO] collector: [CRM] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:59:17,474 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CRM_2026-02-06_2026-05-25.csv
+2026-05-28 22:59:29,755 [INFO] collector: [CRWD] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:59:29,758 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CRWD_2026-02-06_2026-05-25.csv
+2026-05-28 22:59:42,489 [INFO] collector: [CVX] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:59:42,493 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\CVX_2026-02-06_2026-05-25.csv
+2026-05-28 22:59:54,760 [INFO] collector: [DGXX] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 22:59:54,765 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\DGXX_2026-02-06_2026-05-25.csv
+2026-05-28 23:00:07,858 [INFO] collector: [DJT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:00:07,862 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\DJT_2026-02-06_2026-05-25.csv
+2026-05-28 23:00:22,672 [INFO] collector: [DOCS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:00:22,676 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\DOCS_2026-02-06_2026-05-25.csv
+2026-05-28 23:00:34,989 [INFO] collector: [DON] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:00:34,992 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\DON_2026-02-06_2026-05-25.csv
+2026-05-28 23:00:47,235 [INFO] collector: [DRAM] OHLCV range 36일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:00:47,238 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\DRAM_2026-02-06_2026-05-25.csv
+2026-05-28 23:00:59,625 [INFO] collector: [DRIP] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:00:59,627 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\DRIP_2026-02-06_2026-05-25.csv
+2026-05-28 23:01:11,892 [INFO] collector: [EASY] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:01:11,895 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\EASY_2026-02-06_2026-05-25.csv
+2026-05-28 23:01:24,172 [INFO] collector: [EVER] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:01:24,177 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\EVER_2026-02-06_2026-05-25.csv
+2026-05-28 23:01:36,476 [INFO] collector: [EWJ] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:01:36,485 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\EWJ_2026-02-06_2026-05-25.csv
+2026-05-28 23:01:48,789 [INFO] collector: [F] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:01:48,793 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\F_2026-02-06_2026-05-25.csv
+2026-05-28 23:02:01,138 [INFO] collector: [FCEL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:02:01,143 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\FCEL_2026-02-06_2026-05-25.csv
+2026-05-28 23:02:43,432 [INFO] collector: [FIX] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:02:43,436 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\FIX_2026-02-06_2026-05-25.csv
+2026-05-28 23:02:55,970 [INFO] collector: [FLY] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:02:55,972 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\FLY_2026-02-06_2026-05-25.csv
+2026-05-28 23:03:08,298 [INFO] collector: [GFS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:03:08,301 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\GFS_2026-02-06_2026-05-25.csv
+2026-05-28 23:03:20,607 [INFO] collector: [GLXY] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:03:20,610 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\GLXY_2026-02-06_2026-05-25.csv
+2026-05-28 23:03:32,870 [INFO] collector: [GOOGL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:03:32,874 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\GOOGL_2026-02-06_2026-05-25.csv
+2026-05-28 23:03:45,183 [INFO] collector: [GRPN] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:03:45,187 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\GRPN_2026-02-06_2026-05-25.csv
+2026-05-28 23:03:57,464 [INFO] collector: [H] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:03:57,467 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\H_2026-02-06_2026-05-25.csv
+2026-05-28 23:04:09,769 [INFO] collector: [HAS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:04:09,772 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\HAS_2026-02-06_2026-05-25.csv
+2026-05-28 23:04:22,048 [INFO] collector: [HBM] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:04:22,051 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\HBM_2026-02-06_2026-05-25.csv
+2026-05-28 23:04:34,313 [INFO] collector: [HD] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:04:34,315 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\HD_2026-02-06_2026-05-25.csv
+2026-05-28 23:04:46,652 [INFO] collector: [HYSA] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:04:46,655 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\HYSA_2026-02-06_2026-05-25.csv
+2026-05-28 23:04:59,011 [INFO] collector: [IBM] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:04:59,013 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\IBM_2026-02-06_2026-05-25.csv
+2026-05-28 23:05:11,332 [INFO] collector: [IGV] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:05:11,335 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\IGV_2026-02-06_2026-05-25.csv
+2026-05-28 23:05:23,636 [INFO] collector: [IMAX] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:05:23,640 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\IMAX_2026-02-06_2026-05-25.csv
+2026-05-28 23:05:39,337 [INFO] collector: [INFQ] OHLCV range 68일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:05:39,340 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\INFQ_2026-02-06_2026-05-25.csv
+2026-05-28 23:05:51,682 [INFO] collector: [INTU] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:05:51,687 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\INTU_2026-02-06_2026-05-25.csv
+2026-05-28 23:06:11,587 [INFO] collector: [IONQ] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:06:11,589 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\IONQ_2026-02-06_2026-05-25.csv
+2026-05-28 23:06:23,843 [INFO] collector: [IREN] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:06:23,847 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\IREN_2026-02-06_2026-05-25.csv
+2026-05-28 23:06:36,095 [INFO] collector: [IRS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:06:36,099 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\IRS_2026-02-06_2026-05-25.csv
+2026-05-28 23:06:48,396 [INFO] collector: [IVR] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:06:48,399 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\IVR_2026-02-06_2026-05-25.csv
+2026-05-28 23:07:00,679 [INFO] collector: [JMIA] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:07:00,683 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\JMIA_2026-02-06_2026-05-25.csv
+2026-05-28 23:07:13,056 [INFO] collector: [KNSA] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:07:13,060 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\KNSA_2026-02-06_2026-05-25.csv
+2026-05-28 23:07:25,404 [INFO] collector: [LITE] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:07:25,408 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\LITE_2026-02-06_2026-05-25.csv
+2026-05-28 23:07:37,696 [INFO] collector: [LULU] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:07:37,698 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\LULU_2026-02-06_2026-05-25.csv
+2026-05-28 23:07:50,037 [INFO] collector: [LUNR] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:07:50,041 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\LUNR_2026-02-06_2026-05-25.csv
+2026-05-28 23:08:02,707 [INFO] collector: [MAGS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:08:02,709 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\MAGS_2026-02-06_2026-05-25.csv
+2026-05-28 23:08:14,971 [INFO] collector: [MARA] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:08:14,974 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\MARA_2026-02-06_2026-05-25.csv
+2026-05-28 23:08:27,267 [INFO] collector: [META] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:08:27,270 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\META_2026-02-06_2026-05-25.csv
+2026-05-28 23:08:39,529 [INFO] collector: [MNDY] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:08:39,532 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\MNDY_2026-02-06_2026-05-25.csv
+2026-05-28 23:08:51,782 [INFO] collector: [MRAM] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:08:51,786 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\MRAM_2026-02-06_2026-05-25.csv
+2026-05-28 23:09:04,073 [INFO] collector: [MRVL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:09:04,076 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\MRVL_2026-02-06_2026-05-25.csv
+2026-05-28 23:09:16,402 [INFO] collector: [MSCI] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:09:16,406 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\MSCI_2026-02-06_2026-05-25.csv
+2026-05-28 23:09:28,724 [INFO] collector: [MSFT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:09:28,726 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\MSFT_2026-02-06_2026-05-25.csv
+2026-05-28 23:09:40,984 [INFO] collector: [MSTR] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:09:40,987 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\MSTR_2026-02-06_2026-05-25.csv
+2026-05-28 23:09:53,269 [INFO] collector: [NASA] OHLCV range 38일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:09:53,271 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\NASA_2026-02-06_2026-05-25.csv
+2026-05-28 23:10:05,535 [INFO] collector: [NBIS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:10:05,537 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\NBIS_2026-02-06_2026-05-25.csv
+2026-05-28 23:10:17,792 [INFO] collector: [NFLX] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:10:17,795 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\NFLX_2026-02-06_2026-05-25.csv
+2026-05-28 23:10:30,135 [INFO] collector: [NIO] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:10:30,138 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\NIO_2026-02-06_2026-05-25.csv
+2026-05-28 23:10:42,397 [INFO] collector: [NKE] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:10:42,400 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\NKE_2026-02-06_2026-05-25.csv
+2026-05-28 23:10:54,648 [INFO] collector: [NOK] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:10:54,650 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\NOK_2026-02-06_2026-05-25.csv
+2026-05-28 23:11:06,931 [INFO] collector: [OMER] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:11:06,934 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\OMER_2026-02-06_2026-05-25.csv
+2026-05-28 23:11:19,219 [INFO] collector: [ONDS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:11:19,222 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\ONDS_2026-02-06_2026-05-25.csv
+2026-05-28 23:11:31,494 [INFO] collector: [ORCL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:11:31,497 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\ORCL_2026-02-06_2026-05-25.csv
+2026-05-28 23:12:04,624 [INFO] collector: [PDT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:12:04,626 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\PDT_2026-02-06_2026-05-25.csv
+2026-05-28 23:12:16,899 [INFO] collector: [PPI] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:12:16,902 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\PPI_2026-02-06_2026-05-25.csv
+2026-05-28 23:12:29,199 [INFO] collector: [QBTS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:12:29,202 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\QBTS_2026-02-06_2026-05-25.csv
+2026-05-28 23:12:41,461 [INFO] collector: [QCOM] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:12:41,465 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\QCOM_2026-02-06_2026-05-25.csv
+2026-05-28 23:12:53,747 [INFO] collector: [QUBT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:12:53,750 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\QUBT_2026-02-06_2026-05-25.csv
+2026-05-28 23:13:06,041 [INFO] collector: [RDDT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:13:06,047 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\RDDT_2026-02-06_2026-05-25.csv
+2026-05-28 23:13:18,315 [INFO] collector: [RDW] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:13:18,320 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\RDW_2026-02-06_2026-05-25.csv
+2026-05-28 23:13:30,628 [INFO] collector: [RGTI] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:13:30,631 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\RGTI_2026-02-06_2026-05-25.csv
+2026-05-28 23:13:42,916 [INFO] collector: [RKLB] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:13:42,920 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\RKLB_2026-02-06_2026-05-25.csv
+2026-05-28 23:13:55,257 [INFO] collector: [RL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:13:55,259 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\RL_2026-02-06_2026-05-25.csv
+2026-05-28 23:14:07,517 [INFO] collector: [SAP] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:14:07,521 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SAP_2026-02-06_2026-05-25.csv
+2026-05-28 23:14:19,880 [INFO] collector: [SCHD] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:14:19,882 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SCHD_2026-02-06_2026-05-25.csv
+2026-05-28 23:14:32,142 [INFO] collector: [SEGG] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:14:32,145 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SEGG_2026-02-06_2026-05-25.csv
+2026-05-28 23:14:44,440 [INFO] collector: [SHE] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:14:44,442 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SHE_2026-02-06_2026-05-25.csv
+2026-05-28 23:14:56,771 [INFO] collector: [SKM] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:14:56,774 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SKM_2026-02-06_2026-05-25.csv
+2026-05-28 23:15:09,123 [INFO] collector: [SLS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:15:09,126 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SLS_2026-02-06_2026-05-25.csv
+2026-05-28 23:15:21,412 [INFO] collector: [SMCI] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:15:21,415 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SMCI_2026-02-06_2026-05-25.csv
+2026-05-28 23:15:33,733 [INFO] collector: [SMH] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:15:33,737 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SMH_2026-02-06_2026-05-25.csv
+2026-05-28 23:15:46,375 [INFO] collector: [SNDK] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:15:46,378 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SNDK_2026-02-06_2026-05-25.csv
+2026-05-28 23:15:59,550 [INFO] collector: [SOXL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:15:59,553 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SOXL_2026-02-06_2026-05-25.csv
+2026-05-28 23:16:11,862 [INFO] collector: [SOXS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:16:11,865 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SOXS_2026-02-06_2026-05-25.csv
+2026-05-28 23:16:26,112 [INFO] collector: [SOXX] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:16:26,115 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SOXX_2026-02-06_2026-05-25.csv
+2026-05-28 23:16:38,401 [INFO] collector: [SPGI] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:16:38,404 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SPGI_2026-02-06_2026-05-25.csv
+2026-05-28 23:16:50,762 [INFO] collector: [STRL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:16:50,765 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\STRL_2026-02-06_2026-05-25.csv
+2026-05-28 23:17:03,321 [INFO] collector: [SXC] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:17:03,325 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\SXC_2026-02-06_2026-05-25.csv
+2026-05-28 23:17:15,674 [INFO] collector: [TENB] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:17:15,679 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\TENB_2026-02-06_2026-05-25.csv
+2026-05-28 23:17:27,989 [INFO] collector: [TGT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:17:27,994 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\TGT_2026-02-06_2026-05-25.csv
+2026-05-28 23:17:40,506 [INFO] collector: [TIME] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:17:40,509 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\TIME_2026-02-06_2026-05-25.csv
+2026-05-28 23:17:52,834 [INFO] collector: [TLN] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:17:52,838 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\TLN_2026-02-06_2026-05-25.csv
+2026-05-28 23:18:05,172 [INFO] collector: [TOST] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:18:05,178 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\TOST_2026-02-06_2026-05-25.csv
+2026-05-28 23:18:17,491 [INFO] collector: [TTMI] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:18:17,495 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\TTMI_2026-02-06_2026-05-25.csv
+2026-05-28 23:18:29,836 [INFO] collector: [TTWO] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:18:29,841 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\TTWO_2026-02-06_2026-05-25.csv
+2026-05-28 23:18:42,166 [INFO] collector: [UAE] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:18:42,171 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\UAE_2026-02-06_2026-05-25.csv
+2026-05-28 23:18:54,457 [INFO] collector: [UFCS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:18:54,460 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\UFCS_2026-02-06_2026-05-25.csv
+2026-05-28 23:19:06,778 [INFO] collector: [UHAL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:19:06,782 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\UHAL_2026-02-06_2026-05-25.csv
+2026-05-28 23:19:19,075 [INFO] collector: [UNH] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:19:19,078 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\UNH_2026-02-06_2026-05-25.csv
+2026-05-28 23:19:31,354 [INFO] collector: [USA] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:19:31,358 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\USA_2026-02-06_2026-05-25.csv
+2026-05-28 23:19:43,673 [INFO] collector: [USOY] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:19:43,681 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\USOY_2026-02-06_2026-05-25.csv
+2026-05-28 23:19:56,599 [INFO] collector: [UUUU] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:19:56,602 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\UUUU_2026-02-06_2026-05-25.csv
+2026-05-28 23:20:08,902 [INFO] collector: [VITL] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:20:08,908 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\VITL_2026-02-06_2026-05-25.csv
+2026-05-28 23:20:21,230 [INFO] collector: [VST] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:20:21,235 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\VST_2026-02-06_2026-05-25.csv
+2026-05-28 23:20:33,569 [INFO] collector: [VXUS] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:20:33,574 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\VXUS_2026-02-06_2026-05-25.csv
+2026-05-28 23:21:15,722 [INFO] collector: [WANT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:21:15,725 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\WANT_2026-02-06_2026-05-25.csv
+2026-05-28 23:21:28,032 [INFO] collector: [WDAY] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:21:28,035 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\WDAY_2026-02-06_2026-05-25.csv
+2026-05-28 23:21:40,401 [INFO] collector: [WMT] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:21:40,408 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\WMT_2026-02-06_2026-05-25.csv
+2026-05-28 23:21:52,729 [INFO] collector: [WULF] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:21:52,733 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\WULF_2026-02-06_2026-05-25.csv
+2026-05-28 23:22:05,035 [INFO] collector: [WYY] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:22:05,038 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\WYY_2026-02-06_2026-05-25.csv
+2026-05-28 23:22:18,005 [INFO] collector: [XPEV] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:22:18,009 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\XPEV_2026-02-06_2026-05-25.csv
+2026-05-28 23:22:30,308 [INFO] collector: [XYZ] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:22:30,311 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\XYZ_2026-02-06_2026-05-25.csv
+2026-05-28 23:22:42,633 [INFO] collector: [YEAR] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:22:42,637 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\YEAR_2026-02-06_2026-05-25.csv
+2026-05-28 23:22:54,917 [INFO] collector: [ZM] OHLCV range 74일치 수집 완료 (2026-02-06~2026-05-25)
+2026-05-28 23:22:54,921 [INFO] backtester: [Backtest] OHLCV 스냅샷 저장: data/backtest_snapshots\v2\ohlcv\ZM_2026-02-06_2026-05-25.csv
+2026-05-28 23:23:31,331 [INFO] indicators: FinBERT 모델 로드 중... (캐시)
+2026-05-28 23:23:33,500 [INFO] indicators: FinBERT 초기화 완료 (ONNX Runtime)
+2026-05-28 23:23:33,831 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:33,832 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1212 → scaled=43.94
+2026-05-28 23:23:33,876 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:33,876 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.8394 → scaled=8.03
+2026-05-28 23:23:33,970 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:33,970 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3631 → scaled=31.85
+2026-05-28 23:23:34,029 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,029 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9480 → scaled=2.60
+2026-05-28 23:23:34,077 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,078 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0329 → scaled=51.65
+2026-05-28 23:23:34,122 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,122 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9270 → scaled=3.65
+2026-05-28 23:23:34,200 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,201 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0323 → scaled=51.61
+2026-05-28 23:23:34,327 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,327 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1989 → scaled=40.06
+2026-05-28 23:23:34,364 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,364 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0040 → scaled=49.80
+2026-05-28 23:23:34,412 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,412 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0976 → scaled=54.88
+2026-05-28 23:23:34,461 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,461 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0699 → scaled=53.49
+2026-05-28 23:23:34,504 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,506 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0699 → scaled=53.49
+2026-05-28 23:23:34,541 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,541 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0293 → scaled=51.47
+2026-05-28 23:23:34,581 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,582 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0175 → scaled=50.88
+2026-05-28 23:23:34,661 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,662 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.5468 → scaled=22.66
+2026-05-28 23:23:34,835 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,836 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2333 → scaled=38.34
+2026-05-28 23:23:34,949 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:34,950 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2295 → scaled=38.53
+2026-05-28 23:23:35,036 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,037 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3823 → scaled=30.89
+2026-05-28 23:23:35,037 [INFO] wsb_signal_engine: [중립 필터] NVDA: 중립비율=88% → NEUTRAL
+2026-05-28 23:23:35,037 [INFO] wsb_signal_engine: [중립 필터] SOFI: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,037 [INFO] wsb_signal_engine: [중립 필터] META: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,037 [INFO] wsb_signal_engine: [중립 필터] MSFT: 중립비율=75% → NEUTRAL
+2026-05-28 23:23:35,037 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,038 [INFO] wsb_signal_engine: [중립 필터] SOXS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,038 [INFO] wsb_signal_engine: [중립 필터] COHR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,038 [INFO] wsb_signal_engine: [중립 필터] TTWO: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,038 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,038 [INFO] wsb_signal_engine: [중립 필터] AMZN: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,038 [INFO] wsb_signal_engine: [중립 필터] SEGG: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:35,048 [INFO] indicators: [AAPL] RSI=75.14, RSI_MA=72.70
+2026-05-28 23:23:35,050 [INFO] indicators: [AMD] RSI=67.50, RSI_MA=76.75
+2026-05-28 23:23:35,051 [INFO] indicators: [DRAM] RSI=68.85, RSI_MA=78.92
+2026-05-28 23:23:35,053 [INFO] indicators: [TSLA] RSI=58.25, RSI_MA=67.98
+2026-05-28 23:23:35,054 [INFO] indicators: [SPGI] RSI=32.80, RSI_MA=40.06
+2026-05-28 23:23:35,055 [INFO] indicators: [ASTS] RSI=54.01, RSI_MA=48.53
+2026-05-28 23:23:35,057 [INFO] indicators: [CVX] RSI=54.13, RSI_MA=44.80
+2026-05-28 23:23:35,058 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=18, 중립필터=11, 컨센서스통과=0, Top3=[]
+2026-05-28 23:23:35,070 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-17\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:23:35,324 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,324 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1501 → scaled=57.51
+2026-05-28 23:23:35,402 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,402 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0624 → scaled=46.88
+2026-05-28 23:23:35,479 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,481 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0251 → scaled=51.26
+2026-05-28 23:23:35,626 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,627 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2407 → scaled=37.97
+2026-05-28 23:23:35,779 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,781 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4675 → scaled=26.62
+2026-05-28 23:23:35,799 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,800 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.5041 → scaled=75.21
+2026-05-28 23:23:35,867 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,867 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9480 → scaled=2.60
+2026-05-28 23:23:35,899 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,900 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0469 → scaled=52.34
+2026-05-28 23:23:35,915 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,915 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0346 → scaled=51.73
+2026-05-28 23:23:35,956 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,957 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0590 → scaled=52.95
+2026-05-28 23:23:35,981 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:35,982 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0585 → scaled=52.92
+2026-05-28 23:23:36,002 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,002 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0182 → scaled=50.91
+2026-05-28 23:23:36,039 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,040 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0543 → scaled=47.28
+2026-05-28 23:23:36,055 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,056 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0058 → scaled=49.71
+2026-05-28 23:23:36,099 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,100 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0024 → scaled=49.88
+2026-05-28 23:23:36,166 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,167 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0682 → scaled=46.59
+2026-05-28 23:23:36,217 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,217 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0019 → scaled=50.09
+2026-05-28 23:23:36,244 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,244 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0249 → scaled=51.24
+2026-05-28 23:23:36,351 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,351 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.6006 → scaled=19.97
+2026-05-28 23:23:36,570 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,571 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0636 → scaled=53.18
+2026-05-28 23:23:36,661 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,661 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0231 → scaled=51.16
+2026-05-28 23:23:36,718 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,719 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0044 → scaled=50.22
+2026-05-28 23:23:36,746 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,746 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1553 → scaled=57.76
+2026-05-28 23:23:36,761 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,761 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0346 → scaled=51.73
+2026-05-28 23:23:36,786 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,786 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.8688 → scaled=93.44
+2026-05-28 23:23:36,827 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,828 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0029 → scaled=49.86
+2026-05-28 23:23:36,866 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:36,866 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2475 → scaled=62.37
+2026-05-28 23:23:36,866 [INFO] wsb_signal_engine: [중립 필터] NVDA: 중립비율=86% → NEUTRAL
+2026-05-28 23:23:36,867 [INFO] wsb_signal_engine: [중립 필터] AAPL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,867 [INFO] wsb_signal_engine: [중립 필터] MSFT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,867 [INFO] wsb_signal_engine: [중립 필터] RKLB: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,867 [INFO] wsb_signal_engine: [중립 필터] ASTS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,867 [INFO] wsb_signal_engine: [중립 필터] MU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,867 [INFO] wsb_signal_engine: [중립 필터] SNDK: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,868 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,868 [INFO] wsb_signal_engine: [중립 필터] PLTR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,868 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,868 [INFO] wsb_signal_engine: [중립 필터] TIME: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,868 [INFO] wsb_signal_engine: [중립 필터] RDDT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,868 [INFO] wsb_signal_engine: [중립 필터] BACK: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,869 [INFO] wsb_signal_engine: [중립 필터] CBRS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,869 [INFO] wsb_signal_engine: [중립 필터] NOK: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,869 [INFO] wsb_signal_engine: [중립 필터] H: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,869 [INFO] wsb_signal_engine: [중립 필터] RDW: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,869 [INFO] wsb_signal_engine: [중립 필터] DGXX: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:36,871 [INFO] indicators: [AMZN] RSI=59.34, RSI_MA=65.25
+2026-05-28 23:23:36,872 [INFO] indicators: [AMD] RSI=66.43, RSI_MA=75.31
+2026-05-28 23:23:36,875 [INFO] indicators: [SOFI] RSI=42.51, RSI_MA=41.56
+2026-05-28 23:23:36,876 [INFO] indicators: [DRAM] RSI=64.53, RSI_MA=76.52
+2026-05-28 23:23:36,877 [INFO] indicators: [META] RSI=45.04, RSI_MA=44.30
+2026-05-28 23:23:36,880 [INFO] indicators: [MSTR] RSI=48.63, RSI_MA=59.82
+2026-05-28 23:23:36,881 [INFO] indicators: [PPI] RSI=47.43, RSI_MA=56.11
+2026-05-28 23:23:36,882 [INFO] indicators: [ONDS] RSI=49.32, RSI_MA=48.79
+2026-05-28 23:23:36,882 [INFO] indicators: [UAE] RSI=40.86, RSI_MA=46.33
+2026-05-28 23:23:36,886 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=27, 중립필터=18, 컨센서스통과=0, Top3=[]
+2026-05-28 23:23:36,890 [INFO] indicators: [TIME] RSI=68.12, RSI_MA=75.68
+2026-05-28 23:23:36,892 [INFO] indicators: [PLTR] RSI=45.92, RSI_MA=44.54
+2026-05-28 23:23:36,894 [INFO] indicators: [H] RSI=57.57, RSI_MA=56.18
+2026-05-28 23:23:36,897 [INFO] indicators: [UAE] RSI=40.86, RSI_MA=46.33
+2026-05-28 23:23:36,899 [INFO] indicators: [ASTS] RSI=56.23, RSI_MA=51.14
+2026-05-28 23:23:36,901 [INFO] indicators: [HOOD] RSI=49.00, RSI_MA=50.73
+2026-05-28 23:23:36,904 [INFO] indicators: [BACK] RSI=48.59, RSI_MA=41.96
+2026-05-28 23:23:36,904 [WARNING] indicators: RSI 계산 데이터 부족: 3개 (최소 15개 필요)
+2026-05-28 23:23:36,905 [WARNING] indicators: [CBRS] RSI 계산 결과 없음
+2026-05-28 23:23:36,907 [INFO] indicators: [GOOGL] RSI=70.45, RSI_MA=73.95
+2026-05-28 23:23:36,909 [INFO] indicators: [RDW] RSI=68.75, RSI_MA=64.41
+2026-05-28 23:23:36,911 [INFO] indicators: [AMZN] RSI=59.34, RSI_MA=65.25
+2026-05-28 23:23:36,912 [INFO] indicators: [DRAM] RSI=64.53, RSI_MA=76.52
+2026-05-28 23:23:36,915 [INFO] indicators: [MSFT] RSI=59.61, RSI_MA=53.84
+2026-05-28 23:23:36,917 [INFO] indicators: [DGXX] RSI=69.54, RSI_MA=81.96
+2026-05-28 23:23:36,919 [INFO] indicators: [MSTR] RSI=48.63, RSI_MA=59.82
+2026-05-28 23:23:36,920 [INFO] indicators: [NOK] RSI=62.71, RSI_MA=68.01
+2026-05-28 23:23:36,922 [INFO] indicators: [PPI] RSI=47.43, RSI_MA=56.11
+2026-05-28 23:23:36,925 [INFO] indicators: [AMD] RSI=66.43, RSI_MA=75.31
+2026-05-28 23:23:36,927 [INFO] indicators: [NVDA] RSI=61.94, RSI_MA=68.78
+2026-05-28 23:23:36,929 [INFO] indicators: [SOFI] RSI=42.51, RSI_MA=41.56
+2026-05-28 23:23:36,930 [INFO] indicators: [MU] RSI=59.50, RSI_MA=75.82
+2026-05-28 23:23:36,932 [INFO] indicators: [RKLB] RSI=73.33, RSI_MA=73.67
+2026-05-28 23:23:36,934 [INFO] indicators: [ONDS] RSI=49.32, RSI_MA=48.79
+2026-05-28 23:23:36,937 [INFO] indicators: [AAPL] RSI=70.87, RSI_MA=73.03
+2026-05-28 23:23:36,939 [INFO] indicators: [SNDK] RSI=59.43, RSI_MA=69.60
+2026-05-28 23:23:36,941 [INFO] indicators: [META] RSI=45.04, RSI_MA=44.30
+2026-05-28 23:23:36,944 [INFO] indicators: [RDDT] RSI=53.25, RSI_MA=51.26
+2026-05-28 23:23:36,947 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-18\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:23:37,102 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,103 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0841 → scaled=45.79
+2026-05-28 23:23:37,319 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,319 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1533 → scaled=42.33
+2026-05-28 23:23:37,381 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,381 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0138 → scaled=50.69
+2026-05-28 23:23:37,494 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,494 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0693 → scaled=46.54
+2026-05-28 23:23:37,513 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,513 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0012 → scaled=49.94
+2026-05-28 23:23:37,622 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,622 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.5256 → scaled=23.72
+2026-05-28 23:23:37,637 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,637 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0056 → scaled=50.28
+2026-05-28 23:23:37,684 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,684 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0723 → scaled=53.62
+2026-05-28 23:23:37,707 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,708 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1178 → scaled=55.89
+2026-05-28 23:23:37,766 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,766 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3258 → scaled=66.29
+2026-05-28 23:23:37,960 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (7건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:37,960 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2576 → scaled=37.12
+2026-05-28 23:23:38,079 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,079 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0267 → scaled=51.33
+2026-05-28 23:23:38,136 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,136 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0929 → scaled=45.36
+2026-05-28 23:23:38,479 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (8건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,480 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1272 → scaled=56.36
+2026-05-28 23:23:38,537 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,537 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3884 → scaled=30.58
+2026-05-28 23:23:38,593 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,593 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0308 → scaled=51.54
+2026-05-28 23:23:38,641 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,641 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0988 → scaled=54.94
+2026-05-28 23:23:38,742 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,742 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0163 → scaled=50.82
+2026-05-28 23:23:38,839 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,840 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1477 → scaled=57.38
+2026-05-28 23:23:38,994 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:38,994 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2056 → scaled=39.72
+2026-05-28 23:23:39,009 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,009 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.4070 → scaled=70.35
+2026-05-28 23:23:39,022 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,022 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0909 → scaled=54.54
+2026-05-28 23:23:39,085 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,085 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.8676 → scaled=6.62
+2026-05-28 23:23:39,116 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,116 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.8676 → scaled=6.62
+2026-05-28 23:23:39,160 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,161 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9564 → scaled=2.18
+2026-05-28 23:23:39,181 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,181 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1178 → scaled=55.89
+2026-05-28 23:23:39,305 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,305 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0271 → scaled=48.65
+2026-05-28 23:23:39,455 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,456 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2227 → scaled=61.13
+2026-05-28 23:23:39,509 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,509 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0619 → scaled=53.09
+2026-05-28 23:23:39,537 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,539 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2378 → scaled=38.11
+2026-05-28 23:23:39,567 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,567 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0224 → scaled=51.12
+2026-05-28 23:23:39,591 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,591 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1033 → scaled=55.17
+2026-05-28 23:23:39,680 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,680 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.7654 → scaled=88.27
+2026-05-28 23:23:39,773 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,773 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1103 → scaled=44.49
+2026-05-28 23:23:39,773 [INFO] wsb_signal_engine: [중립 필터] NVDA: 중립비율=83% → NEUTRAL
+2026-05-28 23:23:39,773 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,774 [INFO] wsb_signal_engine: [중립 필터] TSLA: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,774 [INFO] wsb_signal_engine: [중립 필터] AMD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,774 [INFO] wsb_signal_engine: [중립 필터] MSFT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,774 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,774 [INFO] wsb_signal_engine: [중립 필터] DGXX: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,774 [INFO] wsb_signal_engine: [중립 필터] MU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,775 [INFO] wsb_signal_engine: [중립 필터] DRAM: 중립비율=80% → NEUTRAL
+2026-05-28 23:23:39,775 [INFO] wsb_signal_engine: [중립 필터] SNDK: 중립비율=86% → NEUTRAL
+2026-05-28 23:23:39,775 [INFO] wsb_signal_engine: [중립 필터] RKLB: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,775 [INFO] wsb_signal_engine: [중립 필터] INTC: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,775 [INFO] wsb_signal_engine: [중립 필터] PLTR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,775 [INFO] wsb_signal_engine: [중립 필터] DRIP: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,775 [INFO] wsb_signal_engine: [중립 필터] CEG: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,775 [INFO] wsb_signal_engine: [중립 필터] ORCL: 중립비율=75% → NEUTRAL
+2026-05-28 23:23:39,776 [INFO] wsb_signal_engine: [중립 필터] NASA: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,776 [INFO] wsb_signal_engine: [중립 필터] LITE: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,776 [INFO] wsb_signal_engine: [중립 필터] JMIA: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,776 [INFO] wsb_signal_engine: [중립 필터] OMER: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,776 [INFO] wsb_signal_engine: [중립 필터] LUNR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,776 [INFO] wsb_signal_engine: [중립 필터] SAP: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,776 [INFO] wsb_signal_engine: [중립 필터] CRM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,777 [INFO] wsb_signal_engine: [중립 필터] LULU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:39,781 [INFO] indicators: [META] RSI=41.97, RSI_MA=44.17
+2026-05-28 23:23:39,782 [INFO] indicators: [RDW] RSI=68.35, RSI_MA=65.67
+2026-05-28 23:23:39,784 [INFO] indicators: [ASTS] RSI=57.12, RSI_MA=52.55
+2026-05-28 23:23:39,785 [INFO] indicators: [RDDT] RSI=49.58, RSI_MA=51.08
+2026-05-28 23:23:39,786 [INFO] indicators: [FLY] RSI=61.08, RSI_MA=60.60
+2026-05-28 23:23:39,788 [INFO] indicators: [FIX] RSI=50.38, RSI_MA=65.50
+2026-05-28 23:23:39,789 [INFO] indicators: [STRL] RSI=56.17, RSI_MA=71.24
+2026-05-28 23:23:39,790 [INFO] indicators: [HD] RSI=35.07, RSI_MA=33.23
+2026-05-28 23:23:39,791 [INFO] indicators: [SOXL] RSI=56.48, RSI_MA=66.95
+2026-05-28 23:23:39,792 [INFO] indicators: [BWMN] RSI=42.44, RSI_MA=50.94
+2026-05-28 23:23:39,794 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=34, 중립필터=24, 컨센서스통과=0, Top3=[]
+2026-05-28 23:23:39,797 [INFO] indicators: [JMIA] RSI=44.72, RSI_MA=49.57
+2026-05-28 23:23:39,798 [INFO] indicators: [TSLA] RSI=50.54, RSI_MA=63.38
+2026-05-28 23:23:39,799 [INFO] indicators: [NASA] RSI=73.15, RSI_MA=74.87
+2026-05-28 23:23:39,801 [INFO] indicators: [HOOD] RSI=44.89, RSI_MA=50.10
+2026-05-28 23:23:39,802 [INFO] indicators: [HD] RSI=35.07, RSI_MA=33.23
+2026-05-28 23:23:39,805 [INFO] indicators: [FLY] RSI=61.08, RSI_MA=60.60
+2026-05-28 23:23:39,806 [INFO] indicators: [DRIP] RSI=39.11, RSI_MA=46.08
+2026-05-28 23:23:39,809 [INFO] indicators: [OMER] RSI=37.47, RSI_MA=48.85
+2026-05-28 23:23:39,811 [INFO] indicators: [MSFT] RSI=54.96, RSI_MA=53.82
+2026-05-28 23:23:39,813 [INFO] indicators: [DGXX] RSI=72.11, RSI_MA=79.84
+2026-05-28 23:23:39,814 [INFO] indicators: [AMD] RSI=64.00, RSI_MA=72.88
+2026-05-28 23:23:39,816 [INFO] indicators: [NVDA] RSI=60.23, RSI_MA=67.91
+2026-05-28 23:23:39,818 [INFO] indicators: [MU] RSI=61.17, RSI_MA=72.62
+2026-05-28 23:23:39,820 [INFO] indicators: [BWMN] RSI=42.44, RSI_MA=50.94
+2026-05-28 23:23:39,821 [INFO] indicators: [INTC] RSI=63.29, RSI_MA=70.42
+2026-05-28 23:23:39,824 [INFO] indicators: [LULU] RSI=25.93, RSI_MA=26.55
+2026-05-28 23:23:39,825 [INFO] indicators: [META] RSI=41.97, RSI_MA=44.17
+2026-05-28 23:23:39,828 [INFO] indicators: [CEG] RSI=33.54, RSI_MA=39.41
+2026-05-28 23:23:39,829 [INFO] indicators: [FIX] RSI=50.38, RSI_MA=65.50
+2026-05-28 23:23:39,831 [INFO] indicators: [PLTR] RSI=46.08, RSI_MA=44.43
+2026-05-28 23:23:39,832 [INFO] indicators: [ORCL] RSI=53.00, RSI_MA=61.82
+2026-05-28 23:23:39,835 [INFO] indicators: [LUNR] RSI=60.71, RSI_MA=67.30
+2026-05-28 23:23:39,837 [INFO] indicators: [SAP] RSI=58.01, RSI_MA=46.54
+2026-05-28 23:23:39,839 [INFO] indicators: [ASTS] RSI=57.12, RSI_MA=52.55
+2026-05-28 23:23:39,841 [INFO] indicators: [GOOGL] RSI=62.19, RSI_MA=70.79
+2026-05-28 23:23:39,842 [INFO] indicators: [RDW] RSI=68.35, RSI_MA=65.67
+2026-05-28 23:23:39,845 [INFO] indicators: [DRAM] RSI=65.13, RSI_MA=73.57
+2026-05-28 23:23:39,847 [INFO] indicators: [STRL] RSI=56.17, RSI_MA=71.24
+2026-05-28 23:23:39,848 [INFO] indicators: [LITE] RSI=48.81, RSI_MA=56.73
+2026-05-28 23:23:39,850 [INFO] indicators: [CRM] RSI=50.42, RSI_MA=44.08
+2026-05-28 23:23:39,851 [INFO] indicators: [RKLB] RSI=69.78, RSI_MA=73.77
+2026-05-28 23:23:39,854 [INFO] indicators: [SOXL] RSI=56.48, RSI_MA=66.95
+2026-05-28 23:23:39,856 [INFO] indicators: [SNDK] RSI=61.95, RSI_MA=67.04
+2026-05-28 23:23:39,858 [INFO] indicators: [RDDT] RSI=49.58, RSI_MA=51.08
+2026-05-28 23:23:39,862 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-19\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:23:39,934 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:39,935 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0674 → scaled=53.37
+2026-05-28 23:23:40,119 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:40,119 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1396 → scaled=43.02
+2026-05-28 23:23:40,365 [INFO] sentiment_provider: FinBERT 감성 점수: pos=0/10건 valid → score=0.00 (neutral 필터 제외: 5건)
+2026-05-28 23:23:40,454 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:40,455 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1433 → scaled=42.83
+2026-05-28 23:23:40,466 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:40,467 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0005 → scaled=49.98
+2026-05-28 23:23:40,529 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:40,529 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0961 → scaled=45.19
+2026-05-28 23:23:40,577 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:40,577 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0676 → scaled=53.38
+2026-05-28 23:23:40,635 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:40,636 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1447 → scaled=42.76
+2026-05-28 23:23:40,863 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:40,863 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1942 → scaled=40.29
+2026-05-28 23:23:40,924 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:40,925 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2020 → scaled=39.90
+2026-05-28 23:23:41,021 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:41,021 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0377 → scaled=48.12
+2026-05-28 23:23:41,067 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:41,068 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.5757 → scaled=21.22
+2026-05-28 23:23:41,098 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:41,099 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9372 → scaled=3.14
+2026-05-28 23:23:41,120 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:41,120 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1178 → scaled=55.89
+2026-05-28 23:23:41,205 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:41,205 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.8801 → scaled=94.01
+2026-05-28 23:23:41,291 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:41,292 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0291 → scaled=51.46
+2026-05-28 23:23:41,588 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (5건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:41,589 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2047 → scaled=39.76
+2026-05-28 23:23:42,141 [INFO] sentiment_provider: FinBERT 감성 점수: pos=5/10건 valid → score=71.43 (neutral 필터 제외: 6건)
+2026-05-28 23:23:42,417 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (6건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:42,417 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0757 → scaled=53.79
+2026-05-28 23:23:42,485 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:42,486 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0236 → scaled=48.82
+2026-05-28 23:23:42,544 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:42,545 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0371 → scaled=51.85
+2026-05-28 23:23:42,822 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:42,823 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0412 → scaled=47.94
+2026-05-28 23:23:42,888 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:42,888 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2603 → scaled=36.98
+2026-05-28 23:23:42,958 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:42,958 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4198 → scaled=29.01
+2026-05-28 23:23:43,065 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,066 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0163 → scaled=50.82
+2026-05-28 23:23:43,157 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,157 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.7654 → scaled=88.27
+2026-05-28 23:23:43,451 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,452 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1694 → scaled=58.47
+2026-05-28 23:23:43,497 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,498 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0816 → scaled=54.08
+2026-05-28 23:23:43,542 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,542 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0674 → scaled=53.37
+2026-05-28 23:23:43,621 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,622 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1936 → scaled=40.32
+2026-05-28 23:23:43,705 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,705 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1365 → scaled=56.82
+2026-05-28 23:23:43,723 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,724 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0008 → scaled=49.96
+2026-05-28 23:23:43,742 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,742 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0008 → scaled=49.96
+2026-05-28 23:23:43,768 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,769 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9372 → scaled=3.14
+2026-05-28 23:23:43,797 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,797 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9372 → scaled=3.14
+2026-05-28 23:23:43,830 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,831 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0240 → scaled=48.80
+2026-05-28 23:23:43,964 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:43,965 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1039 → scaled=55.19
+2026-05-28 23:23:44,002 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,003 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0287 → scaled=48.57
+2026-05-28 23:23:44,054 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,054 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2253 → scaled=38.74
+2026-05-28 23:23:44,179 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,180 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1906 → scaled=40.47
+2026-05-28 23:23:44,263 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,264 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0394 → scaled=48.03
+2026-05-28 23:23:44,361 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,362 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1162 → scaled=44.19
+2026-05-28 23:23:44,417 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,417 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0302 → scaled=48.49
+2026-05-28 23:23:44,501 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,501 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3762 → scaled=68.81
+2026-05-28 23:23:44,584 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,585 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0022 → scaled=50.11
+2026-05-28 23:23:44,674 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,674 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0103 → scaled=49.48
+2026-05-28 23:23:44,843 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:44,844 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0623 → scaled=53.11
+2026-05-28 23:23:45,007 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:45,007 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0861 → scaled=45.70
+2026-05-28 23:23:45,066 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:45,067 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0500 → scaled=52.50
+2026-05-28 23:23:45,169 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:45,170 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1741 → scaled=41.29
+2026-05-28 23:23:45,170 [INFO] wsb_signal_engine: [중립 필터] SOXL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,170 [INFO] wsb_signal_engine: [중립 필터] META: 중립비율=78% → NEUTRAL
+2026-05-28 23:23:45,170 [INFO] wsb_signal_engine: [중립 필터] DRAM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,170 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,171 [INFO] wsb_signal_engine: [중립 필터] MU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,171 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=71% → NEUTRAL
+2026-05-28 23:23:45,171 [INFO] wsb_signal_engine: [중립 필터] MSFT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,171 [INFO] wsb_signal_engine: [중립 필터] AAPL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,171 [INFO] wsb_signal_engine: [중립 필터] LITE: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,171 [INFO] wsb_signal_engine: [중립 필터] PLTR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,171 [INFO] wsb_signal_engine: [중립 필터] IRS: 중립비율=85% → NEUTRAL
+2026-05-28 23:23:45,172 [INFO] wsb_signal_engine: [중립 필터] SNDK: 중립비율=91% → NEUTRAL
+2026-05-28 23:23:45,172 [INFO] wsb_signal_engine: [중립 필터] ORCL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,172 [INFO] wsb_signal_engine: [중립 필터] NOK: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,172 [INFO] wsb_signal_engine: [중립 필터] RDDT: 중립비율=86% → NEUTRAL
+2026-05-28 23:23:45,172 [INFO] wsb_signal_engine: [중립 필터] DRIP: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,172 [INFO] wsb_signal_engine: [중립 필터] RKLB: 중립비율=75% → NEUTRAL
+2026-05-28 23:23:45,172 [INFO] wsb_signal_engine: [중립 필터] INTC: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] IGV: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] MRAM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] BWXT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] VXUS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] EWJ: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] NFLX: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] SLS: 중립비율=86% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] YEAR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] PDT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] CAVA: 중립비율=75% → NEUTRAL
+2026-05-28 23:23:45,173 [INFO] wsb_signal_engine: [중립 필터] COST: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,174 [INFO] wsb_signal_engine: [중립 필터] CRWD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,174 [INFO] wsb_signal_engine: [중립 필터] API: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,174 [INFO] wsb_signal_engine: [중립 필터] KNSA: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,174 [INFO] wsb_signal_engine: [중립 필터] IVR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,174 [INFO] wsb_signal_engine: [중립 필터] MNDY: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,174 [INFO] wsb_signal_engine: [중립 필터] TGT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,175 [INFO] wsb_signal_engine: [중립 필터] WULF: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,175 [INFO] wsb_signal_engine: [중립 필터] QBTS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,175 [INFO] wsb_signal_engine: [중립 필터] DOCS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:45,177 [INFO] indicators: [NVDA] RSI=62.12, RSI_MA=66.93
+2026-05-28 23:23:45,178 [INFO] indicators: [TSLA] RSI=55.38, RSI_MA=60.65
+2026-05-28 23:23:45,180 [INFO] indicators: [AMD] RSI=69.76, RSI_MA=71.22
+2026-05-28 23:23:45,181 [INFO] indicators: [AMZN] RSI=57.77, RSI_MA=60.30
+2026-05-28 23:23:45,182 [INFO] indicators: [CEG] RSI=45.85, RSI_MA=38.95
+2026-05-28 23:23:45,183 [INFO] indicators: [SAP] RSI=59.03, RSI_MA=48.40
+2026-05-28 23:23:45,185 [INFO] indicators: [ASTS] RSI=58.19, RSI_MA=53.25
+2026-05-28 23:23:45,186 [INFO] indicators: [UNH] RSI=65.61, RSI_MA=77.68
+2026-05-28 23:23:45,187 [INFO] indicators: [USA] RSI=49.82, RSI_MA=47.54
+2026-05-28 23:23:45,189 [INFO] indicators: [BWMN] RSI=44.35, RSI_MA=48.61
+2026-05-28 23:23:45,190 [INFO] indicators: [VST] RSI=43.71, RSI_MA=37.13
+2026-05-28 23:23:45,192 [INFO] indicators: [TLN] RSI=47.29, RSI_MA=44.38
+2026-05-28 23:23:45,193 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=50, 중립필터=38, 컨센서스통과=1, Top3=['BWMN']
+2026-05-28 23:23:45,196 [INFO] indicators: [TSLA] RSI=55.38, RSI_MA=60.65
+2026-05-28 23:23:45,198 [INFO] indicators: [BWXT] RSI=43.81, RSI_MA=43.66
+2026-05-28 23:23:45,200 [INFO] indicators: [EWJ] RSI=56.81, RSI_MA=59.38
+2026-05-28 23:23:45,202 [INFO] indicators: [NFLX] RSI=41.63, RSI_MA=40.05
+2026-05-28 23:23:45,204 [INFO] indicators: [USA] RSI=49.82, RSI_MA=47.54
+2026-05-28 23:23:45,206 [INFO] indicators: [CAVA] RSI=45.52, RSI_MA=38.37
+2026-05-28 23:23:45,207 [INFO] indicators: [HOOD] RSI=47.43, RSI_MA=49.10
+2026-05-28 23:23:45,209 [INFO] indicators: [TGT] RSI=46.51, RSI_MA=46.96
+2026-05-28 23:23:45,211 [INFO] indicators: [DOCS] RSI=35.76, RSI_MA=37.51
+2026-05-28 23:23:45,213 [INFO] indicators: [TLN] RSI=47.29, RSI_MA=44.38
+2026-05-28 23:23:45,214 [INFO] indicators: [YEAR] RSI=45.59, RSI_MA=41.77
+2026-05-28 23:23:45,216 [INFO] indicators: [MRAM] RSI=56.55, RSI_MA=73.42
+2026-05-28 23:23:45,218 [INFO] indicators: [IRS] RSI=42.87, RSI_MA=38.73
+2026-05-28 23:23:45,220 [INFO] indicators: [DRIP] RSI=44.53, RSI_MA=45.29
+2026-05-28 23:23:45,222 [INFO] indicators: [QBTS] RSI=47.62, RSI_MA=51.26
+2026-05-28 23:23:45,224 [INFO] indicators: [CRWD] RSI=86.86, RSI_MA=82.51
+2026-05-28 23:23:45,226 [INFO] indicators: [MSFT] RSI=57.11, RSI_MA=54.34
+2026-05-28 23:23:45,227 [INFO] indicators: [PDT] RSI=44.94, RSI_MA=36.49
+2026-05-28 23:23:45,230 [INFO] indicators: [NOK] RSI=61.50, RSI_MA=65.42
+2026-05-28 23:23:45,231 [INFO] indicators: [UNH] RSI=65.61, RSI_MA=77.68
+2026-05-28 23:23:45,233 [INFO] indicators: [AMD] RSI=69.76, RSI_MA=71.22
+2026-05-28 23:23:45,235 [INFO] indicators: [NVDA] RSI=62.12, RSI_MA=66.93
+2026-05-28 23:23:45,237 [INFO] indicators: [MU] RSI=64.25, RSI_MA=69.57
+2026-05-28 23:23:45,240 [INFO] indicators: [BWMN] RSI=44.35, RSI_MA=48.61
+2026-05-28 23:23:45,241 [INFO] indicators: [INTC] RSI=67.93, RSI_MA=67.81
+2026-05-28 23:23:45,243 [INFO] indicators: [META] RSI=43.16, RSI_MA=44.64
+2026-05-28 23:23:45,245 [INFO] indicators: [CEG] RSI=45.85, RSI_MA=38.95
+2026-05-28 23:23:45,248 [INFO] indicators: [IVR] RSI=39.73, RSI_MA=44.39
+2026-05-28 23:23:45,249 [INFO] indicators: [API] RSI=48.69, RSI_MA=50.90
+2026-05-28 23:23:45,251 [INFO] indicators: [PLTR] RSI=48.71, RSI_MA=44.82
+2026-05-28 23:23:45,253 [INFO] indicators: [ORCL] RSI=57.58, RSI_MA=60.28
+2026-05-28 23:23:45,255 [INFO] indicators: [SLS] RSI=81.83, RSI_MA=72.90
+2026-05-28 23:23:45,257 [INFO] indicators: [KNSA] RSI=53.69, RSI_MA=61.83
+2026-05-28 23:23:45,259 [INFO] indicators: [SAP] RSI=59.03, RSI_MA=48.40
+2026-05-28 23:23:45,261 [INFO] indicators: [ASTS] RSI=58.19, RSI_MA=53.25
+2026-05-28 23:23:45,262 [INFO] indicators: [GOOGL] RSI=62.82, RSI_MA=69.51
+2026-05-28 23:23:45,264 [INFO] indicators: [AMZN] RSI=57.77, RSI_MA=60.30
+2026-05-28 23:23:45,265 [INFO] indicators: [DRAM] RSI=67.41, RSI_MA=70.76
+2026-05-28 23:23:45,268 [INFO] indicators: [MNDY] RSI=57.62, RSI_MA=51.18
+2026-05-28 23:23:45,269 [INFO] indicators: [LITE] RSI=46.99, RSI_MA=54.15
+2026-05-28 23:23:45,272 [INFO] indicators: [VST] RSI=43.71, RSI_MA=37.13
+2026-05-28 23:23:45,274 [INFO] indicators: [IGV] RSI=66.38, RSI_MA=63.38
+2026-05-28 23:23:45,275 [INFO] indicators: [RKLB] RSI=72.39, RSI_MA=73.58
+2026-05-28 23:23:45,277 [INFO] indicators: [COST] RSI=65.65, RSI_MA=65.39
+2026-05-28 23:23:45,280 [INFO] indicators: [SOXL] RSI=62.70, RSI_MA=64.51
+2026-05-28 23:23:45,282 [INFO] indicators: [AAPL] RSI=73.97, RSI_MA=73.32
+2026-05-28 23:23:45,284 [INFO] indicators: [WULF] RSI=51.97, RSI_MA=55.93
+2026-05-28 23:23:45,286 [INFO] indicators: [SNDK] RSI=62.41, RSI_MA=64.74
+2026-05-28 23:23:45,288 [INFO] indicators: [RDDT] RSI=43.36, RSI_MA=49.66
+2026-05-28 23:23:45,290 [INFO] indicators: [VXUS] RSI=55.23, RSI_MA=55.43
+2026-05-28 23:23:45,291 [INFO] reddit_portfolio: [BWMN] 매수: 325주 × $30.68 = $9971.00 (수수료 $24.93)
+2026-05-28 23:23:45,293 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-20\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:23:45,372 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:45,372 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0289 → scaled=51.44
+2026-05-28 23:23:45,422 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:45,422 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0664 → scaled=46.68
+2026-05-28 23:23:46,360 [INFO] sentiment_provider: FinBERT 감성 점수: pos=14/21건 valid → score=82.35 (neutral 필터 제외: 12건)
+2026-05-28 23:23:46,499 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:46,499 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1275 → scaled=43.62
+2026-05-28 23:23:46,742 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:46,742 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1990 → scaled=40.05
+2026-05-28 23:23:46,791 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:46,791 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0002 → scaled=50.01
+2026-05-28 23:23:46,983 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (8건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:46,983 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1082 → scaled=44.59
+2026-05-28 23:23:47,037 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,037 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2746 → scaled=63.73
+2026-05-28 23:23:47,064 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,065 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.5785 → scaled=78.93
+2026-05-28 23:23:47,091 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,092 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2063 → scaled=39.69
+2026-05-28 23:23:47,266 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,266 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0202 → scaled=51.01
+2026-05-28 23:23:47,280 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,280 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0389 → scaled=51.94
+2026-05-28 23:23:47,325 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,327 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3313 → scaled=66.56
+2026-05-28 23:23:47,367 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,367 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3313 → scaled=66.56
+2026-05-28 23:23:47,431 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,431 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1275 → scaled=56.38
+2026-05-28 23:23:47,514 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,515 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0488 → scaled=52.44
+2026-05-28 23:23:47,575 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,575 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2837 → scaled=35.82
+2026-05-28 23:23:47,602 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,602 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3471 → scaled=67.36
+2026-05-28 23:23:47,987 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (7건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:47,988 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1328 → scaled=56.64
+2026-05-28 23:23:48,063 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,063 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2616 → scaled=63.08
+2026-05-28 23:23:48,119 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,119 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2872 → scaled=35.64
+2026-05-28 23:23:48,165 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,165 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0002 → scaled=50.01
+2026-05-28 23:23:48,268 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,269 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1385 → scaled=43.07
+2026-05-28 23:23:48,283 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,283 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0070 → scaled=49.65
+2026-05-28 23:23:48,298 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,298 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0322 → scaled=51.61
+2026-05-28 23:23:48,312 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,312 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0383 → scaled=51.92
+2026-05-28 23:23:48,354 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,355 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.9349 → scaled=96.74
+2026-05-28 23:23:48,440 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,440 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.9048 → scaled=95.24
+2026-05-28 23:23:48,514 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,515 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4224 → scaled=28.88
+2026-05-28 23:23:48,616 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,616 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1348 → scaled=43.26
+2026-05-28 23:23:48,671 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,671 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0673 → scaled=46.63
+2026-05-28 23:23:48,708 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,708 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0143 → scaled=50.72
+2026-05-28 23:23:48,790 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:48,791 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1141 → scaled=55.70
+2026-05-28 23:23:49,091 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,091 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0160 → scaled=50.80
+2026-05-28 23:23:49,205 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,205 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0249 → scaled=48.75
+2026-05-28 23:23:49,306 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,306 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.7968 → scaled=89.84
+2026-05-28 23:23:49,409 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,410 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9391 → scaled=3.04
+2026-05-28 23:23:49,410 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,411 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,411 [INFO] wsb_signal_engine: [중립 필터] TSLA: 중립비율=75% → NEUTRAL
+2026-05-28 23:23:49,411 [INFO] wsb_signal_engine: [중립 필터] META: 중립비율=78% → NEUTRAL
+2026-05-28 23:23:49,411 [INFO] wsb_signal_engine: [중립 필터] MU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,411 [INFO] wsb_signal_engine: [중립 필터] MSFT: 중립비율=87% → NEUTRAL
+2026-05-28 23:23:49,411 [INFO] wsb_signal_engine: [중립 필터] SOFI: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,412 [INFO] wsb_signal_engine: [중립 필터] AMD: 중립비율=83% → NEUTRAL
+2026-05-28 23:23:49,412 [INFO] wsb_signal_engine: [중립 필터] NBIS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,412 [INFO] wsb_signal_engine: [중립 필터] INTC: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,412 [INFO] wsb_signal_engine: [중립 필터] RKLB: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,412 [INFO] wsb_signal_engine: [중립 필터] IRS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,413 [INFO] wsb_signal_engine: [중립 필터] DRAM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,413 [INFO] wsb_signal_engine: [중립 필터] BOT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,413 [INFO] wsb_signal_engine: [중립 필터] AMC: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,413 [INFO] wsb_signal_engine: [중립 필터] INFQ: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,413 [INFO] wsb_signal_engine: [중립 필터] IBM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,413 [INFO] wsb_signal_engine: [중립 필터] UUUU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,413 [INFO] wsb_signal_engine: [중립 필터] INTU: 중립비율=86% → NEUTRAL
+2026-05-28 23:23:49,414 [INFO] wsb_signal_engine: [중립 필터] ARM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,414 [INFO] wsb_signal_engine: [중립 필터] ASML: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,414 [INFO] wsb_signal_engine: [중립 필터] BOXX: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,414 [INFO] wsb_signal_engine: [중립 필터] VITL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:49,416 [INFO] indicators: [NVDA] RSI=58.01, RSI_MA=65.26
+2026-05-28 23:23:49,417 [INFO] indicators: [RDDT] RSI=46.31, RSI_MA=49.38
+2026-05-28 23:23:49,419 [INFO] indicators: [MSTR] RSI=47.72, RSI_MA=52.04
+2026-05-28 23:23:49,421 [INFO] indicators: [IREN] RSI=58.58, RSI_MA=54.64
+2026-05-28 23:23:49,423 [INFO] indicators: [QBTS] RSI=64.27, RSI_MA=52.04
+2026-05-28 23:23:49,423 [INFO] indicators: [ASTS] RSI=62.70, RSI_MA=55.63
+2026-05-28 23:23:49,425 [INFO] indicators: [LUNR] RSI=64.04, RSI_MA=66.10
+2026-05-28 23:23:49,426 [INFO] indicators: [LULU] RSI=39.10, RSI_MA=29.20
+2026-05-28 23:23:49,428 [INFO] indicators: [RL] RSI=60.22, RSI_MA=39.49
+2026-05-28 23:23:49,430 [INFO] indicators: [XPEV] RSI=44.12, RSI_MA=41.51
+2026-05-28 23:23:49,430 [INFO] indicators: [WMT] RSI=34.90, RSI_MA=54.54
+2026-05-28 23:23:49,432 [INFO] indicators: [APLD] RSI=65.00, RSI_MA=61.07
+2026-05-28 23:23:49,433 [INFO] indicators: [TENB] RSI=72.94, RSI_MA=65.13
+2026-05-28 23:23:49,434 [INFO] indicators: [NKE] RSI=49.11, RSI_MA=36.75
+2026-05-28 23:23:49,437 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=37, 중립필터=23, 컨센서스통과=0, Top3=[]
+2026-05-28 23:23:49,438 [WARNING] indicators: RSI 계산 데이터 부족: 9개 (최소 15개 필요)
+2026-05-28 23:23:49,438 [WARNING] indicators: [BOT] RSI 계산 결과 없음
+2026-05-28 23:23:49,441 [INFO] indicators: [TSLA] RSI=55.59, RSI_MA=58.95
+2026-05-28 23:23:49,442 [INFO] indicators: [XPEV] RSI=44.12, RSI_MA=41.51
+2026-05-28 23:23:49,445 [INFO] indicators: [VITL] RSI=36.05, RSI_MA=30.20
+2026-05-28 23:23:49,447 [INFO] indicators: [HOOD] RSI=47.69, RSI_MA=48.66
+2026-05-28 23:23:49,454 [INFO] indicators: [WMT] RSI=34.90, RSI_MA=54.54
+2026-05-28 23:23:49,457 [INFO] indicators: [INTU] RSI=28.55, RSI_MA=44.12
+2026-05-28 23:23:49,458 [INFO] indicators: [IRS] RSI=47.59, RSI_MA=40.20
+2026-05-28 23:23:49,461 [INFO] indicators: [AMC] RSI=56.75, RSI_MA=45.64
+2026-05-28 23:23:49,463 [INFO] indicators: [QBTS] RSI=64.27, RSI_MA=52.04
+2026-05-28 23:23:49,466 [INFO] indicators: [INFQ] RSI=58.44, RSI_MA=48.20
+2026-05-28 23:23:49,467 [INFO] indicators: [MSFT] RSI=55.56, RSI_MA=55.12
+2026-05-28 23:23:49,470 [INFO] indicators: [NKE] RSI=49.11, RSI_MA=36.75
+2026-05-28 23:23:49,472 [INFO] indicators: [IBM] RSI=65.52, RSI_MA=42.73
+2026-05-28 23:23:49,473 [INFO] indicators: [AMD] RSI=70.07, RSI_MA=70.16
+2026-05-28 23:23:49,475 [INFO] indicators: [NVDA] RSI=58.01, RSI_MA=65.26
+2026-05-28 23:23:49,477 [INFO] indicators: [MU] RSI=66.82, RSI_MA=67.79
+2026-05-28 23:23:49,479 [INFO] indicators: [SOFI] RSI=43.40, RSI_MA=41.79
+2026-05-28 23:23:49,482 [INFO] indicators: [ASML] RSI=59.42, RSI_MA=55.47
+2026-05-28 23:23:49,484 [INFO] indicators: [INTC] RSI=67.41, RSI_MA=66.71
+2026-05-28 23:23:49,487 [INFO] indicators: [LULU] RSI=39.10, RSI_MA=29.20
+2026-05-28 23:23:49,489 [INFO] indicators: [BWMN] RSI=45.03, RSI_MA=47.00
+2026-05-28 23:23:49,492 [INFO] indicators: [NBIS] RSI=66.07, RSI_MA=66.00
+2026-05-28 23:23:49,494 [INFO] indicators: [META] RSI=44.33, RSI_MA=45.04
+2026-05-28 23:23:49,497 [INFO] indicators: [MSTR] RSI=47.72, RSI_MA=52.04
+2026-05-28 23:23:49,499 [INFO] indicators: [LUNR] RSI=64.04, RSI_MA=66.10
+2026-05-28 23:23:49,501 [INFO] indicators: [APLD] RSI=65.00, RSI_MA=61.07
+2026-05-28 23:23:49,503 [INFO] indicators: [ASTS] RSI=62.70, RSI_MA=55.63
+2026-05-28 23:23:49,506 [INFO] indicators: [GOOGL] RSI=61.71, RSI_MA=68.24
+2026-05-28 23:23:49,508 [INFO] indicators: [DRAM] RSI=70.75, RSI_MA=70.10
+2026-05-28 23:23:49,510 [INFO] indicators: [TENB] RSI=72.94, RSI_MA=65.13
+2026-05-28 23:23:49,512 [INFO] indicators: [ARM] RSI=75.53, RSI_MA=63.02
+2026-05-28 23:23:49,514 [INFO] indicators: [IREN] RSI=58.58, RSI_MA=54.64
+2026-05-28 23:23:49,516 [INFO] indicators: [RKLB] RSI=64.77, RSI_MA=72.29
+2026-05-28 23:23:49,518 [INFO] indicators: [BOXX] RSI=93.81, RSI_MA=92.69
+2026-05-28 23:23:49,522 [INFO] indicators: [RDDT] RSI=46.31, RSI_MA=49.38
+2026-05-28 23:23:49,524 [INFO] indicators: [RL] RSI=60.22, RSI_MA=39.49
+2026-05-28 23:23:49,526 [INFO] indicators: [UUUU] RSI=42.95, RSI_MA=41.25
+2026-05-28 23:23:49,537 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-21\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:23:49,580 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,580 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0045 → scaled=50.23
+2026-05-28 23:23:49,626 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,627 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0301 → scaled=51.50
+2026-05-28 23:23:49,650 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,651 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0066 → scaled=49.67
+2026-05-28 23:23:49,696 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,696 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.9349 → scaled=96.74
+2026-05-28 23:23:49,715 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,715 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.6788 → scaled=83.94
+2026-05-28 23:23:49,800 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,800 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0656 → scaled=53.28
+2026-05-28 23:23:49,909 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:49,909 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2659 → scaled=36.70
+2026-05-28 23:23:50,002 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,002 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0268 → scaled=48.66
+2026-05-28 23:23:50,087 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,087 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3662 → scaled=31.69
+2026-05-28 23:23:50,416 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (5건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,416 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2089 → scaled=60.45
+2026-05-28 23:23:50,505 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,505 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.9048 → scaled=95.24
+2026-05-28 23:23:50,537 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,538 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1263 → scaled=43.68
+2026-05-28 23:23:50,620 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,620 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2634 → scaled=63.17
+2026-05-28 23:23:50,693 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,693 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1343 → scaled=43.29
+2026-05-28 23:23:50,821 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,822 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.4830 → scaled=74.15
+2026-05-28 23:23:50,856 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,867 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0042 → scaled=50.21
+2026-05-28 23:23:50,973 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:50,974 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1449 → scaled=57.25
+2026-05-28 23:23:51,071 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:51,071 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0480 → scaled=47.60
+2026-05-28 23:23:51,141 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:51,141 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1650 → scaled=41.75
+2026-05-28 23:23:51,452 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:51,453 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0574 → scaled=47.13
+2026-05-28 23:23:51,497 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:51,498 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0433 → scaled=47.83
+2026-05-28 23:23:51,543 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:51,543 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0494 → scaled=52.47
+2026-05-28 23:23:51,935 [INFO] sentiment_provider: FinBERT 감성 점수: pos=8/10건 valid → score=100.00 (neutral 필터 제외: 5건)
+2026-05-28 23:23:51,951 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:51,952 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0122 → scaled=50.61
+2026-05-28 23:23:51,969 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:51,970 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0122 → scaled=50.61
+2026-05-28 23:23:51,986 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:51,986 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0333 → scaled=48.34
+2026-05-28 23:23:52,001 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,002 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1060 → scaled=44.70
+2026-05-28 23:23:52,139 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,139 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0154 → scaled=49.23
+2026-05-28 23:23:52,238 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,238 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4502 → scaled=27.49
+2026-05-28 23:23:52,358 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,359 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0408 → scaled=47.96
+2026-05-28 23:23:52,439 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,439 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1582 → scaled=42.09
+2026-05-28 23:23:52,659 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,660 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1807 → scaled=40.97
+2026-05-28 23:23:52,727 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,728 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0803 → scaled=45.98
+2026-05-28 23:23:52,769 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,769 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.8716 → scaled=93.58
+2026-05-28 23:23:52,813 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,813 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0753 → scaled=53.77
+2026-05-28 23:23:52,853 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,853 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0097 → scaled=49.52
+2026-05-28 23:23:52,896 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,896 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3654 → scaled=68.27
+2026-05-28 23:23:52,938 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,938 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3654 → scaled=68.27
+2026-05-28 23:23:52,964 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:52,964 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0088 → scaled=50.44
+2026-05-28 23:23:53,132 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,132 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0656 → scaled=53.28
+2026-05-28 23:23:53,200 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,201 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0458 → scaled=47.71
+2026-05-28 23:23:53,463 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (6건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,463 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1964 → scaled=59.82
+2026-05-28 23:23:53,672 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,673 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0306 → scaled=48.47
+2026-05-28 23:23:53,731 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,732 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3177 → scaled=34.11
+2026-05-28 23:23:53,762 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,763 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0301 → scaled=48.49
+2026-05-28 23:23:53,789 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,789 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0296 → scaled=51.48
+2026-05-28 23:23:53,896 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,896 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1930 → scaled=59.65
+2026-05-28 23:23:53,962 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:53,963 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0166 → scaled=50.83
+2026-05-28 23:23:54,287 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:54,287 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2521 → scaled=62.61
+2026-05-28 23:23:54,363 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:54,365 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3864 → scaled=69.32
+2026-05-28 23:23:54,398 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:54,400 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0280 → scaled=51.40
+2026-05-28 23:23:54,430 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:54,430 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0599 → scaled=53.00
+2026-05-28 23:23:54,492 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:54,492 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.4058 → scaled=70.29
+2026-05-28 23:23:54,578 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:54,578 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2198 → scaled=60.99
+2026-05-28 23:23:54,761 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:54,761 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1601 → scaled=58.00
+2026-05-28 23:23:54,921 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:54,922 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.7971 → scaled=10.14
+2026-05-28 23:23:55,046 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:55,046 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.9012 → scaled=95.06
+2026-05-28 23:23:55,079 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:55,080 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3511 → scaled=67.55
+2026-05-28 23:23:55,146 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:55,146 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0963 → scaled=54.82
+2026-05-28 23:23:55,146 [INFO] wsb_signal_engine: [중립 필터] LITE: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,147 [INFO] wsb_signal_engine: [중립 필터] TTWO: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,147 [INFO] wsb_signal_engine: [중립 필터] ONDS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,147 [INFO] wsb_signal_engine: [중립 필터] NFLX: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,147 [INFO] wsb_signal_engine: [중립 필터] YEAR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,147 [INFO] wsb_signal_engine: [중립 필터] PDT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,147 [INFO] wsb_signal_engine: [중립 필터] EVER: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] ARM: 중립비율=75% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] LULU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] APLD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] VXUS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] INTU: 중립비율=75% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=88% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] SKM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,148 [INFO] wsb_signal_engine: [중립 필터] MU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,149 [INFO] wsb_signal_engine: [중립 필터] SNDK: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,149 [INFO] wsb_signal_engine: [중립 필터] SMCI: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,149 [INFO] wsb_signal_engine: [중립 필터] ASTS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,149 [INFO] wsb_signal_engine: [중립 필터] AAPL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,149 [INFO] wsb_signal_engine: [중립 필터] AMD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,149 [INFO] wsb_signal_engine: [중립 필터] META: 중립비율=86% → NEUTRAL
+2026-05-28 23:23:55,149 [INFO] wsb_signal_engine: [중립 필터] AMZN: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,149 [INFO] wsb_signal_engine: [중립 필터] PLTR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,150 [INFO] wsb_signal_engine: [중립 필터] UFCS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,150 [INFO] wsb_signal_engine: [중립 필터] WDAY: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,150 [INFO] wsb_signal_engine: [중립 필터] ZM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,150 [INFO] wsb_signal_engine: [중립 필터] CAR: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,150 [INFO] wsb_signal_engine: [중립 필터] IMAX: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,150 [INFO] wsb_signal_engine: [중립 필터] DON: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,150 [INFO] wsb_signal_engine: [중립 필터] RKLB: 중립비율=91% → NEUTRAL
+2026-05-28 23:23:55,150 [INFO] wsb_signal_engine: [중립 필터] DRAM: 중립비율=85% → NEUTRAL
+2026-05-28 23:23:55,151 [INFO] wsb_signal_engine: [중립 필터] EASY: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,151 [INFO] wsb_signal_engine: [중립 필터] CAN: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,151 [INFO] wsb_signal_engine: [중립 필터] NBIS: 중립비율=80% → NEUTRAL
+2026-05-28 23:23:55,151 [INFO] wsb_signal_engine: [중립 필터] INTC: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,151 [INFO] wsb_signal_engine: [중립 필터] FCEL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,151 [INFO] wsb_signal_engine: [중립 필터] RGTI: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,152 [INFO] wsb_signal_engine: [중립 필터] SOXX: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,152 [INFO] wsb_signal_engine: [중립 필터] HYSA: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,152 [INFO] wsb_signal_engine: [중립 필터] MRVL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:55,154 [INFO] indicators: [RL] RSI=61.14, RSI_MA=43.02
+2026-05-28 23:23:55,155 [INFO] indicators: [SAP] RSI=53.90, RSI_MA=52.63
+2026-05-28 23:23:55,157 [INFO] indicators: [HAS] RSI=39.49, RSI_MA=47.27
+2026-05-28 23:23:55,158 [INFO] indicators: [IBM] RSI=65.96, RSI_MA=47.57
+2026-05-28 23:23:55,159 [INFO] indicators: [XPEV] RSI=43.75, RSI_MA=40.55
+2026-05-28 23:23:55,161 [INFO] indicators: [LUNR] RSI=70.44, RSI_MA=65.82
+2026-05-28 23:23:55,163 [INFO] indicators: [QBTS] RSI=70.09, RSI_MA=54.18
+2026-05-28 23:23:55,164 [INFO] indicators: [NVDA] RSI=53.95, RSI_MA=62.61
+2026-05-28 23:23:55,165 [INFO] indicators: [MSFT] RSI=55.14, RSI_MA=56.07
+2026-05-28 23:23:55,166 [INFO] indicators: [TSLA] RSI=58.51, RSI_MA=57.23
+2026-05-28 23:23:55,167 [INFO] indicators: [WYY] RSI=70.42, RSI_MA=67.52
+2026-05-28 23:23:55,169 [INFO] indicators: [DJT] RSI=31.15, RSI_MA=34.62
+2026-05-28 23:23:55,171 [INFO] indicators: [RDDT] RSI=40.57, RSI_MA=48.11
+2026-05-28 23:23:55,172 [INFO] indicators: [IONQ] RSI=69.35, RSI_MA=61.28
+2026-05-28 23:23:55,173 [INFO] indicators: [IREN] RSI=56.95, RSI_MA=54.48
+2026-05-28 23:23:55,174 [INFO] indicators: [UHAL] RSI=54.50, RSI_MA=45.63
+2026-05-28 23:23:55,175 [INFO] indicators: [NIO] RSI=32.78, RSI_MA=42.59
+2026-05-28 23:23:55,176 [INFO] indicators: [GFS] RSI=74.43, RSI_MA=64.50
+2026-05-28 23:23:55,178 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=59, 중립필터=41, 컨센서스통과=2, Top3=['RDDT', 'XPEV']
+2026-05-28 23:23:55,181 [INFO] indicators: [EASY] RSI=54.19, RSI_MA=49.82
+2026-05-28 23:23:55,182 [INFO] indicators: [UFCS] RSI=62.07, RSI_MA=70.50
+2026-05-28 23:23:55,184 [INFO] indicators: [HYSA] RSI=50.71, RSI_MA=45.23
+2026-05-28 23:23:55,186 [INFO] indicators: [RGTI] RSI=71.46, RSI_MA=53.79
+2026-05-28 23:23:55,188 [INFO] indicators: [XPEV] RSI=43.75, RSI_MA=40.55
+2026-05-28 23:23:55,190 [INFO] indicators: [TSLA] RSI=58.51, RSI_MA=57.23
+2026-05-28 23:23:55,192 [INFO] indicators: [NFLX] RSI=43.79, RSI_MA=42.07
+2026-05-28 23:23:55,195 [INFO] indicators: [CAR] RSI=44.75, RSI_MA=41.53
+2026-05-28 23:23:55,197 [INFO] indicators: [HOOD] RSI=44.33, RSI_MA=48.06
+2026-05-28 23:23:55,199 [INFO] indicators: [DON] RSI=56.49, RSI_MA=49.23
+2026-05-28 23:23:55,200 [INFO] indicators: [INTU] RSI=33.03, RSI_MA=43.14
+2026-05-28 23:23:55,203 [INFO] indicators: [SMCI] RSI=64.28, RSI_MA=57.28
+2026-05-28 23:23:55,205 [INFO] indicators: [YEAR] RSI=45.78, RSI_MA=42.97
+2026-05-28 23:23:55,207 [INFO] indicators: [EVER] RSI=55.14, RSI_MA=52.64
+2026-05-28 23:23:55,208 [INFO] indicators: [QBTS] RSI=70.09, RSI_MA=54.18
+2026-05-28 23:23:55,210 [INFO] indicators: [IMAX] RSI=64.29, RSI_MA=41.10
+2026-05-28 23:23:55,212 [INFO] indicators: [UHAL] RSI=54.50, RSI_MA=45.63
+2026-05-28 23:23:55,213 [INFO] indicators: [MSFT] RSI=55.14, RSI_MA=56.07
+2026-05-28 23:23:55,215 [INFO] indicators: [MRVL] RSI=71.26, RSI_MA=66.81
+2026-05-28 23:23:55,217 [INFO] indicators: [PDT] RSI=46.45, RSI_MA=38.34
+2026-05-28 23:23:55,218 [INFO] indicators: [IBM] RSI=65.96, RSI_MA=47.57
+2026-05-28 23:23:55,220 [INFO] indicators: [DJT] RSI=31.15, RSI_MA=34.62
+2026-05-28 23:23:55,221 [INFO] indicators: [AMD] RSI=72.74, RSI_MA=69.63
+2026-05-28 23:23:55,222 [INFO] indicators: [NVDA] RSI=53.95, RSI_MA=62.61
+2026-05-28 23:23:55,225 [INFO] indicators: [MU] RSI=64.97, RSI_MA=65.48
+2026-05-28 23:23:55,227 [INFO] indicators: [BWMN] RSI=48.96, RSI_MA=46.46
+2026-05-28 23:23:55,229 [INFO] indicators: [LULU] RSI=39.78, RSI_MA=31.19
+2026-05-28 23:23:55,230 [INFO] indicators: [ONDS] RSI=45.26, RSI_MA=50.15
+2026-05-28 23:23:55,233 [INFO] indicators: [INTC] RSI=68.17, RSI_MA=65.77
+2026-05-28 23:23:55,235 [INFO] indicators: [NBIS] RSI=63.63, RSI_MA=65.09
+2026-05-28 23:23:55,237 [INFO] indicators: [META] RSI=45.81, RSI_MA=44.87
+2026-05-28 23:23:55,240 [INFO] indicators: [FCEL] RSI=72.28, RSI_MA=72.55
+2026-05-28 23:23:55,241 [INFO] indicators: [PLTR] RSI=48.32, RSI_MA=46.66
+2026-05-28 23:23:55,243 [INFO] indicators: [LUNR] RSI=70.44, RSI_MA=65.82
+2026-05-28 23:23:55,245 [INFO] indicators: [WYY] RSI=70.42, RSI_MA=67.52
+2026-05-28 23:23:55,247 [INFO] indicators: [HAS] RSI=39.49, RSI_MA=47.27
+2026-05-28 23:23:55,250 [INFO] indicators: [APLD] RSI=61.08, RSI_MA=59.63
+2026-05-28 23:23:55,254 [INFO] indicators: [SAP] RSI=53.90, RSI_MA=52.63
+2026-05-28 23:23:55,256 [INFO] indicators: [NIO] RSI=32.78, RSI_MA=42.59
+2026-05-28 23:23:55,258 [INFO] indicators: [GFS] RSI=74.43, RSI_MA=64.50
+2026-05-28 23:23:55,261 [INFO] indicators: [ASTS] RSI=68.07, RSI_MA=58.56
+2026-05-28 23:23:55,264 [INFO] indicators: [ZM] RSI=61.38, RSI_MA=54.20
+2026-05-28 23:23:55,266 [INFO] indicators: [GOOGL] RSI=57.59, RSI_MA=65.64
+2026-05-28 23:23:55,268 [INFO] indicators: [SKM] RSI=53.25, RSI_MA=55.87
+2026-05-28 23:23:55,271 [INFO] indicators: [AMZN] RSI=58.03, RSI_MA=58.52
+2026-05-28 23:23:55,273 [INFO] indicators: [DRAM] RSI=66.79, RSI_MA=68.49
+2026-05-28 23:23:55,274 [INFO] indicators: [WDAY] RSI=52.73, RSI_MA=50.24
+2026-05-28 23:23:55,275 [INFO] indicators: [LITE] RSI=53.35, RSI_MA=52.40
+2026-05-28 23:23:55,277 [INFO] indicators: [ARM] RSI=76.66, RSI_MA=65.14
+2026-05-28 23:23:55,279 [INFO] indicators: [CAN] RSI=37.65, RSI_MA=42.90
+2026-05-28 23:23:55,281 [INFO] indicators: [IONQ] RSI=69.35, RSI_MA=61.28
+2026-05-28 23:23:55,283 [INFO] indicators: [IREN] RSI=56.95, RSI_MA=54.48
+2026-05-28 23:23:55,284 [INFO] indicators: [RKLB] RSI=68.89, RSI_MA=71.26
+2026-05-28 23:23:55,286 [INFO] indicators: [SOXX] RSI=69.21, RSI_MA=65.86
+2026-05-28 23:23:55,288 [INFO] indicators: [TTWO] RSI=53.92, RSI_MA=69.90
+2026-05-28 23:23:55,289 [INFO] indicators: [AAPL] RSI=77.98, RSI_MA=74.18
+2026-05-28 23:23:55,291 [INFO] indicators: [SNDK] RSI=63.87, RSI_MA=63.76
+2026-05-28 23:23:55,293 [INFO] indicators: [RDDT] RSI=40.57, RSI_MA=48.11
+2026-05-28 23:23:55,296 [INFO] indicators: [VXUS] RSI=56.14, RSI_MA=54.65
+2026-05-28 23:23:55,297 [INFO] indicators: [RL] RSI=61.14, RSI_MA=43.02
+2026-05-28 23:23:55,301 [INFO] reddit_portfolio: [RDDT] 매수: 61주 × $145.23 = $8859.03 (수수료 $22.15)
+2026-05-28 23:23:55,302 [INFO] reddit_portfolio: [XPEV] 매수: 530주 × $15.28 = $8098.40 (수수료 $20.25)
+2026-05-28 23:23:55,304 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-22\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:23:55,358 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:55,358 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0710 → scaled=46.45
+2026-05-28 23:23:55,703 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (9건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:55,704 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0796 → scaled=46.02
+2026-05-28 23:23:55,851 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (5건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:55,852 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3260 → scaled=66.30
+2026-05-28 23:23:56,034 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,034 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0027 → scaled=49.86
+2026-05-28 23:23:56,268 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,268 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0450 → scaled=47.75
+2026-05-28 23:23:56,304 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,305 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.9183 → scaled=4.08
+2026-05-28 23:23:56,353 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,354 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2724 → scaled=63.62
+2026-05-28 23:23:56,400 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,400 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2724 → scaled=63.62
+2026-05-28 23:23:56,475 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,476 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0141 → scaled=49.29
+2026-05-28 23:23:56,514 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,515 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0666 → scaled=53.33
+2026-05-28 23:23:56,560 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,560 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4160 → scaled=29.20
+2026-05-28 23:23:56,607 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,608 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4160 → scaled=29.20
+2026-05-28 23:23:56,655 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,655 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4160 → scaled=29.20
+2026-05-28 23:23:56,681 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,681 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3973 → scaled=30.14
+2026-05-28 23:23:56,706 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:56,706 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3301 → scaled=33.49
+2026-05-28 23:23:57,057 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (7건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:57,057 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2162 → scaled=60.81
+2026-05-28 23:23:57,093 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:57,094 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.6544 → scaled=17.28
+2026-05-28 23:23:57,566 [INFO] sentiment_provider: FinBERT 감성 점수: pos=6/12건 valid → score=66.67 (neutral 필터 제외: 6건)
+2026-05-28 23:23:57,766 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (7건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:57,767 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1955 → scaled=40.23
+2026-05-28 23:23:57,904 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:57,904 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1285 → scaled=56.43
+2026-05-28 23:23:57,975 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:57,975 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3121 → scaled=65.60
+2026-05-28 23:23:58,066 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,067 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3426 → scaled=67.13
+2026-05-28 23:23:58,151 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,152 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0710 → scaled=46.45
+2026-05-28 23:23:58,194 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,194 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0710 → scaled=46.45
+2026-05-28 23:23:58,283 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,284 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0315 → scaled=51.58
+2026-05-28 23:23:58,364 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,365 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0602 → scaled=53.01
+2026-05-28 23:23:58,378 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,378 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0314 → scaled=48.43
+2026-05-28 23:23:58,424 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,424 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2724 → scaled=63.62
+2026-05-28 23:23:58,472 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,473 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4160 → scaled=29.20
+2026-05-28 23:23:58,494 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,494 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.8258 → scaled=91.29
+2026-05-28 23:23:58,506 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,506 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0739 → scaled=53.69
+2026-05-28 23:23:58,581 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,581 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2371 → scaled=38.14
+2026-05-28 23:23:58,625 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,625 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0791 → scaled=53.95
+2026-05-28 23:23:58,661 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,661 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0504 → scaled=47.48
+2026-05-28 23:23:58,713 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,714 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3474 → scaled=67.37
+2026-05-28 23:23:58,714 [INFO] wsb_signal_engine: [중립 필터] IREN: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,714 [INFO] wsb_signal_engine: [중립 필터] AMD: 중립비율=71% → NEUTRAL
+2026-05-28 23:23:58,714 [INFO] wsb_signal_engine: [중립 필터] MU: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,714 [INFO] wsb_signal_engine: [중립 필터] WMT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,714 [INFO] wsb_signal_engine: [중립 필터] TSLA: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,714 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,714 [INFO] wsb_signal_engine: [중립 필터] QBTS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,715 [INFO] wsb_signal_engine: [중립 필터] RGTI: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,715 [INFO] wsb_signal_engine: [중립 필터] IONQ: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,715 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,715 [INFO] wsb_signal_engine: [중립 필터] RKLB: 중립비율=79% → NEUTRAL
+2026-05-28 23:23:58,715 [INFO] wsb_signal_engine: [중립 필터] RDDT: 중립비율=75% → NEUTRAL
+2026-05-28 23:23:58,715 [INFO] wsb_signal_engine: [중립 필터] GLXY: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,716 [INFO] wsb_signal_engine: [중립 필터] COIN: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,716 [INFO] wsb_signal_engine: [중립 필터] F: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,716 [INFO] wsb_signal_engine: [중립 필터] TTMI: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,716 [INFO] wsb_signal_engine: [중립 필터] GRPN: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,716 [INFO] wsb_signal_engine: [중립 필터] SCHD: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,717 [INFO] wsb_signal_engine: [중립 필터] QUBT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,717 [INFO] wsb_signal_engine: [중립 필터] SOXS: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,717 [INFO] wsb_signal_engine: [중립 필터] WANT: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,717 [INFO] wsb_signal_engine: [중립 필터] QCOM: 중립비율=100% → NEUTRAL
+2026-05-28 23:23:58,719 [INFO] indicators: [NVDA] RSI=53.95, RSI_MA=62.61
+2026-05-28 23:23:58,722 [INFO] indicators: [AAPL] RSI=77.98, RSI_MA=74.18
+2026-05-28 23:23:58,723 [INFO] indicators: [META] RSI=45.81, RSI_MA=44.87
+2026-05-28 23:23:58,724 [INFO] indicators: [MSFT] RSI=55.14, RSI_MA=56.07
+2026-05-28 23:23:58,726 [INFO] indicators: [PLTR] RSI=48.32, RSI_MA=46.66
+2026-05-28 23:23:58,729 [INFO] indicators: [DJT] RSI=31.15, RSI_MA=34.62
+2026-05-28 23:23:58,731 [INFO] indicators: [ASTS] RSI=68.07, RSI_MA=58.56
+2026-05-28 23:23:58,733 [INFO] indicators: [DRAM] RSI=66.79, RSI_MA=68.49
+2026-05-28 23:23:58,734 [INFO] indicators: [IBM] RSI=65.96, RSI_MA=47.57
+2026-05-28 23:23:58,737 [INFO] indicators: [MSTR] RSI=44.81, RSI_MA=50.36
+2026-05-28 23:23:58,738 [INFO] indicators: [CRDO] RSI=64.87, RSI_MA=54.02
+2026-05-28 23:23:58,740 [INFO] indicators: [USA] RSI=54.49, RSI_MA=49.06
+2026-05-28 23:23:58,742 [INFO] indicators: [MAGS] RSI=61.56, RSI_MA=64.76
+2026-05-28 23:23:58,743 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=35, 중립필터=22, 컨센서스통과=0, Top3=[]
+2026-05-28 23:23:58,767 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-23\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:23:58,969 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (5건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:58,970 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2835 → scaled=64.17
+2026-05-28 23:23:59,151 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (5건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,152 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0041 → scaled=49.80
+2026-05-28 23:23:59,235 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,235 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0710 → scaled=46.45
+2026-05-28 23:23:59,276 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,276 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0710 → scaled=46.45
+2026-05-28 23:23:59,377 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,377 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.5007 → scaled=24.96
+2026-05-28 23:23:59,654 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (5건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,655 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1416 → scaled=42.92
+2026-05-28 23:23:59,678 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,679 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0514 → scaled=52.57
+2026-05-28 23:23:59,692 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,692 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0314 → scaled=48.43
+2026-05-28 23:23:59,763 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,764 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.5090 → scaled=24.55
+2026-05-28 23:23:59,913 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,914 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1080 → scaled=44.60
+2026-05-28 23:23:59,951 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,951 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0996 → scaled=45.02
+2026-05-28 23:23:59,973 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,973 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.8258 → scaled=91.29
+2026-05-28 23:23:59,986 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:23:59,987 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0739 → scaled=53.69
+2026-05-28 23:24:00,001 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:00,001 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0684 → scaled=46.58
+2026-05-28 23:24:00,028 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:00,028 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3301 → scaled=33.49
+2026-05-28 23:24:00,539 [INFO] sentiment_provider: FinBERT 감성 점수: pos=6/12건 valid → score=66.67 (neutral 필터 제외: 7건)
+2026-05-28 23:24:00,685 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:00,686 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3039 → scaled=65.19
+2026-05-28 23:24:00,724 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:00,724 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.6544 → scaled=17.28
+2026-05-28 23:24:00,873 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (4건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:00,873 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.3099 → scaled=34.51
+2026-05-28 23:24:00,908 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:00,908 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0504 → scaled=47.48
+2026-05-28 23:24:00,942 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:00,943 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0131 → scaled=50.66
+2026-05-28 23:24:01,123 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (7건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,123 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1955 → scaled=40.23
+2026-05-28 23:24:01,170 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,171 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0791 → scaled=53.95
+2026-05-28 23:24:01,274 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,274 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1285 → scaled=56.43
+2026-05-28 23:24:01,303 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,304 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.1375 → scaled=43.13
+2026-05-28 23:24:01,339 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,340 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0072 → scaled=50.36
+2026-05-28 23:24:01,567 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,568 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.5285 → scaled=76.42
+2026-05-28 23:24:01,620 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,620 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.3474 → scaled=67.37
+2026-05-28 23:24:01,752 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,753 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0383 → scaled=51.91
+2026-05-28 23:24:01,837 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,837 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0356 → scaled=51.78
+2026-05-28 23:24:01,837 [INFO] wsb_signal_engine: [중립 필터] AMD: 중립비율=75% → NEUTRAL
+2026-05-28 23:24:01,838 [INFO] wsb_signal_engine: [중립 필터] GLXY: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,838 [INFO] wsb_signal_engine: [중립 필터] IREN: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,838 [INFO] wsb_signal_engine: [중립 필터] NVDA: 중립비율=75% → NEUTRAL
+2026-05-28 23:24:01,838 [INFO] wsb_signal_engine: [중립 필터] AAPL: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,838 [INFO] wsb_signal_engine: [중립 필터] GRPN: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,838 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,838 [INFO] wsb_signal_engine: [중립 필터] AMZN: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] SOXS: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] TSLA: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] QCOM: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] WMT: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] RDDT: 중립비율=75% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] WANT: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] IBM: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] SMH: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,839 [INFO] wsb_signal_engine: [중립 필터] IRS: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:01,842 [INFO] indicators: [META] RSI=45.81, RSI_MA=44.87
+2026-05-28 23:24:01,843 [INFO] indicators: [COIN] RSI=44.64, RSI_MA=49.31
+2026-05-28 23:24:01,844 [INFO] indicators: [MSFT] RSI=55.14, RSI_MA=56.07
+2026-05-28 23:24:01,845 [INFO] indicators: [CRDO] RSI=64.87, RSI_MA=54.02
+2026-05-28 23:24:01,846 [INFO] indicators: [PLTR] RSI=48.32, RSI_MA=46.66
+2026-05-28 23:24:01,848 [INFO] indicators: [ASTS] RSI=68.07, RSI_MA=58.56
+2026-05-28 23:24:01,850 [INFO] indicators: [RKLB] RSI=68.89, RSI_MA=71.26
+2026-05-28 23:24:01,851 [INFO] indicators: [DJT] RSI=31.15, RSI_MA=34.62
+2026-05-28 23:24:01,853 [INFO] indicators: [USA] RSI=54.49, RSI_MA=49.06
+2026-05-28 23:24:01,854 [INFO] indicators: [DRAM] RSI=66.79, RSI_MA=68.49
+2026-05-28 23:24:01,855 [INFO] indicators: [SOXX] RSI=69.21, RSI_MA=65.86
+2026-05-28 23:24:01,856 [INFO] indicators: [MAGS] RSI=61.56, RSI_MA=64.76
+2026-05-28 23:24:01,859 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=30, 중립필터=18, 컨센서스통과=0, Top3=[]
+2026-05-28 23:24:01,871 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-24\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:24:01,939 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,939 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.8880 → scaled=5.60
+2026-05-28 23:24:01,984 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,984 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0044 → scaled=50.22
+2026-05-28 23:24:01,999 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:01,999 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0003 → scaled=50.02
+2026-05-28 23:24:02,149 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,150 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.4580 → scaled=72.90
+2026-05-28 23:24:02,253 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,253 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0864 → scaled=54.32
+2026-05-28 23:24:02,294 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,295 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0083 → scaled=49.58
+2026-05-28 23:24:02,338 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,339 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0083 → scaled=49.58
+2026-05-28 23:24:02,384 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,385 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0604 → scaled=53.02
+2026-05-28 23:24:02,550 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (3건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,550 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.2587 → scaled=37.06
+2026-05-28 23:24:02,615 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,615 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.4821 → scaled=74.11
+2026-05-28 23:24:02,647 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,648 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1376 → scaled=56.88
+2026-05-28 23:24:02,801 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,801 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.0653 → scaled=46.73
+2026-05-28 23:24:02,845 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:02,845 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.2263 → scaled=61.32
+2026-05-28 23:24:03,280 [INFO] sentiment_provider: FinBERT 감성 점수: pos=5/10건 valid → score=71.43 (neutral 필터 제외: 1건)
+2026-05-28 23:24:03,304 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,306 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0226 → scaled=51.13
+2026-05-28 23:24:03,322 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,322 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1659 → scaled=58.29
+2026-05-28 23:24:03,341 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,341 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1659 → scaled=58.29
+2026-05-28 23:24:03,388 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (1건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,389 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1321 → scaled=56.60
+2026-05-28 23:24:03,470 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,470 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.1557 → scaled=57.79
+2026-05-28 23:24:03,562 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,562 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.7939 → scaled=89.69
+2026-05-28 23:24:03,651 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (2건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,651 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=-0.4595 → scaled=27.02
+2026-05-28 23:24:03,748 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,749 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0604 → scaled=53.02
+2026-05-28 23:24:03,950 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (5건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:03,950 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.6585 → scaled=82.93
+2026-05-28 23:24:04,054 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:04,055 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0994 → scaled=54.97
+2026-05-28 23:24:04,157 [WARNING] sentiment_provider: FinBERT: 유효 기사 부족 (0건 < 10건) — 폴백 방식(avg p-n) 사용
+2026-05-28 23:24:04,157 [INFO] sentiment_provider: FinBERT(폴백) 감성 점수: avg_raw=0.0441 → scaled=52.20
+2026-05-28 23:24:04,158 [INFO] wsb_signal_engine: [중립 필터] RDDT: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,158 [INFO] wsb_signal_engine: [중립 필터] PLTR: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,158 [INFO] wsb_signal_engine: [중립 필터] AMD: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,158 [INFO] wsb_signal_engine: [중립 필터] AMZN: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,158 [INFO] wsb_signal_engine: [중립 필터] HOOD: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,158 [INFO] wsb_signal_engine: [중립 필터] GOOGL: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] NVDA: 중립비율=75% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] DJT: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] RKLB: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] NOK: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] MRVL: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] MARA: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] BGDE: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] BKNG: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,159 [INFO] wsb_signal_engine: [중립 필터] SHE: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,160 [INFO] wsb_signal_engine: [중립 필터] MSCI: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,160 [INFO] wsb_signal_engine: [중립 필터] HBM: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,160 [INFO] wsb_signal_engine: [중립 필터] XYZ: 중립비율=100% → NEUTRAL
+2026-05-28 23:24:04,162 [INFO] indicators: [MSFT] RSI=55.14, RSI_MA=56.07
+2026-05-28 23:24:04,164 [INFO] indicators: [META] RSI=45.81, RSI_MA=44.87
+2026-05-28 23:24:04,166 [INFO] indicators: [CAN] RSI=37.65, RSI_MA=42.90
+2026-05-28 23:24:04,168 [INFO] indicators: [ASTS] RSI=68.07, RSI_MA=58.56
+2026-05-28 23:24:04,169 [INFO] indicators: [SXC] RSI=79.27, RSI_MA=73.59
+2026-05-28 23:24:04,171 [INFO] indicators: [USOY] RSI=47.56, RSI_MA=52.72
+2026-05-28 23:24:04,172 [INFO] indicators: [TOST] RSI=36.47, RSI_MA=34.92
+2026-05-28 23:24:04,174 [INFO] wsb_signal_engine: WSBSignalEngine V3 결과: 입력=25, 중립필터=18, 컨센서스통과=1, Top3=['META']
+2026-05-28 23:24:04,184 [WARNING] reddit_portfolio: [META] 시가 없음 — 매수 건너뜀
+2026-05-28 23:24:04,188 [INFO] reddit_portfolio: portfolio_state 저장: data/reddit\2026-05-25\portfolio_state_finbert_mentions_equal.json
+2026-05-28 23:24:04,188 [INFO] reddit_backtester: [RedditBacktest] 완료 — finbert_mentions_equal | 수익률=+0.0% | 거래=0회 | 승률=0.0% | MDD=0.0%
+2026-05-28 23:29:10,869 [INFO] __main__: 즉시 신호 계산 실행
+2026-05-28 23:29:10,874 [INFO] signals: [KIS] 매매 가능 종목 캐시 없음 — 전체 종목으로 신호 생성
+2026-05-28 23:29:10,891 [INFO] signals: [Signal Engine] 'finbert' Provider로 신호 생성 시작
+2026-05-28 23:29:12,063 [INFO] collector: [QQQ] OHLCV 70일치 수집 완료
+2026-05-28 23:29:12,068 [INFO] indicators: [QQQ] RSI=74.89, RSI_MA=71.21
+2026-05-28 23:29:12,068 [INFO] market_filter: [Market Filter] QQQ RSI=74.89 → 시장 상태: 과열 (RSI>70) — 매수 신호 다운그레이드 활성
+2026-05-28 23:29:12,080 [INFO] signals: [NVDA] 신호 계산 시작
+2026-05-28 23:29:12,386 [INFO] collector: [NVDA] OHLCV 70일치 수집 완료
+2026-05-28 23:29:12,388 [INFO] indicators: [NVDA] RSI=51.28, RSI_MA=57.31
+2026-05-28 23:29:13,338 [INFO] collector: [NVDA] 뉴스 100건 수집 완료 (Finnhub, 2026-05-21~2026-05-28)
+2026-05-28 23:29:19,196 [INFO] indicators: FinBERT 모델 로드 중... (캐시)
+2026-05-28 23:29:21,236 [INFO] indicators: FinBERT 초기화 완료 (ONNX Runtime)
+2026-05-28 23:29:25,017 [INFO] sentiment_provider: FinBERT 감성 점수: pos=23/73건 valid → score=43.40 (neutral 필터 제외: 27건)
+2026-05-28 23:29:25,074 [INFO] sentiment_provider: TextBlob 감성 점수: avg_polarity=0.1145 → scaled=55.73 (기사 100건)
+2026-05-28 23:29:25,086 [INFO] signals: [NVDA] 신호=NEUTRAL | RSI=51.3 | RSI_MA=57.3 | TB=55.7 | FB=43.4 | Avg=49.6 | VolMA=162019475 | Spike=N
+2026-05-28 23:29:25,086 [INFO] signals: [TSLA] 신호 계산 시작
+2026-05-28 23:29:25,375 [INFO] collector: [TSLA] OHLCV 70일치 수집 완료
+2026-05-28 23:29:25,377 [INFO] indicators: [TSLA] RSI=63.18, RSI_MA=56.65
+2026-05-28 23:29:26,173 [INFO] collector: [TSLA] 뉴스 100건 수집 완료 (Finnhub, 2026-05-21~2026-05-28)
+2026-05-28 23:29:29,741 [INFO] sentiment_provider: FinBERT 감성 점수: pos=37/69건 valid → score=68.52 (neutral 필터 제외: 31건)
+2026-05-28 23:29:29,766 [INFO] sentiment_provider: TextBlob 감성 점수: avg_polarity=0.0851 → scaled=54.25 (기사 100건)
+2026-05-28 23:29:29,782 [INFO] signals: [TSLA] 신호=NEUTRAL | RSI=63.2 | RSI_MA=56.7 | TB=54.2 | FB=68.5 | Avg=61.4 | VolMA=53523299 | Spike=N
+2026-05-28 23:30:03,066 [INFO] __main__: 즉시 주문 처리 실행 (DRY-RUN)
+2026-05-28 23:30:03,066 [INFO] scheduler: === 주문 처리 잡 시작 (09:35 ET, DRY-RUN) ===
+2026-05-28 23:30:03,222 [INFO] portfolio: 포트폴리오 로드 완료 (현금=$100,000.00, 보유종목=0개)
+2026-05-28 23:30:03,739 [INFO] kis_broker: [KIS] 모의투자 토큰 발급 성공 (만료: 2026-05-29T14:30:03.735822+00:00)
+2026-05-28 23:30:06,360 [INFO] trader: [KIS] 잔고 조회: cash=$100,000.00, positions=0개
+2026-05-28 23:30:06,360 [INFO] trader: [NVDA] 주문 처리 시작 (신호=NEUTRAL)
+2026-05-28 23:30:06,360 [INFO] trader: [TSLA] 주문 처리 시작 (신호=NEUTRAL)
+2026-05-28 23:30:06,360 [INFO] scheduler: 주문 처리 완료: 0건 체결 (DRY-RUN)
+2026-05-28 23:30:06,360 [INFO] scheduler: === 주문 처리 잡 완료 (DRY-RUN) ===
+2026-05-28 23:38:13,791 [INFO] portfolio: 포트폴리오 로드 완료 (현금=$100,000.00, 보유종목=0개)
+2026-05-28 23:40:01,580 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-05-28 23:40:01,580 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-05-28 23:40:01,580 [INFO] apscheduler.scheduler: Added job "Signal Calculation Job" to job store "default"
+2026-05-28 23:40:01,580 [INFO] apscheduler.scheduler: Added job "Order Processing Job" to job store "default"
+2026-05-28 23:40:01,581 [INFO] apscheduler.scheduler: Scheduler started
+2026-05-28 23:44:41,904 [INFO] __main__: 즉시 신호 계산 실행
+2026-05-28 23:44:41,908 [INFO] signals: [KIS] 매매 가능 종목 캐시 없음 — 전체 종목으로 신호 생성
+2026-05-28 23:44:41,908 [INFO] signals: [Signal Engine] 'finbert' Provider로 신호 생성 시작
+2026-05-28 23:44:42,854 [INFO] collector: [QQQ] OHLCV 70일치 수집 완료
+2026-05-28 23:44:42,857 [INFO] indicators: [QQQ] RSI=74.89, RSI_MA=71.21
+2026-05-28 23:44:42,857 [INFO] market_filter: [Market Filter] QQQ RSI=74.89 → 시장 상태: 과열 (RSI>70) — 매수 신호 다운그레이드 활성
+2026-05-28 23:44:42,857 [INFO] signals: [NVDA] 신호 계산 시작
+2026-05-28 23:44:43,125 [INFO] collector: [NVDA] OHLCV 70일치 수집 완료
+2026-05-28 23:44:43,126 [INFO] indicators: [NVDA] RSI=51.28, RSI_MA=57.31
+2026-05-28 23:44:45,528 [INFO] collector: [NVDA] 뉴스 100건 수집 완료 (Finnhub, 2026-05-21~2026-05-28)
+2026-05-28 23:44:51,147 [INFO] indicators: FinBERT 모델 로드 중... (캐시)
+2026-05-28 23:44:53,511 [INFO] indicators: FinBERT 초기화 완료 (ONNX Runtime)
+2026-05-28 23:44:57,388 [INFO] sentiment_provider: FinBERT 감성 점수: pos=23/73건 valid → score=43.40 (neutral 필터 제외: 27건)
+2026-05-28 23:44:57,436 [INFO] sentiment_provider: TextBlob 감성 점수: avg_polarity=0.1145 → scaled=55.73 (기사 100건)
+2026-05-28 23:44:57,452 [INFO] signals: [NVDA] 신호=NEUTRAL | RSI=51.3 | RSI_MA=57.3 | TB=55.7 | FB=43.4 | Avg=49.6 | VolMA=162019475 | Spike=N
+2026-05-28 23:44:57,452 [INFO] signals: [TSLA] 신호 계산 시작
+2026-05-28 23:44:57,730 [INFO] collector: [TSLA] OHLCV 70일치 수집 완료
+2026-05-28 23:44:57,731 [INFO] indicators: [TSLA] RSI=63.18, RSI_MA=56.65
+2026-05-28 23:44:58,863 [INFO] collector: [TSLA] 뉴스 100건 수집 완료 (Finnhub, 2026-05-21~2026-05-28)
+2026-05-28 23:45:02,327 [INFO] sentiment_provider: FinBERT 감성 점수: pos=37/69건 valid → score=68.52 (neutral 필터 제외: 31건)
+2026-05-28 23:45:02,349 [INFO] sentiment_provider: TextBlob 감성 점수: avg_polarity=0.0851 → scaled=54.25 (기사 100건)
+2026-05-28 23:45:02,361 [INFO] signals: [TSLA] 신호=NEUTRAL | RSI=63.2 | RSI_MA=56.7 | TB=54.2 | FB=68.5 | Avg=61.4 | VolMA=53523299 | Spike=N
+2026-05-29 00:16:50,549 [INFO] __main__: 즉시 주문 처리 실행 (LIVE)
+2026-05-29 00:16:50,549 [INFO] scheduler: === 주문 처리 잡 시작 (09:35 ET, LIVE) ===
+2026-05-29 00:16:50,730 [INFO] portfolio: 포트폴리오 로드 완료 (현금=$100,000.00, 보유종목=0개)
+2026-05-29 00:16:52,283 [INFO] trader: [KIS] 잔고 조회: cash=$100,000.00, positions=0개
+2026-05-29 00:16:52,283 [INFO] trader: [NVDA] 주문 처리 시작 (신호=NEUTRAL)
+2026-05-29 00:16:52,283 [INFO] trader: [TSLA] 주문 처리 시작 (신호=NEUTRAL)
+2026-05-29 00:16:54,457 [INFO] portfolio: 포트폴리오 저장 완료
+2026-05-29 00:16:54,457 [INFO] scheduler: 주문 처리 완료: 0건 체결 (LIVE)
+2026-05-29 00:16:54,457 [INFO] scheduler: === 주문 처리 잡 완료 (LIVE) ===
+2026-05-29 00:25:30,664 [INFO] __main__: [Reddit] 수집 시작: 2026-05-29
+2026-05-29 00:25:31,391 [INFO] reddit_collector: PRAW Reddit 초기화 완료
+2026-05-29 00:26:02,059 [INFO] reddit_collector: r/wallstreetbets: Daily Thread 'Daily Discussion Thread for May 28, 2026' (전체 6874개 댓글) → top 1000개 수집
+2026-05-29 00:26:06,176 [INFO] reddit_collector: r/wallstreetbets: Daily Thread 댓글 756개 추출 (source=daily_thread)
+2026-05-29 00:26:07,177 [INFO] reddit_collector: r/wallstreetbets: 게시글 20개 + Daily Thread 756개
+2026-05-29 00:26:23,154 [INFO] reddit_collector: r/investing: Daily Thread 'Daily General Discussion and Advice Thread - May 2' (전체 19개 댓글) → top 1000개 수집
+2026-05-29 00:26:23,155 [INFO] reddit_collector: r/investing: Daily Thread 댓글 4개 추출 (source=daily_thread)
+2026-05-29 00:26:24,156 [INFO] reddit_collector: r/investing: 게시글 21개 + Daily Thread 4개
+2026-05-29 00:26:42,496 [INFO] reddit_collector: r/stocks: Daily Thread 'r/Stocks Daily Discussion & Options Trading Thursd' (전체 136개 댓글) → top 1000개 수집
+2026-05-29 00:26:42,788 [INFO] reddit_collector: r/stocks: Daily Thread 댓글 43개 추출 (source=daily_thread)
+2026-05-29 00:26:43,789 [INFO] reddit_collector: r/stocks: 게시글 24개 + Daily Thread 43개
+2026-05-29 00:26:54,552 [INFO] reddit_collector: r/options: Daily Thread 'Options Questions Safe Haven periodic megathread |' (전체 15개 댓글) → top 1000개 수집
+2026-05-29 00:26:54,552 [INFO] reddit_collector: r/options: Daily Thread 댓글 7개 추출 (source=daily_thread)
+2026-05-29 00:26:55,553 [INFO] reddit_collector: r/options: 게시글 16개 + Daily Thread 7개
+2026-05-29 00:27:06,341 [INFO] reddit_collector: r/StockMarket: 게시글 4개 + Daily Thread 0개
+2026-05-29 00:27:16,364 [INFO] reddit_collector: r/thetagang: Daily Thread 'Daily r/thetagang Discussion Thread - What are you' (전체 172개 댓글) → top 1000개 수집
+2026-05-29 00:27:16,366 [INFO] reddit_collector: r/thetagang: Daily Thread 댓글 61개 추출 (source=daily_thread)
+2026-05-29 00:27:17,367 [INFO] reddit_collector: r/thetagang: 게시글 8개 + Daily Thread 61개
+2026-05-29 00:27:18,080 [INFO] reddit_collector: Polygon 검증: 신규 98개 (캐시 유효 0개 / 캐시 제외 0개)
+2026-05-29 00:27:19,034 [INFO] collector: [DELL] OHLCV 3일치 수집 완료
+2026-05-29 00:27:31,306 [INFO] collector: [MSFT] OHLCV 3일치 수집 완료
+2026-05-29 00:27:43,543 [INFO] collector: [AMZN] OHLCV 3일치 수집 완료
+2026-05-29 00:27:55,763 [WARNING] collector: [YAHU] OHLCV 데이터 없음
+2026-05-29 00:28:08,033 [INFO] collector: [HOOD] OHLCV 3일치 수집 완료
+2026-05-29 00:28:20,308 [INFO] collector: [META] OHLCV 3일치 수집 완료
+2026-05-29 00:28:32,585 [INFO] collector: [CRSR] OHLCV 3일치 수집 완료
+2026-05-29 00:28:44,839 [INFO] collector: [AMD] OHLCV 3일치 수집 완료
+2026-05-29 00:28:57,107 [INFO] collector: [AAPL] OHLCV 3일치 수집 완료
+2026-05-29 00:29:09,376 [INFO] collector: [NOK] OHLCV 3일치 수집 완료
+2026-05-29 00:29:21,624 [INFO] collector: [NVDA] OHLCV 3일치 수집 완료
+2026-05-29 00:29:33,900 [INFO] collector: [GOOGL] OHLCV 3일치 수집 완료
+2026-05-29 00:29:46,128 [INFO] collector: [SHOP] OHLCV 3일치 수집 완료
+2026-05-29 00:29:58,376 [INFO] collector: [MELI] OHLCV 3일치 수집 완료
+2026-05-29 00:30:10,784 [INFO] collector: [KTOS] OHLCV 3일치 수집 완료
+2026-05-29 00:30:23,056 [INFO] collector: [RCAT] OHLCV 3일치 수집 완료
+2026-05-29 00:30:35,316 [INFO] collector: [AVAV] OHLCV 3일치 수집 완료
+2026-05-29 00:30:47,553 [INFO] collector: [UMAC] OHLCV 3일치 수집 완료
+2026-05-29 00:30:59,839 [INFO] collector: [ONDS] OHLCV 3일치 수집 완료
+2026-05-29 00:31:12,559 [INFO] collector: [SOFI] OHLCV 3일치 수집 완료
+2026-05-29 00:31:24,832 [INFO] collector: [SFIX] OHLCV 3일치 수집 완료
+2026-05-29 00:31:37,073 [INFO] collector: [OSUR] OHLCV 3일치 수집 완료
+2026-05-29 00:31:49,354 [INFO] collector: [SNOW] OHLCV 3일치 수집 완료
+2026-05-29 00:32:18,223 [INFO] collector: [COST] OHLCV 3일치 수집 완료
+2026-05-29 00:32:30,494 [INFO] collector: [MDB] OHLCV 3일치 수집 완료
+2026-05-29 00:32:42,733 [WARNING] collector: [ONE] OHLCV 데이터 없음
+2026-05-29 00:32:54,987 [WARNING] collector: [GOT] OHLCV 데이터 없음
+2026-05-29 00:33:07,295 [INFO] collector: [IREN] OHLCV 3일치 수집 완료
+2026-05-29 00:33:19,554 [INFO] collector: [ASTS] OHLCV 3일치 수집 완료
+2026-05-29 00:33:43,865 [INFO] collector: [RKLB] OHLCV 3일치 수집 완료
+2026-05-29 00:33:56,108 [INFO] collector: [CRM] OHLCV 3일치 수집 완료
+2026-05-29 00:34:08,476 [INFO] collector: [ARR] OHLCV 3일치 수집 완료
+2026-05-29 00:34:20,735 [WARNING] collector: [APRIL] OHLCV 데이터 없음
+2026-05-29 00:34:33,011 [WARNING] collector: [PCE] OHLCV 데이터 없음
+2026-05-29 00:34:45,251 [WARNING] collector: [PRICE] OHLCV 데이터 없음
+2026-05-29 00:34:57,487 [WARNING] collector: [INDEX] OHLCV 데이터 없음
+2026-05-29 00:35:09,711 [WARNING] collector: [RISES] OHLCV 데이터 없음
+2026-05-29 00:35:21,944 [WARNING] collector: [EST] OHLCV 데이터 없음
+2026-05-29 00:35:34,240 [WARNING] collector: [CORE] OHLCV 데이터 없음
+2026-05-29 00:35:46,462 [WARNING] collector: [RIP] OHLCV 데이터 없음
+2026-05-29 00:35:58,681 [WARNING] collector: [FUCK] OHLCV 데이터 없음
+2026-05-29 00:36:10,915 [WARNING] collector: [CNBC] OHLCV 데이터 없음
+2026-05-29 00:36:23,167 [WARNING] collector: [GOING] OHLCV 데이터 없음
+2026-05-29 00:36:35,414 [WARNING] collector: [LET] OHLCV 데이터 없음
+2026-05-29 00:36:47,665 [WARNING] collector: [BER] OHLCV 데이터 없음
+2026-05-29 00:36:59,944 [INFO] collector: [HIT] OHLCV 3일치 수집 완료
+2026-05-29 00:37:12,191 [WARNING] collector: [FLOOR] OHLCV 데이터 없음
+2026-05-29 00:37:24,425 [WARNING] collector: [RGB] OHLCV 데이터 없음
+2026-05-29 00:37:36,688 [INFO] collector: [RDDT] OHLCV 3일치 수집 완료
+2026-05-29 00:37:48,986 [WARNING] collector: [RAM] OHLCV 데이터 없음
+2026-05-29 00:38:01,231 [INFO] collector: [EOD] OHLCV 3일치 수집 완료
+2026-05-29 00:38:13,478 [WARNING] collector: [LMAO] OHLCV 데이터 없음
+2026-05-29 00:38:25,734 [WARNING] collector: [MOU] OHLCV 데이터 없음
+2026-05-29 00:38:37,997 [WARNING] collector: [BERS] OHLCV 데이터 없음
+2026-05-29 00:38:50,214 [WARNING] collector: [POTUS] OHLCV 데이터 없음
+2026-05-29 00:39:02,513 [WARNING] collector: [NOT] OHLCV 데이터 없음
+2026-05-29 00:39:14,796 [INFO] collector: [WEEK] OHLCV 3일치 수집 완료
+2026-05-29 00:39:27,069 [INFO] collector: [SNDK] OHLCV 3일치 수집 완료
+2026-05-29 00:39:39,334 [WARNING] collector: [FUK] OHLCV 데이터 없음
+2026-05-29 00:39:51,600 [INFO] collector: [DRAM] OHLCV 3일치 수집 완료
+2026-05-29 00:40:03,855 [WARNING] collector: [DAY] OHLCV 데이터 없음
+2026-05-29 00:40:16,118 [INFO] collector: [HAS] OHLCV 3일치 수집 완료
+2026-05-29 00:40:28,346 [WARNING] collector: [NEVER] OHLCV 데이터 없음
+2026-05-29 00:40:40,572 [WARNING] collector: [GREEN] OHLCV 데이터 없음
+2026-05-29 00:40:52,788 [WARNING] collector: [REACH] OHLCV 데이터 없음
+2026-05-29 00:41:05,029 [WARNING] collector: [NEED] OHLCV 데이터 없음
+2026-05-29 00:41:17,252 [WARNING] collector: [TRUMP] OHLCV 데이터 없음
+2026-05-29 00:41:29,523 [WARNING] collector: [FINAL] OHLCV 데이터 없음
+2026-05-29 00:41:41,796 [INFO] collector: [SMH] OHLCV 3일치 수집 완료
+2026-05-29 00:41:54,042 [INFO] collector: [LOVE] OHLCV 3일치 수집 완료
+2026-05-29 00:42:06,339 [INFO] collector: [LUNR] OHLCV 3일치 수집 완료
+2026-05-29 00:42:18,574 [WARNING] collector: [MODEL] OHLCV 데이터 없음
+2026-05-29 00:42:30,798 [WARNING] collector: [AGAIN] OHLCV 데이터 없음
+2026-05-29 00:42:43,018 [WARNING] collector: [PEACE] OHLCV 데이터 없음
+2026-05-29 00:42:55,242 [WARNING] collector: [EOW] OHLCV 데이터 없음
+2026-05-29 00:43:07,513 [INFO] collector: [BACK] OHLCV 1일치 수집 완료
+2026-05-29 00:43:19,773 [WARNING] collector: [DEAD] OHLCV 데이터 없음
+2026-05-29 00:43:32,046 [INFO] collector: [MRVL] OHLCV 3일치 수집 완료
+2026-05-29 00:43:44,269 [WARNING] collector: [GOD] OHLCV 데이터 없음
+2026-05-29 00:43:56,550 [INFO] collector: [USA] OHLCV 3일치 수집 완료
+2026-05-29 00:44:08,784 [WARNING] collector: [WSJ] OHLCV 데이터 없음
+2026-05-29 00:44:21,028 [INFO] collector: [IBD] OHLCV 3일치 수집 완료
+2026-05-29 00:44:33,259 [WARNING] collector: [NVIDA] OHLCV 데이터 없음
+2026-05-29 00:44:45,510 [INFO] collector: [NBIS] OHLCV 3일치 수집 완료
+2026-05-29 00:44:57,737 [WARNING] collector: [SWPPX] OHLCV 데이터 없음
+2026-05-29 00:45:09,974 [WARNING] collector: [DICK] OHLCV 데이터 없음
+2026-05-29 00:45:22,226 [INFO] collector: [TTMI] OHLCV 3일치 수집 완료
+2026-05-29 00:45:34,563 [INFO] collector: [ACH] OHLCV 3일치 수집 완료
+2026-05-29 00:45:46,814 [INFO] collector: [GEV] OHLCV 3일치 수집 완료
+2026-05-29 00:45:59,063 [INFO] collector: [LPL] OHLCV 3일치 수집 완료
+2026-05-29 00:46:11,325 [WARNING] collector: [APY] OHLCV 데이터 없음
+2026-05-29 00:46:23,634 [INFO] collector: [PLTR] OHLCV 3일치 수집 완료
+2026-05-29 00:46:35,872 [INFO] collector: [IBKR] OHLCV 3일치 수집 완료
+2026-05-29 00:46:48,151 [WARNING] collector: [MES] OHLCV 데이터 없음
+2026-05-29 00:47:00,395 [WARNING] collector: [STO] OHLCV 데이터 없음
+2026-05-29 00:47:12,664 [INFO] collector: [STC] OHLCV 3일치 수집 완료
+2026-05-29 00:47:24,912 [INFO] collector: [AVGO] OHLCV 3일치 수집 완료
+2026-05-29 00:47:37,146 [INFO] collector: [WULF] OHLCV 3일치 수집 완료
+2026-05-29 00:47:49,150 [INFO] reddit_collector: 유효 종목: 53/98개 -['DELL', 'MSFT', 'AMZN', 'HOOD', 'META', 'CRSR', 'AMD', 'AAPL', 'NOK', 'NVDA', 'GOOGL', 'SHOP', 'MELI', 'KTOS', 'RCAT', 'AVAV', 'UMAC', 'ONDS', 'SOFI', 'SFIX', 'OSUR', 'SNOW', 'COST', 'MDB', 'IREN', 'ASTS', 'RKLB', 'CRM', 'ARR', 'HIT', 'RDDT', 'EOD', 'WEEK', 'SNDK', 'DRAM', 'HAS', 'SMH', 'LOVE', 'LUNR', 'BACK', 'MRVL', 'USA', 'IBD', 'NBIS', 'TTMI', 'ACH', 'GEV', 'LPL', 'PLTR', 'IBKR', 'STC', 'AVGO', 'WULF']
+2026-05-29 00:47:49,153 [INFO] reddit_collector: wsb_posts.json 저장 완료: data/reddit\2026-05-29\wsb_posts.json (53개 종목)
+2026-05-29 00:47:49,153 [INFO] __main__: [Reddit] 수집 완료: 53개 종목 → data/reddit/2026-05-29/wsb_posts.json 저장
