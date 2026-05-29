@@ -196,6 +196,43 @@ WSB_RSI_HOLD_ONCE = True             # HIGH_MOMENTUM 시 RSI 과매수 1회 유�
 # --- WSB Signal V3: 데이터 파일 ---
 MENTION_HISTORY_FILE = "data/mention_history.json"
 POSITION_SCORES_FILE = "data/position_scores.json"
+SCORE_HISTORY_FILE = "data/score_history.json"   # community-opinion-trend-sizing: 일별 의견 점수 이력 (라이브용)
+
+# --- Community Opinion Trend Sizing (Design Ref: community-opinion-trend-sizing §5) ---
+# opinion_score band (= 기존 sentiment score 0~100 재사용)
+WSB_OPINION_SCORE_HIGH = 80.0
+WSB_OPINION_SCORE_MID  = 70.0
+WSB_OPINION_SCORE_LOW  = 60.0          # 미만 진입 제외
+WSB_OPINION_FACTOR_HIGH = 1.2
+WSB_OPINION_FACTOR_MID  = 1.0
+WSB_OPINION_FACTOR_LOW  = 0.7
+
+WSB_OPINION_TREND_LOOKBACK_DAYS = 3
+WSB_OPINION_TREND_UP_FACTOR   = 1.15
+WSB_OPINION_TREND_FLAT_FACTOR = 1.0
+WSB_OPINION_TREND_DOWN_FACTOR = 0.5
+
+WSB_OPINION_PERSISTENCE_MIN_DAYS    = 2
+WSB_OPINION_PERSISTENCE_STRONG_DAYS = 3
+WSB_OPINION_PERSISTENCE_WEAK_FACTOR   = 0.6
+WSB_OPINION_PERSISTENCE_NORMAL_FACTOR = 1.0
+WSB_OPINION_PERSISTENCE_STRONG_FACTOR = 1.2
+
+WSB_OPINION_CONSENSUS_STRONG_RATIO = 2.0
+WSB_OPINION_CONSENSUS_MIN_RATIO    = 1.5
+
+WSB_OPINION_NEUTRAL_ENTRY_MAX  = 0.70  # 초과 진입 제외
+WSB_OPINION_NEUTRAL_EXIT_RATIO = 0.75  # 초과 청산
+WSB_OPINION_REVERSAL_RATIO     = 0.65  # opinion_score < entry_score × 0.65 → 청산
+
+WSB_OPINION_NEW_SPIKE_FACTOR      = 0.5
+WSB_OPINION_HIGH_ATTENTION_FACTOR = 1.1
+WSB_OPINION_DECLINING_FACTOR      = 0.6
+
+WSB_OPINION_SIZE_FACTOR_MIN = 0.0
+WSB_OPINION_SIZE_FACTOR_MAX = 1.3
+
+WSB_USE_PROFIT_TARGET = False           # 고정 익절 비활성 (의견 변화 청산 우선)
 
 # --- API 요청 설정 ---
 REQUEST_MAX_RETRIES = 3
