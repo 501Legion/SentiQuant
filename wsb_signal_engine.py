@@ -297,26 +297,23 @@ class WSBSignalEngine:
 
     def _rank(self, symbols: list[str], scored: dict) -> list[str]:
         """
-        ranking="mentions": 총 게시글 수 내림차순
-        ranking="ratio":    bullish/(bullish+bearish) 내림차순
+        ranking="mentions":  총 게시글 수 내림차순
+        ranking="ratio":     bullish/(bullish+bearish) 내림차순
+        ranking="sentiment": 감성 score 내림차순 (community-opinion-trend-sizing)
         Returns: TOP_N개 symbol 리스트 (없으면 빈 리스트)
         """
         if not symbols:
             return []
 
         if self.ranking == "mentions":
-            sorted_syms = sorted(
-                symbols,
-                key=lambda s: scored[s]["mentions"],
-                reverse=True,
-            )
+            key = lambda s: scored[s]["mentions"]
+        elif self.ranking == "sentiment":
+            # Design Ref: community-opinion-trend-sizing §4.4 — score 기준 정렬
+            key = lambda s: scored[s]["score"]
         else:  # "ratio"
-            sorted_syms = sorted(
-                symbols,
-                key=lambda s: scored[s]["ratio"],
-                reverse=True,
-            )
+            key = lambda s: scored[s]["ratio"]
 
+        sorted_syms = sorted(symbols, key=key, reverse=True)
         return sorted_syms[: config.TOP_N]
 
     def check_exit(
@@ -328,6 +325,8 @@ class WSBSignalEngine:
         position_scores: dict[str, dict],
         velocity_state: str = "NORMAL",
         holding_days: int = 0,
+        opinion_mode: bool = False,
+        opinion=None,
     ) -> tuple[bool, str]:
         """
         5단계 우선순위 청산 조건 체크.
@@ -366,8 +365,14 @@ class WSBSignalEngine:
         sym_scored = scored.get(symbol, {})
         today_score = sym_scored.get("score")
 
-        # 1. 감성 역전: 2일 연속 today_score < entry_score × 0.6
-        if entry_score is not None and today_score is not None:
+        # 1. 감성/의견 역전
+        if opinion_mode and opinion is not None:
+            # opinion_reversal (강화) — Design Ref: community-opinion-trend-sizing §6
+            _reason = self._opinion_reversal(symbol, opinion, ps, sym_scored)
+            if _reason:
+                return True, _reason
+        elif entry_score is not None and today_score is not None:
+            # 기존 sentiment_reversal (opinion_mode=False → 회귀 0)
             reversal_threshold = entry_score * config.WSB_SENTIMENT_REVERSAL_RATIO
             today_below = today_score < reversal_threshold
             if today_below and ps.get("yesterday_below", False):
@@ -426,3 +431,40 @@ class WSBSignalEngine:
             return True, "trailing_stop"
 
         return False, ""
+
+    def _opinion_reversal(self, symbol, opinion, ps: dict, sym_scored: dict) -> str | None:
+        """
+        opinion_mode 청산 1단계 — 의견 변화 기반 역전 감지.
+        # Design Ref: community-opinion-trend-sizing §6
+        우선순위: neutral 급증 > consensus 붕괴 > 감성/의견 역전(score 하락·trend down·bearish 급증).
+        Returns: 청산 사유 문자열 ("neutral_spike"|"consensus_break"|"sentiment_reversal") 또는 None.
+        """
+        # neutral 급증
+        if opinion.neutral_ratio > config.WSB_OPINION_NEUTRAL_EXIT_RATIO:
+            logger.info(f"[{symbol}] opinion_reversal(neutral_spike): neutral={opinion.neutral_ratio:.2f}")
+            return "neutral_spike"
+        # consensus 붕괴 (bullish/bearish <= 1.0)
+        if opinion.consensus_ratio <= 1.0:
+            logger.info(f"[{symbol}] opinion_reversal(consensus_break): consensus={opinion.consensus_ratio:.2f}")
+            return "consensus_break"
+        # opinion_score 역전
+        entry_score = ps.get("entry_score")
+        cur_score = opinion.opinion_score
+        if entry_score and cur_score < entry_score * config.WSB_OPINION_REVERSAL_RATIO:
+            logger.info(
+                f"[{symbol}] opinion_reversal(score): {cur_score:.1f}"
+                f" < entry×{config.WSB_OPINION_REVERSAL_RATIO}={entry_score*config.WSB_OPINION_REVERSAL_RATIO:.1f}"
+            )
+            return "sentiment_reversal"
+        # 추세 하락
+        if opinion.sentiment_trend == "DOWN":
+            logger.info(f"[{symbol}] opinion_reversal(trend_down)")
+            return "sentiment_reversal"
+        # bearish 급증 (entry 대비 2배 이상)
+        entry_bear = ps.get("entry_bearish_count")
+        cur_bear = sym_scored.get("bearish")
+        if entry_bear is not None and cur_bear is not None:
+            if cur_bear >= max(entry_bear, 1) * 2 and cur_bear >= 2:
+                logger.info(f"[{symbol}] opinion_reversal(bearish_surge): {cur_bear} >= {max(entry_bear,1)*2}")
+                return "sentiment_reversal"
+        return None

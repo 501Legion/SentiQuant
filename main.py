@@ -89,9 +89,9 @@ def _run_reddit_backtest(args) -> None:
     if not args.model or args.model == "combined":
         missing.append(f"--model {{finbert|finbert-wsb|{config.GPT_MODEL_ALIAS}}}")
     if not args.ranking:
-        missing.append("--ranking {mentions|ratio}")
+        missing.append("--ranking {mentions|ratio|sentiment}")
     if not args.sizing:
-        missing.append("--sizing {equal|sentiment|volatility}")
+        missing.append("--sizing {equal|sentiment|volatility|opinion_trend}")
     if not args.from_date:
         missing.append("--from YYYY-MM-DD")
     if not args.to_date:
@@ -227,12 +227,12 @@ def main() -> None:
     )
     parser.add_argument(
         "--ranking",
-        choices=["mentions", "ratio"],
+        choices=["mentions", "ratio", "sentiment"],
         help="Reddit Ranking 방식 (--source reddit 필수)",
     )
     parser.add_argument(
         "--sizing",
-        choices=["equal", "sentiment", "volatility"],
+        choices=["equal", "sentiment", "volatility", "opinion_trend"],
         help="Position Sizing 방식 (--source reddit 필수)",
     )
     parser.add_argument(
