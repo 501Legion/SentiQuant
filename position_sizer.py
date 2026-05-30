@@ -175,8 +175,16 @@ class CommunityOpinionTrendSizer(PositionSizer):
             getattr(opinion, "atr", None), getattr(opinion, "prev_close", None)
         )
 
+        # --- community-opinion-agent §7: +3 factor (속성 없으면 1.0 → 회귀 0) ---
+        f_source = self._source_quality_factor(
+            getattr(opinion, "source_quality_score", None)
+        )
+        f_universe = self._mult_factor(getattr(opinion, "universe_size_multiplier", 1.0))
+        f_cost = self._mult_factor(getattr(opinion, "cost_risk_factor", 1.0))
+
         raw = (f_sentiment * f_trend * f_persist * f_consensus
-               * f_neutral * f_attention * f_risk)
+               * f_neutral * f_attention * f_risk
+               * f_source * f_universe * f_cost)
         final = max(config.WSB_OPINION_SIZE_FACTOR_MIN,
                     min(config.WSB_OPINION_SIZE_FACTOR_MAX, raw))
         self.last_size_factor = final
@@ -187,9 +195,36 @@ class CommunityOpinionTrendSizer(PositionSizer):
             f" persist={opinion.persistence_days} cons={consensus:.2f}"
             f" vel={opinion.velocity_state} → factors"
             f"({f_sentiment},{f_trend},{f_persist},{f_consensus},{f_neutral},"
-            f"{f_attention},{f_risk}) → final={final:.3f} → {shares}주"
+            f"{f_attention},{f_risk},src={f_source},uni={f_universe},cost={f_cost})"
+            f" → final={final:.3f} → {shares}주"
         )
         return max(0, shares)
+
+    @staticmethod
+    def _source_quality_factor(sqs: float | None) -> float:
+        """source_quality_score(평균 글 품질 weight) → 사이징 factor.
+        속성 없음(None) → 1.0 (기존 OpinionMetrics 회귀 0)."""
+        if sqs is None:
+            return 1.0
+        if sqs >= 1.2:
+            return 1.1
+        if sqs >= 0.8:
+            return 1.0
+        if sqs >= 0.5:
+            return 0.9
+        return 0.7
+
+    @staticmethod
+    def _mult_factor(value) -> float:
+        """universe_size_multiplier / cost_risk_factor를 안전 float로.
+        None/음수 → 1.0, 그 외 그대로 (0.0이면 진입 차단으로 작동)."""
+        if value is None:
+            return 1.0
+        try:
+            v = float(value)
+        except (TypeError, ValueError):
+            return 1.0
+        return v if v >= 0 else 1.0
 
     @staticmethod
     def _sentiment_factor(score: float) -> float:

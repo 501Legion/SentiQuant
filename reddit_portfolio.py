@@ -67,6 +67,7 @@ class RedditPortfolio:
         atr_cache: dict[str, float] = None,  # ATR (VolatilitySizer용)
         position_scores: dict[str, dict] = None,  # wsb_state position_scores (entry_score 저장)
         opinion_metrics: dict[str, "object"] = None,  # community-opinion-trend-sizing: 종목별 OpinionMetrics
+        snapshots: dict[str, "object"] = None,  # community-opinion-agent: 종목별 DailyOpinionSnapshot (entry 보강)
     ) -> dict:
         """
         하루 포트폴리오 처리.
@@ -83,6 +84,7 @@ class RedditPortfolio:
         scored = scored or {}
         atr_cache = atr_cache or {}
         opinion_metrics = opinion_metrics or {}
+        snapshots = snapshots or {}
         position_scores = position_scores if position_scores is not None else wsb_state.load_position_scores()
         daily_buys = []
         daily_sells = []
@@ -176,6 +178,16 @@ class RedditPortfolio:
                         entry_opinion_trend=om.sentiment_trend,
                         entry_persistence_days=om.persistence_days,
                         size_factor=size_factor,
+                    )
+                # community-opinion-agent §3.6 — DailyOpinionSnapshot 진입 보강 (Plan FR-2.6)
+                osnap = snapshots.get(symbol)
+                if osnap is not None:
+                    snap.update(
+                        entry_universe_tier=getattr(osnap, "universe_tier", None),
+                        entry_tradeability_score=getattr(osnap, "tradeability_score", None),
+                        entry_summary=getattr(osnap, "summary", None),
+                        entry_query_opinion_trend=getattr(osnap, "query_opinion_trend", None),
+                        entry_query_risk=getattr(osnap, "query_risk", None),
                     )
                 snap = {k: v for k, v in snap.items() if v is not None}
                 if snap:

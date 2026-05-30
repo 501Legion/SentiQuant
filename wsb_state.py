@@ -1,5 +1,6 @@
 # Design Ref: §wsb-signal-v3 §2 — mention_history + position_scores 파일 I/O 전담
 # Plan SC: SC-04 velocity_state 저장, SC-05/SC-06/SC-07 감성역전·RSI hold 상태 관리
+import dataclasses
 import json
 import logging
 import os
@@ -110,6 +111,13 @@ def upsert_position_score(
     size_factor: float | None = None,
     stop_loss_pct: float | None = None,
     trailing_stop_pct: float | None = None,
+    # community-opinion-agent §3.6 — entry opinion 스냅샷 확장 (Plan FR-2.6)
+    entry_universe_tier: str | None = None,
+    entry_tradeability_score: float | None = None,
+    entry_summary: str | None = None,
+    entry_query_opinion_trend: str | None = None,
+    entry_query_risk: str | None = None,
+    cost_filter_result: str | None = None,
 ) -> None:
     """
     특정 종목의 position_score를 부분 업데이트 (in-place).
@@ -120,7 +128,7 @@ def upsert_position_score(
         "yesterday_below": False,
         "rsi_held": False,
     })
-    # community-opinion-trend-sizing 스냅샷 필드는 제공될 때만 기록 (하위호환)
+    # community-opinion-trend-sizing/agent 스냅샷 필드는 제공될 때만 기록 (하위호환)
     _updates = {
         "entry_score": entry_score,
         "yesterday_below": yesterday_below,
@@ -136,6 +144,12 @@ def upsert_position_score(
         "size_factor": size_factor,
         "stop_loss_pct": stop_loss_pct,
         "trailing_stop_pct": trailing_stop_pct,
+        "entry_universe_tier": entry_universe_tier,
+        "entry_tradeability_score": entry_tradeability_score,
+        "entry_summary": entry_summary,
+        "entry_query_opinion_trend": entry_query_opinion_trend,
+        "entry_query_risk": entry_query_risk,
+        "cost_filter_result": cost_filter_result,
     }
     for key, value in _updates.items():
         if value is not None:
@@ -242,3 +256,46 @@ def compute_persistence_days(history: list[dict]) -> int:
         else:
             break
     return days
+
+
+# ---------------------------------------------------------------------------
+# Daily Opinion Snapshot (jsonl) — community-opinion-agent §3.6 / Plan FR-1.5
+# data/community/daily_opinion_snapshots.jsonl — line당 snapshot 1개.
+# 기존 mention_history/position_scores/score_history 구조 불변.
+# ---------------------------------------------------------------------------
+
+def _snapshot_to_record(snapshot) -> dict:
+    """DailyOpinionSnapshot(dataclass) 또는 dict → 직렬화 dict (순환 import 회피)."""
+    if dataclasses.is_dataclass(snapshot) and not isinstance(snapshot, type):
+        return dataclasses.asdict(snapshot)
+    return dict(snapshot)
+
+
+def append_daily_snapshot(snapshot, path: str = None) -> None:
+    """DailyOpinionSnapshot 1개를 jsonl에 append.
+    COMMUNITY_ENABLE_DAILY_OPINION_SNAPSHOT=False면 no-op (회귀 0)."""
+    if not config.COMMUNITY_ENABLE_DAILY_OPINION_SNAPSHOT:
+        return
+    path = path or config.COMMUNITY_DAILY_SNAPSHOT_FILE
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    rec = _snapshot_to_record(snapshot)
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
+def load_daily_snapshots(path: str = None) -> list[dict]:
+    """jsonl 전체 로드 (line당 snapshot dict). 파일 없으면 []."""
+    path = path or config.COMMUNITY_DAILY_SNAPSHOT_FILE
+    if not os.path.exists(path):
+        return []
+    out: list[dict] = []
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                out.append(json.loads(line))
+            except json.JSONDecodeError:
+                logger.warning("daily_opinion_snapshots.jsonl 손상 라인 건너뜀")
+    return out
