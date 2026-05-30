@@ -4,10 +4,13 @@ import os
 import json
 import logging
 import base64
-from datetime import datetime
+from datetime import date, datetime, timedelta
+from pathlib import Path
 import subprocess
-import numpy as np
+from zoneinfo import ZoneInfo
 
+import altair as alt
+import pandas_market_calendars as mcal
 import config
 import portfolio
 import collector
@@ -16,6 +19,9 @@ from backtester import BacktestEngine
 
 # --- Page Config ---
 st.set_page_config(page_title="SentiQuant Dashboard", layout="wide")
+
+PRICE_CHART_DEFAULT_DAYS = 63
+PRICE_CHART_MAX_DAYS = 252
 
 def get_logo_data_uri():
     logo_path = os.path.join(os.path.dirname(__file__), "assets", "sentiquant-logo.jpeg")
@@ -53,13 +59,14 @@ def kis_sync():
     추가로 보유 종목 현재가를 KIS 실시간 시세로 갱신 (FR-18, 실패 시 collector 폴백).
 
     Returns:
-        (synced_portfolio, prices) 튜플
+        (synced_portfolio, prices, snapshot_messages) 튜플
     """
     from kis_broker import get_broker
 
     broker = get_broker()
     broker.connect()
-    synced = portfolio.sync_from_kis(portfolio.load_portfolio(), broker)
+    previous_portfolio = portfolio.load_portfolio()
+    synced = portfolio.sync_from_kis(previous_portfolio, broker)
     portfolio.save_portfolio(synced)
 
     # FR-18: 보유 종목 현재가는 KIS API 시세 우선, 실패 시 collector 폴백
@@ -71,7 +78,10 @@ def kis_sync():
             fallback = collector.get_latest_open_price(sym)
             if fallback:
                 prices[sym] = fallback
-    return synced, prices
+
+    snapshot_messages = refresh_price_history_snapshots(synced.positions)
+
+    return synced, prices, snapshot_messages
 
 
 def render_kis_panel(port, current_prices):
@@ -90,12 +100,23 @@ def render_kis_panel(port, current_prices):
         st.metric("총 평가 금액", f"${total_eval:,.2f}")
     with c_sync:
         st.write("")
-        if st.button("새로고침", use_container_width=True):
+        if st.button("계좌 동기화", use_container_width=True):
             try:
-                synced, prices = kis_sync()
+                synced, prices, snapshot_messages = kis_sync()
                 if prices:
                     st.session_state["current_prices"] = prices
-                st.success(f"동기화 완료 — {len(synced.positions)}개 포지션")
+                    st.session_state["current_prices_refreshed_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+                failed_snapshots = [
+                    item["message"] for item in snapshot_messages if not item["ok"]
+                ]
+                st.session_state["last_position_message"] = {
+                    "ok": not failed_snapshots,
+                    "message": (
+                        f"동기화 완료 — {len(synced.positions)}개 포지션, "
+                        "가격 차트 확인 완료"
+                    ),
+                    "details": failed_snapshots,
+                }
                 st.rerun()
             except Exception as e:
                 st.error(f"동기화 실패: {e}")
@@ -108,6 +129,198 @@ def get_current_prices(symbols):
         if price:
             prices[symbol] = price
     return prices
+
+
+def refresh_price_history_snapshots(symbols) -> list[dict]:
+    snapshot_messages = []
+    for symbol in sorted(symbols):
+        ok, message = prime_price_history_snapshot(symbol)
+        snapshot_messages.append({"ok": ok, "message": message})
+    return snapshot_messages
+
+
+def load_ohlcv_snapshot(symbol: str) -> pd.DataFrame:
+    snapshot_dir = Path(config.BACKTEST_SNAPSHOT_DIR) / "v2" / "ohlcv"
+    if not snapshot_dir.exists():
+        return pd.DataFrame()
+
+    snapshots = []
+    snapshot_paths = sorted(snapshot_dir.glob(f"{symbol}_*.csv"))
+    for snapshot_path in snapshot_paths:
+        try:
+            snapshot = pd.read_csv(snapshot_path)
+        except (OSError, pd.errors.ParserError):
+            continue
+        if {"date", "close"}.issubset(snapshot.columns):
+            snapshots.append(snapshot)
+
+    if not snapshots:
+        return pd.DataFrame()
+
+    combined = pd.concat(snapshots, ignore_index=True)
+    combined["date"] = pd.to_datetime(combined["date"], errors="coerce")
+    combined = combined.dropna(subset=["date"]).sort_values("date")
+    combined = combined.drop_duplicates(subset=["date"], keep="last")
+    combined["date"] = combined["date"].dt.strftime("%Y-%m-%d")
+    return combined.reset_index(drop=True)
+
+
+def save_ohlcv_snapshot(symbol: str, ohlcv: pd.DataFrame) -> Path | None:
+    if ohlcv.empty or not {"date", "close"}.issubset(ohlcv.columns):
+        return None
+
+    snapshot = ohlcv.copy()
+    snapshot["date"] = pd.to_datetime(snapshot["date"], errors="coerce")
+    snapshot = snapshot.dropna(subset=["date"]).sort_values("date")
+    snapshot = snapshot.drop_duplicates(subset=["date"], keep="last")
+    if snapshot.empty:
+        return None
+
+    snapshot["date"] = snapshot["date"].dt.strftime("%Y-%m-%d")
+    start = snapshot["date"].iloc[0]
+    end = snapshot["date"].iloc[-1]
+    snapshot_dir = Path(config.BACKTEST_SNAPSHOT_DIR) / "v2" / "ohlcv"
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    snapshot_path = snapshot_dir / f"{symbol}_{start}_{end}.csv"
+    snapshot.to_csv(snapshot_path, index=False)
+    return snapshot_path
+
+
+def get_last_completed_trading_day() -> date:
+    """현재 시점 기준으로 완료된 마지막 NYSE 거래일을 반환한다."""
+    now_utc = pd.Timestamp.now(tz="UTC")
+    now_et = datetime.now(ZoneInfo(config.TIMEZONE))
+    start = (now_et - timedelta(days=14)).strftime("%Y-%m-%d")
+    end = now_et.strftime("%Y-%m-%d")
+
+    try:
+        nyse = mcal.get_calendar("NYSE")
+        schedule = nyse.schedule(start_date=start, end_date=end)
+        if not schedule.empty:
+            completed = schedule[schedule["market_close"] <= now_utc]
+            if not completed.empty:
+                return completed.index[-1].date()
+    except Exception as exc:
+        logging.warning(f"NYSE 거래일 계산 실패, 주말 제외 방식으로 폴백: {exc}")
+
+    fallback = now_et.date()
+    while fallback.weekday() >= 5:
+        fallback -= timedelta(days=1)
+    return fallback
+
+
+def snapshot_is_fresh_enough(snapshot: pd.DataFrame, days: int) -> bool:
+    if snapshot.empty or "date" not in snapshot.columns or len(snapshot) < days:
+        return False
+
+    last_date = pd.to_datetime(snapshot["date"], errors="coerce").max()
+    if pd.isna(last_date):
+        return False
+
+    return last_date.date() >= get_last_completed_trading_day()
+
+
+def prime_price_history_snapshot(symbol: str, days: int = PRICE_CHART_MAX_DAYS) -> tuple[bool, str]:
+    symbol = symbol.upper()
+    existing = load_ohlcv_snapshot(symbol)
+    if snapshot_is_fresh_enough(existing, days):
+        return True, f"{symbol} 1년 가격 스냅샷 이미 준비됨"
+
+    ohlcv = collector.get_ohlcv(symbol, days=days)
+    snapshot_path = save_ohlcv_snapshot(symbol, ohlcv)
+    if snapshot_path:
+        load_price_history.clear()
+        return True, f"{symbol} 1년 가격 스냅샷 저장 완료"
+
+    if not existing.empty:
+        return False, f"{symbol} 신규 가격 스냅샷 저장 실패, 기존 {len(existing)}개 종가 사용"
+    return False, f"{symbol} 가격 스냅샷 저장 실패"
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_price_history(symbol: str, days: int = PRICE_CHART_MAX_DAYS) -> pd.DataFrame:
+    frames = []
+    snapshot = load_ohlcv_snapshot(symbol)
+    if not snapshot.empty:
+        frames.append(snapshot)
+
+    if not snapshot_is_fresh_enough(snapshot, days):
+        ohlcv = collector.get_ohlcv(symbol, days=days)
+        if ohlcv.empty or not {"date", "close"}.issubset(ohlcv.columns):
+            if not frames:
+                return pd.DataFrame()
+        else:
+            save_ohlcv_snapshot(symbol, ohlcv)
+            frames.append(ohlcv)
+
+    chart_data = pd.concat(frames, ignore_index=True)
+    chart_data["date"] = pd.to_datetime(chart_data["date"], errors="coerce")
+    chart_data["Price"] = pd.to_numeric(chart_data["close"], errors="coerce")
+    chart_data = chart_data.dropna(subset=["date", "Price"]).sort_values("date")
+    chart_data = chart_data.drop_duplicates(subset=["date"], keep="last").tail(days)
+    return chart_data.set_index("date")[["Price"]]
+
+
+def render_price_chart(chart_data: pd.DataFrame) -> None:
+    plot_data = chart_data.reset_index().rename(columns={"date": "Date"})
+    visible_data = plot_data.tail(min(PRICE_CHART_DEFAULT_DAYS, len(plot_data)))
+
+    initial_domain = [
+        visible_data["Date"].min().to_pydatetime(),
+        visible_data["Date"].max().to_pydatetime(),
+    ]
+
+    zoom = alt.selection_interval(
+        bind="scales",
+        encodings=["x"],
+        value={"Date": initial_domain},
+    )
+    label = (
+        alt.Chart(plot_data)
+        .transform_filter(zoom)
+        .transform_aggregate(start="min(Date)", end="max(Date)")
+        .transform_calculate(
+            span_days="(toDate(datum.end) - toDate(datum.start)) / 86400000",
+            span_months="round(datum.span_days / 30.4375)",
+            period=(
+                "datum.span_months >= 12 ? '1년' : "
+                "(datum.span_months < 1 ? '1개월' : format(datum.span_months, 'd') + '개월')"
+            ),
+            label="'가격 변동 (최근 ' + datum.period + ')'",
+        )
+        .mark_text(
+            align="left",
+            baseline="middle",
+            color="#f8fafc",
+            fontSize=15,
+            fontWeight=700,
+        )
+        .encode(text="label:N")
+        .properties(height=24)
+    )
+    line = (
+        alt.Chart(plot_data)
+        .mark_line(color="#2563eb", strokeWidth=2)
+        .encode(
+            x=alt.X(
+                "Date:T",
+                title="",
+                scale=alt.Scale(domain=initial_domain),
+            ),
+            y=alt.Y(
+                "Price:Q",
+                title="종가",
+                scale=alt.Scale(zero=False),
+            ),
+            tooltip=[
+                alt.Tooltip("Date:T", title="날짜", format="%Y-%m-%d"),
+                alt.Tooltip("Price:Q", title="종가", format=",.2f"),
+            ],
+        )
+        .add_params(zoom)
+        .properties(height=220)
+    )
+    st.altair_chart(alt.vconcat(label, line).resolve_scale(x="shared"), width="stretch")
 
 def run_signals_now():
     with st.spinner("신호 계산 중..."):
@@ -256,9 +469,21 @@ def main():
             padding: 0;
             width: 100%;
         }
-        .profit-pos { color: #ef4444; font-weight: bold; }
-        .profit-neg { color: #3b82f6; font-weight: bold; }
-        .profit-flat { color: #94a3b8; font-weight: bold; }
+        .profit-pos { color: #ef4444 !important; font-weight: bold; }
+        .profit-neg { color: #3b82f6 !important; font-weight: bold; }
+        .profit-flat { color: #94a3b8 !important; font-weight: bold; }
+        .detail-profit-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 0.35rem 0 0;
+        }
+        .chart-stale-note {
+            color: #f59e0b;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            margin: 4px 0 0;
+        }
         .sub-text { color: #757575; font-size: 0.75rem; }
         .price-large { font-size: 2rem; font-weight: bold; }
         .total-summary {
@@ -310,6 +535,17 @@ def main():
 
     # --- KIS 모의투자 계좌 영역 (FR-16, FR-17) ---
     render_kis_panel(port, current_prices)
+
+    last_position_message = st.session_state.pop("last_position_message", None)
+    if last_position_message:
+        message = last_position_message["message"]
+        details = last_position_message.get("details", [])
+        if details:
+            message += f" · {'; '.join(details)}"
+        if last_position_message["ok"]:
+            st.toast(message)
+        else:
+            st.warning(message)
 
     col_nav, col_total_info = st.columns([3, 1])
     with col_nav:
@@ -411,6 +647,12 @@ def main():
         selected_profit_rate = price_delta_rate
         selected_profit_class = profit_class(selected_profit)
         price_label = "최근 시가" if has_selected_price else "매입 단가"
+        current_price_refreshed_at = st.session_state.get("current_prices_refreshed_at")
+        price_meta = (
+            f"조회: {current_price_refreshed_at}"
+            if has_selected_price and current_price_refreshed_at
+            else ""
+        )
         selected_value_label = "시장 가치" if has_selected_price else "매입 기준 금액"
         selected_value = price * pos.shares
         selected_delta_html = (
@@ -419,9 +661,9 @@ def main():
             else "<span class='sub-text'>가격 미조회 · 손익 계산 대기</span>"
         )
         selected_profit_html = (
-            f"<h3 class='{selected_profit_class}'>{format_signed_money(selected_profit)}</h3>"
+            f"<div class='detail-profit-value {selected_profit_class}'>{format_signed_money(selected_profit)}</div>"
             if has_selected_price
-            else "<h3 class='profit-flat'>가격 미조회</h3>"
+            else "<div class='detail-profit-value profit-flat'>가격 미조회</div>"
         )
         selected_rate_text = format_signed_percent(selected_profit_rate) if has_selected_price else "가격 미조회"
         selected_rate_class = profit_class(selected_profit_rate) if has_selected_price else "profit-flat"
@@ -432,19 +674,39 @@ def main():
             c_title, c_price_info = st.columns([2, 1])
             with c_title:
                 st.markdown(f"<h1 style='margin-bottom:0;'>{config.COMPANY_NAMES.get(sel_sym, sel_sym)}</h1>", unsafe_allow_html=True)
-                st.caption("기술 / AI / 반도체")
-                st.write("가격 변동 (24시간)")
             with c_price_info:
                 st.markdown(f"""
                     <div style='text-align: right;'>
                         <span class='sub-text'>{price_label}</span><br>
                         <span class='price-large'>{price:,.2f}</span><br>
                         {selected_delta_html}
+                        {f"<br><span class='sub-text'>{price_meta}</span>" if price_meta else ""}
                     </div>
                 """, unsafe_allow_html=True)
             
-            chart_data = pd.DataFrame(np.random.randn(40, 1), columns=['Price'])
-            st.bar_chart(chart_data, height=220, width="stretch")
+            chart_data = load_price_history(sel_sym, days=PRICE_CHART_MAX_DAYS)
+            if chart_data.empty:
+                st.warning(f"{sel_sym} 가격 차트 데이터를 가져오지 못했습니다.")
+            else:
+                render_price_chart(chart_data)
+                visible_data = chart_data.tail(min(PRICE_CHART_DEFAULT_DAYS, len(chart_data)))
+                last_completed_trading_day = get_last_completed_trading_day()
+                st.caption(
+                    f"차트 데이터 기준일: {chart_data.index.max():%Y-%m-%d}  \n"
+                    f"기본 표시: {visible_data.index.min():%Y-%m-%d} ~ "
+                    f"{visible_data.index.max():%Y-%m-%d}  \n"
+                    f"확대/축소 가능 범위: {chart_data.index.min():%Y-%m-%d} ~ "
+                    f"{chart_data.index.max():%Y-%m-%d}"
+                )
+                if chart_data.index.max().date() < last_completed_trading_day:
+                    st.markdown(
+                        (
+                            "<div class='chart-stale-note'>"
+                            f"차트 데이터가 최신 거래일({last_completed_trading_day:%Y-%m-%d})보다 오래되었습니다."
+                            "</div>"
+                        ),
+                        unsafe_allow_html=True,
+                    )
             
             m_col1, m_col2, m_col3 = st.columns(3)
             with m_col1:
@@ -479,6 +741,10 @@ def main():
                         <span style='color: #94a3b8; font-size: 0.75rem;'>수익률</span><br>
                         <span class='{selected_rate_class}' style='font-size: 1.6rem;'>{selected_rate_text}</span>
                     </div>
+                    <div style='margin-bottom: 25px;'>
+                        <span style='color: #94a3b8; font-size: 0.75rem;'>미실현 수익</span><br>
+                        <span class='{selected_profit_class}' style='font-size: 1.6rem;'>{format_signed_money(selected_profit) if has_selected_price else "가격 미조회"}</span>
+                    </div>
                     <hr style='border-top: 1px solid #2f3744;'>
                     <div style='text-align: right; display: flex; align-items: center; justify-content: flex-end;'>
                         <span style='color: #60a5fa; font-size: 0.8rem; margin-right: 5px;'>●</span>
@@ -488,18 +754,25 @@ def main():
             """, unsafe_allow_html=True)
             
             st.write("")
-            if st.button("현재가 새로고침", width="stretch"):
-                refreshed_prices = get_current_prices(port.positions.keys())
+            if st.button("가격/차트 갱신", width="stretch"):
+                with st.spinner("현재가와 가격 차트 갱신 중..."):
+                    refreshed_prices = get_current_prices(port.positions.keys())
+                    snapshot_messages = refresh_price_history_snapshots(port.positions.keys())
                 st.session_state["current_prices"] = refreshed_prices
+                st.session_state["current_prices_refreshed_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
                 failed_symbols = [symbol for symbol in port.positions if symbol not in refreshed_prices]
+                failed_snapshots = [
+                    item["message"] for item in snapshot_messages if not item["ok"]
+                ]
                 st.session_state["last_price_refresh"] = {
-                    "ok": not failed_symbols,
+                    "ok": not failed_symbols and not failed_snapshots,
                     "message": (
-                        f"{len(refreshed_prices)}개 종목 가격 조회 완료"
+                        f"{len(refreshed_prices)}개 종목 가격/차트 갱신 완료"
                         if refreshed_prices
                         else "가격 조회 실패"
                     ),
                     "failed_symbols": failed_symbols,
+                    "failed_snapshots": failed_snapshots,
                     "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 }
                 st.rerun()
@@ -518,8 +791,10 @@ def main():
                 price_refresh_text = f"{last_price_refresh['message']} · {last_price_refresh['time']}"
                 if last_price_refresh["failed_symbols"]:
                     price_refresh_text += f" · 미조회: {', '.join(last_price_refresh['failed_symbols'])}"
+                if last_price_refresh.get("failed_snapshots"):
+                    price_refresh_text += f" · {'; '.join(last_price_refresh['failed_snapshots'])}"
                 if last_price_refresh["ok"]:
-                    st.success(price_refresh_text)
+                    st.toast(price_refresh_text)
                 else:
                     st.warning(price_refresh_text)
 
@@ -527,7 +802,7 @@ def main():
             if last_signal_refresh:
                 status_text = f"{last_signal_refresh['message']} · {last_signal_refresh['time']}"
                 if last_signal_refresh["ok"]:
-                    st.success(status_text)
+                    st.toast(status_text)
                 else:
                     st.error(status_text)
 
@@ -569,7 +844,13 @@ def main():
                 )
                 temp_port.positions[new_sym] = new_pos
                 portfolio.save_portfolio(temp_port)
-                st.success(f"{new_sym} 포지션이 저장되었습니다.")
+                with st.spinner(f"{new_sym} 1년 가격 스냅샷 준비 중..."):
+                    snapshot_ok, snapshot_message = prime_price_history_snapshot(new_sym)
+                st.session_state["last_position_message"] = {
+                    "ok": snapshot_ok,
+                    "message": f"{new_sym} 포지션 저장 완료",
+                    "details": [] if snapshot_ok else [snapshot_message],
+                }
                 st.rerun()
 
     with st.expander("포지션 삭제"):
