@@ -12,27 +12,31 @@
 
 뉴스 감성 분석(TextBlob/FinBERT/GPT-5.4 Mini)과 Reddit 군중심리를 결합한 미국주 페이퍼 트레이딩 시스템.
 RSI + 감성 점수 → 매매 신호 → 포지션 관리 → 백테스팅/포워드 테스팅.
+Reddit 경로 위에는 **커뮤니티 여론 의사결정 에이전트**(community-opinion-agent)가 얹혀, 거래대상·비용·글품질·과거학습·구조화 판단을 더한다 (급등추격 ❌, 의견 지속성·합의도·비용효율에 베팅).
 
 ```
-[뉴스 파이프라인]                     [Reddit 파이프라인]
+[뉴스 파이프라인]                     [Reddit 파이프라인 + Community Opinion Agent]
 collector.get_news()                  reddit_collector.py (6 subreddits)
+    ↓                                   + flair 품질가중 · 티커 오탐 필터
+sentiment_provider.py                     ↓
+(TextBlob / FinBERT / GPT-5.4 Mini)   wsb_signal_engine.py  [V3]
+    ↓                                 (Velocity → 중립필터 → consensus → TopN)
+signals.generate_signals_for_all()    + build_daily_snapshot()
+(SIGNAL_ENGINE 디스패처                   ↓
+ → RSI + Sentiment → Signal)          [에이전트 게이팅 — opinion_trend 전용, §5.1]
+    ↓                                 Universe → Cost → Memory → DecisionRouter
+market_filter.apply_market_filter()   (rule 기본 + LLM 보조 OFF, 8 안전장치)
+(QQQ RSI → 시장 과열 시 다운그레이드)       ↓
+    ↓                                 reddit_portfolio.py
+portfolio.py / trader.py              (Equal/Sentiment/Volatility/OpinionTrend
+(포지션 관리 / 주문 실행 → kis_broker)   Gap Down / Stop-Loss / Trailing + opinion_reversal)
     ↓                                     ↓
-sentiment_provider.py                 wsb_signal_engine.py  [V3]
-(TextBlob / FinBERT / GPT-5.4 Mini)   (Velocity 보정 → 중립필터 → TopN)
-    ↓                                     ↓
-signals.generate_signals_for_all()    reddit_portfolio.py
-(SIGNAL_ENGINE 디스패처               (포지션 추적 / Stop-Loss / Trailing)
- → RSI + Sentiment → Signal)
-    ↓
-market_filter.apply_market_filter()
-(QQQ RSI → 시장 과열 시 다운그레이드)
-    ↓
-portfolio.py / trader.py
-(포지션 관리 / 주문 실행 → kis_broker 위임)
-    ↓
-kis_broker.py
-(KIS OpenAPI 모의투자 — OAuth / 주문 / 계좌 / 시세)
+kis_broker.py                         reddit_backtester.py (오케스트레이션
+(KIS OpenAPI 모의투자 — OAuth/주문/계좌)  + gross/net·비용·skip·router metric)
 ```
+
+> **에이전트 핵심**: WSB V3 신호를 1차 후보로 두고 매수 직전에 universe/cost/memory/router 게이팅(§5.1).
+> `--sizing equal` 등 기존 경로는 게이팅 미적용 → **회귀 0**. LLM은 자율매매자가 아닌 보조 라우터(기본 OFF).
 
 > **신호 엔진 추상화** (kis-paper-trading): `signals.generate_signals_for_all()`은
 > `config.SIGNAL_ENGINE` 값으로 Provider를 선택하는 디스패처다. 기본값 `"finbert"`는
