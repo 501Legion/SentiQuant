@@ -52,7 +52,7 @@ def get_ohlcv(symbol: str, days: int = None) -> pd.DataFrame:
                 timespan="day",
                 from_=start_date.strftime("%Y-%m-%d"),
                 to=end_date.strftime("%Y-%m-%d"),
-                limit=200,
+                limit=max(200, int(days * 1.5)),
             )
 
             rows = []
