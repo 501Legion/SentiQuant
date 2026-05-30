@@ -1,0 +1,17 @@
+{
+  "index": "nasdaq100",
+  "as_of": "2026-05-29",
+  "note": "Seed list of major Nasdaq-100 members for community-opinion-agent UniverseFilter. Editable — expand toward full membership as needed. market_caps optional (USD); empty = fall back to liquidity-based tiering.",
+  "symbols": [
+    "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "GOOG", "META", "TSLA",
+    "AVGO", "COST", "NFLX", "AMD", "PEP", "ADBE", "CSCO", "INTC",
+    "QCOM", "INTU", "TXN", "AMGN", "HON", "AMAT", "BKNG", "ISRG",
+    "MU", "ADI", "LRCX", "REGN", "VRTX", "PLTR", "ARM", "MSTR",
+    "PANW", "CRWD", "MRVL", "ABNB", "MELI", "PYPL", "SBUX", "MDLZ",
+    "GILD", "KLAC", "SNPS", "CDNS", "MAR", "CTAS", "ORLY", "ASML",
+    "CSX", "ADP", "WDAY", "FTNT", "DASH", "ROP", "NXPI", "PCAR",
+    "MNST", "AEP", "ODFL", "KDP", "DXCM", "FANG", "ROST", "IDXX",
+    "EXC", "CCEP", "TTWO", "ON", "CPRT", "PAYX", "VRSK"
+  ],
+  "market_caps": {}
+}

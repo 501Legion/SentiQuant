@@ -1,6 +1,8 @@
 # Design Ref: §wsb-signal-v3 §3 — WSBSignalEngine V3: Velocity/NeutralFilter/SignalV3 + 5단계 청산
 # Plan SC: SC-01 30MA 제거, SC-02 중립필터, SC-03~SC-11 매수/매도 신호 기준
 import logging
+import re
+from dataclasses import dataclass, field
 from datetime import date, datetime
 
 import pandas as pd
@@ -10,6 +12,219 @@ import wsb_state
 from sentiment_provider import SentimentProvider
 
 logger = logging.getLogger(__name__)
+
+
+# ===========================================================================
+# community-opinion-agent §4 — DailyOpinionSnapshot + weighted counts
+# 기존 OpinionMetrics(reddit_backtester)와 duck-typing 호환(opinion_score,
+# sentiment_trend, persistence_days, consensus_ratio, neutral_ratio,
+# velocity_state, atr, prev_close). summary(사람용)와 query_*(검색용) 분리.
+# ===========================================================================
+
+@dataclass
+class DailyOpinionSnapshot:
+    date: str
+    symbol: str
+    bullish_count: int = 0
+    bearish_count: int = 0
+    neutral_count: int = 0
+    weighted_bullish_count: float = 0.0
+    weighted_bearish_count: float = 0.0
+    weighted_neutral_count: float = 0.0
+    total_mentions: int = 0
+    source_quality_score: float = 1.0
+    consensus_ratio: float = 0.0
+    neutral_ratio: float = 0.0
+    opinion_score: float = 50.0
+    velocity_state: str = "NORMAL"
+    opinion_trend: str = "FLAT"
+    persistence_days: int = 0
+    attention_state: str = "NORMAL"
+    universe_tier: str = "CORE"
+    tradeability_score: float = 0.0
+    is_consensus_buy: bool = False
+    is_consensus_sell: bool = False
+    top_reasons: list = field(default_factory=list)
+    top_keywords: list = field(default_factory=list)
+    summary: str = ""
+    query_positive: str = ""
+    query_negative: str = ""
+    query_opinion_trend: str = ""
+    query_risk: str = ""
+    query_attention: str = ""
+    query_consensus: str = ""
+    # --- Sizer duck-typing 호환 / 오케스트레이터 주입 필드 ---
+    atr: float | None = None
+    prev_close: float | None = None
+    universe_size_multiplier: float = 1.0
+    cost_risk_factor: float = 1.0
+
+    @property
+    def sentiment_trend(self) -> str:
+        """OpinionMetrics 호환 alias (Sizer는 sentiment_trend를 읽음)."""
+        return self.opinion_trend
+
+
+_KEYWORD_STOPWORDS = frozenset({
+    "THE", "AND", "FOR", "ARE", "THIS", "THAT", "WITH", "FROM", "HAVE",
+    "WILL", "JUST", "WHAT", "ABOUT", "INTO", "MORE", "THAN", "THEY",
+    "BUY", "SELL", "HOLD", "CALLS", "PUTS", "MOON", "YOLO", "DD",
+})
+_KEYWORD_PATTERN = re.compile(r"[A-Za-z]{4,}")
+
+
+def _location_weight(location: str) -> float:
+    """mention 위치별 가중 (title > body > comment)."""
+    if location == "title":
+        return config.COMMUNITY_TITLE_MENTION_WEIGHT
+    if location == "comment":
+        return config.COMMUNITY_COMMENT_MENTION_WEIGHT
+    return config.COMMUNITY_BODY_MENTION_WEIGHT
+
+
+def compute_weighted_counts(labeled_posts: list[dict]) -> tuple[float, float, float, float]:
+    """label·source_quality_weight·location으로 가중 카운트 계산.
+    labeled_posts item: {label, source_quality_weight, location}.
+    Returns (weighted_bullish, weighted_bearish, weighted_neutral, source_quality_score)."""
+    wb = wbear = wneut = 0.0
+    sqw_sum = 0.0
+    n = len(labeled_posts)
+    for p in labeled_posts:
+        sqw = float(p.get("source_quality_weight", 1.0))
+        w = sqw * _location_weight(p.get("location", "body"))
+        label = p.get("label")
+        if label == "bullish":
+            wb += w
+        elif label == "bearish":
+            wbear += w
+        else:
+            wneut += w
+        sqw_sum += sqw
+    sqs = (sqw_sum / n) if n else 1.0
+    return round(wb, 4), round(wbear, 4), round(wneut, 4), round(sqs, 4)
+
+
+def _attention_state(velocity_state: str) -> str:
+    return {
+        "NEW_SPIKE": "SPIKE",
+        "HIGH_MOMENTUM": "RISING",
+        "DECLINING": "DECLINING",
+    }.get(velocity_state, "NORMAL")
+
+
+def _extract_keywords(texts: list[str], top_n: int = 5) -> list[str]:
+    """텍스트에서 빈도 상위 키워드 추출 (YAGNI: 간단 토큰 빈도)."""
+    if not texts:
+        return []
+    freq: dict[str, int] = {}
+    for t in texts:
+        for m in _KEYWORD_PATTERN.findall(t or ""):
+            w = m.upper()
+            if w in _KEYWORD_STOPWORDS:
+                continue
+            freq[w] = freq.get(w, 0) + 1
+    return [w for w, _ in sorted(freq.items(), key=lambda x: -x[1])[:top_n]]
+
+
+def build_daily_snapshot(
+    symbol: str,
+    scored_entry: dict,
+    history: list[dict],
+    *,
+    universe_decision=None,
+    labeled_posts: list[dict] = None,
+    texts: list[str] = None,
+    atr: float = None,
+    prev_close: float = None,
+    date_str: str = "",
+) -> DailyOpinionSnapshot:
+    """종목별 일별 의견 스냅샷 생성 (Design Ref: §4 / Plan FR-1.3~4).
+    weighted 카운트는 labeled_posts가 있으면 가중, 없으면 raw count fallback."""
+    bullish = int(scored_entry.get("bullish", 0))
+    bearish = int(scored_entry.get("bearish", 0))
+    neutral = int(scored_entry.get("neutral", 0))
+    total = int(scored_entry.get("mentions", bullish + bearish + neutral))
+    opinion_score = float(scored_entry.get("score", 50.0))
+    neutral_ratio = float(scored_entry.get("neutral_ratio", 0.0))
+    velocity_state = scored_entry.get("velocity_state", "NORMAL")
+
+    if labeled_posts:
+        wb, wbear, wneut, sqs = compute_weighted_counts(labeled_posts)
+    else:
+        wb, wbear, wneut, sqs = float(bullish), float(bearish), float(neutral), 1.0
+
+    consensus_ratio = wb / max(wbear, 1.0)
+    opinion_trend = wsb_state.compute_sentiment_trend([h["score"] for h in history])
+    persistence_days = wsb_state.compute_persistence_days(history)
+    attention = _attention_state(velocity_state)
+
+    universe_tier = "CORE"
+    tradeability = 0.0
+    universe_mult = 1.0
+    if universe_decision is not None:
+        universe_tier = getattr(universe_decision, "universe_tier", "CORE")
+        tradeability = getattr(universe_decision, "tradeability_score", 0.0)
+        universe_mult = getattr(universe_decision, "size_multiplier", 1.0)
+
+    is_consensus_buy = (
+        wb >= wbear * config.COMMUNITY_CONSENSUS_MIN_RATIO
+        and neutral_ratio <= config.COMMUNITY_NEUTRAL_RATIO_MAX
+        and total >= config.COMMUNITY_MIN_DAILY_MENTIONS
+    )
+    is_consensus_sell = (
+        wbear >= wb * config.COMMUNITY_CONSENSUS_MIN_RATIO
+        and total >= config.COMMUNITY_MIN_DAILY_MENTIONS
+    )
+
+    # top_reasons (사람·라우터용 근거 코드)
+    reasons = []
+    if consensus_ratio >= config.WSB_OPINION_CONSENSUS_STRONG_RATIO:
+        reasons.append("consensus_strong")
+    elif consensus_ratio >= config.COMMUNITY_CONSENSUS_MIN_RATIO:
+        reasons.append("consensus_ok")
+    if opinion_trend == "UP":
+        reasons.append("trend_up")
+    elif opinion_trend == "DOWN":
+        reasons.append("trend_down")
+    if neutral_ratio <= 0.5:
+        reasons.append("low_noise")
+    elif neutral_ratio > config.COMMUNITY_NEUTRAL_RATIO_MAX:
+        reasons.append("high_noise")
+    if velocity_state == "NEW_SPIKE":
+        reasons.append("new_spike")
+    if persistence_days >= config.COMMUNITY_OPINION_PERSISTENCE_STRONG_DAYS:
+        reasons.append("persistent")
+
+    summary = (
+        f"{symbol} {date_str}: score {opinion_score:.0f}, consensus {consensus_ratio:.2f}"
+        f" (bull {wb:.1f}/bear {wbear:.1f}), neutral {neutral_ratio:.0%},"
+        f" trend {opinion_trend} {persistence_days}d, attention {attention},"
+        f" tier {universe_tier}."
+        f" {'BUY consensus' if is_consensus_buy else ('SELL consensus' if is_consensus_sell else 'no consensus')}."
+    )
+
+    return DailyOpinionSnapshot(
+        date=date_str, symbol=symbol,
+        bullish_count=bullish, bearish_count=bearish, neutral_count=neutral,
+        weighted_bullish_count=wb, weighted_bearish_count=wbear, weighted_neutral_count=wneut,
+        total_mentions=total, source_quality_score=sqs,
+        consensus_ratio=round(consensus_ratio, 4), neutral_ratio=round(neutral_ratio, 4),
+        opinion_score=opinion_score, velocity_state=velocity_state,
+        opinion_trend=opinion_trend, persistence_days=persistence_days,
+        attention_state=attention, universe_tier=universe_tier,
+        tradeability_score=round(tradeability, 4),
+        is_consensus_buy=is_consensus_buy, is_consensus_sell=is_consensus_sell,
+        top_reasons=reasons, top_keywords=_extract_keywords(texts or []),
+        summary=summary,
+        query_positive=f"{symbol} bullish opinion score {opinion_score:.0f}",
+        query_negative=f"{symbol} bearish risk neutral {neutral_ratio:.2f}",
+        query_opinion_trend=f"{symbol} trend {opinion_trend} persistence {persistence_days}d",
+        query_risk=f"{symbol} neutral {neutral_ratio:.2f} velocity {velocity_state} tier {universe_tier}",
+        query_attention=f"{symbol} attention {attention} velocity {velocity_state}",
+        query_consensus=f"{symbol} consensus {consensus_ratio:.2f} bull {wb:.1f} bear {wbear:.1f}",
+        atr=atr, prev_close=prev_close,
+        universe_size_multiplier=universe_mult,
+    )
 
 
 class WSBSignalEngine:
