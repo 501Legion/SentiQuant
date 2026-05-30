@@ -52,14 +52,14 @@ kis_broker.py
 | 파일 | 역할 | 주요 진입점 |
 |------|------|------------|
 | `main.py` | CLI 진입점, 모든 실행 모드 라우팅 | `main()` |
-| `config.py` | 전체 상수 정의 (52개+) | — |
+| `config.py` | 전체 상수 정의 (뉴스·WSB V3·KIS·`COMMUNITY_*` 포함 100개+) | — |
 | `signals.py` | SIGNAL_ENGINE 디스패처 + 신호 결정 5단계 파이프라인 + KIS 매매가능 필터 | `generate_signals_for_all()`, `_generate_signals_finbert()` |
 | `signal_provider.py` | `SignalProvider` Protocol + `SIGNAL_ENGINE` Provider 디스패처 | `get_provider(name)` |
 | `kis_broker.py` | KIS OpenAPI 모의투자 브로커 어댑터 (OAuth 24h / 주문 / 계좌 / 시세 / 매매가능 종목) | `KISBroker`, `place_order()`, `get_account()` |
 | `sentiment_provider.py` | TextBlob/FinBERT/GPT-5.4 Mini Provider ABC | `get_provider(name)` |
 | `wsb_preprocessor.py` | WSB 슬랭/이모지/반어법 → FinBERT 친화적 변환 | `WSBPreprocessor.preprocess()` |
 | `collector.py` | OHLCV(Polygon) + 뉴스(Finnhub) 수집 | `get_ohlcv()`, `get_news()` |
-| `reddit_collector.py` | Reddit PRAW 6서브레딧 수집 + Daily Thread | `RedditCollector.collect()` |
+| `reddit_collector.py` | Reddit PRAW 6서브레딧 + Daily Thread + **flair 품질가중·티커 오탐 필터** | `RedditCollector.collect()`, `source_quality_weight()`, `is_ambiguous_ticker()` |
 | `market_filter.py` | QQQ RSI 기반 시장 상태 필터 | `apply_market_filter()` |
 | `indicators.py` | RSI, MA, ATR, VolumeMA20 계산 | `get_latest_rsi()`, `get_ma()`, `calculate_atr()` |
 | `position_sizer.py` | Equal/Sentiment/Volatility/**OpinionTrend(9-factor)** 사이징 ABC | `get_sizer(name)` |
@@ -76,6 +76,7 @@ kis_broker.py
 | `decision_router.py` | rule-based DecisionRouter + 선택적 LLMRouter (8 안전장치, 기본 OFF) | `DecisionRouter.decide()` |
 | `data/universe/{sp500,nasdaq100}.json` | 정적 index 멤버십 시드 (편집 가능) | — |
 | `scripts/regression_check_reddit.py` | equal 회귀 검출 (필터 OFF 강제 → diff 시 exit 1) | — |
+| `scripts/build_deck.py` | 발표용 `.pptx` 생성 (python-pptx) → `docs/presentation/community-opinion-agent.pptx` | — |
 
 ### 백테스팅/포워드 테스팅
 
