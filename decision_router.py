@@ -128,8 +128,8 @@ class DecisionRouter:
     """rule-based 1차 판단 (+ 선택적 LLM 보정은 module-8에서 확장)."""
 
     def __init__(self, llm_router: bool = False, llm: "LLMRouter" = None):
-        # config flag가 OFF면 어떤 경우에도 LLM 비활성 (기본 OFF, 안전)
-        self.llm_router = bool(llm_router) and bool(config.COMMUNITY_LLM_ROUTER_ENABLED)
+        # --llm-router 플래그 OR config flag 둘 중 하나면 활성 (기본은 둘 다 OFF)
+        self.llm_router = bool(llm_router) or bool(config.COMMUNITY_LLM_ROUTER_ENABLED)
         self._llm = llm   # 테스트 주입용 (None이면 _apply_llm에서 lazy 생성)
 
     def decide(self, *, symbol, current_signal, daily_opinion_snapshot,
@@ -371,8 +371,9 @@ class DecisionRouter:
 
 
 # ---------------------------------------------------------------------------
-# LLMRouter — strict JSON 출력, 기본 OFF. 실제 호출은 기존 OpenAI(config.GPT_MODEL).
-# COMMUNITY_LLM_ROUTER_ENABLED=False면 query()는 호출 전에 None 반환 (호출 0회).
+# LLMRouter — strict JSON 출력. 실제 호출은 기존 OpenAI(config.GPT_MODEL).
+# 활성화 게이팅은 DecisionRouter(self.llm_router = --llm-router 플래그 OR config flag)에서
+# 처리하므로, query()는 호출 시 항상 시도한다(실패/무효 JSON이면 None → rule-based fallback).
 # ---------------------------------------------------------------------------
 class LLMRouter:
     def __init__(self, complete_fn=None):
@@ -380,8 +381,6 @@ class LLMRouter:
         self._complete = complete_fn or self._openai_complete
 
     def query(self, ctx) -> "LLMDecisionResult | None":
-        if not config.COMMUNITY_LLM_ROUTER_ENABLED:
-            return None   # 기본 OFF — LLM 호출 0회
         try:
             prompt = self.build_prompt(ctx)
             raw = self._complete(prompt)

@@ -66,14 +66,14 @@ def _toggle(flag):
     config.COMMUNITY_LLM_ROUTER_ENABLED = flag
 
 
-# --- T1: 기본 OFF → LLM 호출 0회 ---
-def test_t1_disabled_no_llm_call():
+# --- T1: 기본(플래그 없음 + config OFF) → LLM 호출 0회 ---
+def test_t1_default_no_llm_call():
     orig = config.COMMUNITY_LLM_ROUTER_ENABLED
     try:
         _toggle(False)
         fake = _Counter('{"action":"BUY","confidence":0.9}')
-        router = DecisionRouter(llm_router=True, llm=LLMRouter(complete_fn=fake))
-        assert router.llm_router is False        # config OFF면 비활성
+        router = DecisionRouter(llm_router=False, llm=LLMRouter(complete_fn=fake))
+        assert router.llm_router is False        # 둘 다 OFF → 비활성
         d = _decide(router)
         assert fake.calls == 0                   # 호출 0회
         assert d.router_mode == "rule_based"
@@ -81,14 +81,31 @@ def test_t1_disabled_no_llm_call():
         _toggle(orig)
 
 
-# --- T2: query()도 OFF면 complete_fn 미호출 ---
-def test_t2_query_disabled():
+# --- T2: --llm-router 플래그 단독으로 활성 (config OFF여도) ---
+def test_t2_flag_alone_enables():
     orig = config.COMMUNITY_LLM_ROUTER_ENABLED
     try:
-        _toggle(False)
-        fake = _Counter('{"action":"BUY","confidence":0.9}')
-        assert LLMRouter(complete_fn=fake).query({"symbol": "X"}) is None
-        assert fake.calls == 0
+        _toggle(False)                           # config는 OFF
+        fake = _Counter('{"action":"BUY","confidence":0.9,"size_factor_modifier":1.0}')
+        router = DecisionRouter(llm_router=True, llm=LLMRouter(complete_fn=fake))
+        assert router.llm_router is True         # 플래그만으로 활성
+        d = _decide(router)
+        assert fake.calls >= 1                   # LLM 실제 호출됨
+        assert d.router_mode == "llm_assisted"
+    finally:
+        _toggle(orig)
+
+
+# --- T2b: config flag 단독으로도 활성 (플래그 없이) ---
+def test_t2b_config_alone_enables():
+    orig = config.COMMUNITY_LLM_ROUTER_ENABLED
+    try:
+        _toggle(True)                            # config ON
+        fake = _Counter('{"action":"HOLD","confidence":0.9}')
+        router = DecisionRouter(llm_router=False, llm=LLMRouter(complete_fn=fake))
+        assert router.llm_router is True
+        _decide(router)
+        assert fake.calls >= 1
     finally:
         _toggle(orig)
 
