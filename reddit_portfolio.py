@@ -24,6 +24,7 @@ class Position:
     entry_price: float
     shares: int
     highest_price: float   # 보유 이후 최고 종가 (Trailing Stop 추적용)
+    size_factor: float = 1.0   # community-opinion-trend-sizing: 진입 시 적용된 사이징 factor
 
 
 class RedditPortfolio:
@@ -65,6 +66,8 @@ class RedditPortfolio:
         scored: dict[str, dict] = None,  # 감성 점수 (SentimentSizer용)
         atr_cache: dict[str, float] = None,  # ATR (VolatilitySizer용)
         position_scores: dict[str, dict] = None,  # wsb_state position_scores (entry_score 저장)
+        opinion_metrics: dict[str, "object"] = None,  # community-opinion-trend-sizing: 종목별 OpinionMetrics
+        snapshots: dict[str, "object"] = None,  # community-opinion-agent: 종목별 DailyOpinionSnapshot (entry 보강)
     ) -> dict:
         """
         하루 포트폴리오 처리.
@@ -80,6 +83,8 @@ class RedditPortfolio:
         """
         scored = scored or {}
         atr_cache = atr_cache or {}
+        opinion_metrics = opinion_metrics or {}
+        snapshots = snapshots or {}
         position_scores = position_scores if position_scores is not None else wsb_state.load_position_scores()
         daily_buys = []
         daily_sells = []
@@ -144,21 +149,49 @@ class RedditPortfolio:
                 prev_close = sym_ohlcv.get("prev_close")
                 if prev_close:
                     kwargs["prev_close"] = prev_close
+            # community-opinion-trend-sizing: OpinionMetrics 전달 (기타 Sizer는 **kwargs로 무시)
+            om = opinion_metrics.get(symbol)
+            if om is not None:
+                kwargs["opinion"] = om
 
             shares = sizer.calc_shares(self.cash, open_price, **kwargs)
+            size_factor = getattr(sizer, "last_size_factor", 1.0)
             if shares <= 0:
-                logger.warning(f"[{symbol}] 매수 주식 수 0 — 현금 부족 또는 가격 이상")
+                logger.warning(f"[{symbol}] 매수 주식 수 0 — 현금 부족/가격 이상/진입 제외")
                 continue
 
             trade = self._buy(symbol, open_price, shares, date_str)
             if trade:
                 daily_buys.append(trade)
-                # Design Ref: §wsb-signal-v3 §4.3 — 매수 시 entry_score 저장
-                today_score = scored.get(symbol, {}).get("score")
-                if today_score is not None:
-                    wsb_state.upsert_position_score(
-                        position_scores, symbol, entry_score=today_score
+                self.positions[symbol].size_factor = size_factor
+                # Design Ref: §wsb-signal-v3 §4.3 + community-opinion-trend-sizing §7 — 진입 스냅샷
+                today_score = sym_scored.get("score")
+                snap = {"entry_score": today_score}
+                if om is not None:
+                    snap.update(
+                        entry_bullish_count=sym_scored.get("bullish"),
+                        entry_bearish_count=sym_scored.get("bearish"),
+                        entry_neutral_count=sym_scored.get("neutral"),
+                        entry_neutral_ratio=om.neutral_ratio,
+                        entry_consensus_ratio=om.consensus_ratio,
+                        entry_velocity_state=om.velocity_state,
+                        entry_opinion_trend=om.sentiment_trend,
+                        entry_persistence_days=om.persistence_days,
+                        size_factor=size_factor,
                     )
+                # community-opinion-agent §3.6 — DailyOpinionSnapshot 진입 보강 (Plan FR-2.6)
+                osnap = snapshots.get(symbol)
+                if osnap is not None:
+                    snap.update(
+                        entry_universe_tier=getattr(osnap, "universe_tier", None),
+                        entry_tradeability_score=getattr(osnap, "tradeability_score", None),
+                        entry_summary=getattr(osnap, "summary", None),
+                        entry_query_opinion_trend=getattr(osnap, "query_opinion_trend", None),
+                        entry_query_risk=getattr(osnap, "query_risk", None),
+                    )
+                snap = {k: v for k, v in snap.items() if v is not None}
+                if snap:
+                    wsb_state.upsert_position_score(position_scores, symbol, **snap)
 
         wsb_state.save_position_scores(position_scores)
 
@@ -252,6 +285,7 @@ class RedditPortfolio:
             "reason": reason,
             "entry_price": round(pos.entry_price, 4),
             "entry_date": pos.entry_date,
+            "size_factor": pos.size_factor,
         }
         self.trade_log.append(record)
         logger.info(

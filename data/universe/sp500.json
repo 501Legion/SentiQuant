@@ -1,0 +1,20 @@
+{
+  "index": "sp500",
+  "as_of": "2026-05-29",
+  "note": "Seed list of major S&P 500 members for community-opinion-agent UniverseFilter. Editable — expand toward full membership as needed. market_caps optional (USD); empty = fall back to liquidity-based tiering.",
+  "symbols": [
+    "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "GOOG", "META", "TSLA",
+    "AVGO", "BRK.B", "JPM", "LLY", "V", "XOM", "UNH", "MA", "COST",
+    "HD", "PG", "JNJ", "WMT", "NFLX", "BAC", "ORCL", "CRM", "CVX",
+    "KO", "AMD", "PEP", "MRK", "ADBE", "ACN", "LIN", "TMO", "MCD",
+    "CSCO", "ABT", "GE", "INTC", "QCOM", "DIS", "INTU", "IBM", "TXN",
+    "VZ", "CAT", "PFE", "AMGN", "NOW", "COIN", "PLTR", "SMCI", "UBER",
+    "MU", "GS", "BKNG", "ISRG", "HON", "AMAT", "BLK", "SPGI", "RTX",
+    "AXP", "LOW", "PGR", "T", "ELV", "SYK", "TJX", "VRTX", "REGN",
+    "BSX", "C", "MS", "DE", "ADI", "LRCX", "MDT", "PANW", "BX",
+    "CB", "MMC", "KLAC", "SCHW", "CMCSA", "ETN", "ABBV", "DELL",
+    "GME", "F", "GM", "PYPL", "SBUX", "MDLZ", "GILD", "CME", "MO",
+    "DASH", "ABNB", "MRVL", "CRWD", "FTNT", "SNPS", "CDNS", "WDAY"
+  ],
+  "market_caps": {}
+}

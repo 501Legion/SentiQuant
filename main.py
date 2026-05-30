@@ -89,9 +89,9 @@ def _run_reddit_backtest(args) -> None:
     if not args.model or args.model == "combined":
         missing.append(f"--model {{finbert|finbert-wsb|{config.GPT_MODEL_ALIAS}}}")
     if not args.ranking:
-        missing.append("--ranking {mentions|ratio}")
+        missing.append("--ranking {mentions|ratio|sentiment}")
     if not args.sizing:
-        missing.append("--sizing {equal|sentiment|volatility}")
+        missing.append("--sizing {equal|sentiment|volatility|opinion_trend}")
     if not args.from_date:
         missing.append("--from YYYY-MM-DD")
     if not args.to_date:
@@ -106,15 +106,22 @@ def _run_reddit_backtest(args) -> None:
 
     from reddit_backtester import RedditReplayBacktester, print_reddit_comparison
 
+    universe_mode = getattr(args, "universe", None) or "community_liquid"
+    llm_router = getattr(args, "llm_router", False)
     replayer = RedditReplayBacktester(
         model=args.model,
         ranking=args.ranking,
         sizing=args.sizing,
         from_date=args.from_date,
         to_date=args.to_date,
+        universe_mode=universe_mode,
+        llm_router=llm_router,
     )
     result = replayer.run()
-    print_reddit_comparison({f"{args.model}_{args.ranking}_{args.sizing}": result})
+    key = f"{args.model}_{args.ranking}_{args.sizing}_{universe_mode}"
+    if llm_router:
+        key += "_llm"
+    print_reddit_comparison({key: result})
 
 
 def _run_reddit_collect() -> None:
@@ -227,13 +234,27 @@ def main() -> None:
     )
     parser.add_argument(
         "--ranking",
-        choices=["mentions", "ratio"],
+        choices=["mentions", "ratio", "sentiment"],
         help="Reddit Ranking 방식 (--source reddit 필수)",
     )
     parser.add_argument(
         "--sizing",
-        choices=["equal", "sentiment", "volatility"],
+        choices=["equal", "sentiment", "volatility", "opinion_trend"],
         help="Position Sizing 방식 (--source reddit 필수)",
+    )
+    # community-opinion-agent: universe 모드 / LLM 라우터 (기본 OFF)
+    parser.add_argument(
+        "--universe",
+        choices=["sp500_only", "nasdaq100_only", "sp500_nasdaq100",
+                 "liquid_us", "community_liquid", "custom_watchlist"],
+        default="community_liquid",
+        help="거래 universe 모드 (--source reddit, 기본값: community_liquid)",
+    )
+    parser.add_argument(
+        "--llm-router",
+        dest="llm_router",
+        action="store_true",
+        help="LLM Decision Router 활성화 (기본 OFF — rule-based router 사용)",
     )
     parser.add_argument(
         "--from",

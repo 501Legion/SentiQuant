@@ -73,6 +73,59 @@ _TICKER_PATTERN = re.compile(r'\$([A-Z]{1,5})\b')
 _WORD_TICKER_PATTERN = re.compile(r'\b([A-Z]{2,5})\b')
 
 
+# ---------------------------------------------------------------------------
+# community-opinion-agent §3.6 — source quality + ticker ambiguity 헬퍼
+# 모두 config flag 게이팅 — OFF면 기존 동작과 동일(회귀 0). forward 수집 전용.
+# ---------------------------------------------------------------------------
+
+# flair 텍스트 → weight 상수 매핑
+_FLAIR_WEIGHT_MAP_KEYS = (
+    ("DD", "COMMUNITY_FLAIR_WEIGHT_DD"),
+    ("Discussion", "COMMUNITY_FLAIR_WEIGHT_DISCUSSION"),
+    ("Daily Discussion", "COMMUNITY_FLAIR_WEIGHT_DISCUSSION"),
+    ("Stocks", "COMMUNITY_FLAIR_WEIGHT_DISCUSSION"),
+    ("News", "COMMUNITY_FLAIR_WEIGHT_NEWS"),
+    ("Earnings", "COMMUNITY_FLAIR_WEIGHT_NEWS"),
+    ("Options", "COMMUNITY_FLAIR_WEIGHT_OPTIONS"),
+    ("Technical Analysis", "COMMUNITY_FLAIR_WEIGHT_TECHNICAL"),
+    ("Technicals", "COMMUNITY_FLAIR_WEIGHT_TECHNICAL"),
+    ("Fundamentals", "COMMUNITY_FLAIR_WEIGHT_FUNDAMENTALS"),
+)
+
+
+def source_quality_weight(flair: str | None, source: str = "post") -> float:
+    """flair·source로 게시글 품질 weight 계산 (Design Ref: §3.6 / Plan FR-1.1).
+    필터 OFF 또는 flair 없음 → DEFAULT(1.0) fallback. low quality flair → 0.0.
+    daily_thread 댓글 → DAILY_THREAD weight(0.5)."""
+    if not config.COMMUNITY_ENABLE_SOURCE_QUALITY_FILTER:
+        return config.COMMUNITY_FLAIR_WEIGHT_DEFAULT
+    if source == "daily_thread":
+        return config.COMMUNITY_FLAIR_WEIGHT_DAILY_THREAD
+    f = (flair or "").strip()
+    if not f:
+        return config.COMMUNITY_FLAIR_WEIGHT_DEFAULT
+    if f in config.COMMUNITY_LOW_QUALITY_FLAIRS:
+        return config.COMMUNITY_FLAIR_WEIGHT_LOW_QUALITY   # 0.0
+    for key, const_name in _FLAIR_WEIGHT_MAP_KEYS:
+        if f == key:
+            return getattr(config, const_name)
+    return config.COMMUNITY_FLAIR_WEIGHT_DEFAULT
+
+
+def is_ambiguous_ticker(ticker: str, *, has_dollar: bool) -> bool:
+    """티커 오탐 위험 판정 (Design Ref: §3.6 / Plan FR-1.2).
+    필터 OFF면 항상 False. ambiguity blacklist 종목·단일문자 티커는
+    $ prefix가 없으면 ambiguous(=제외 대상)로 본다."""
+    if not config.COMMUNITY_ENABLE_TICKER_AMBIGUITY_FILTER:
+        return False
+    t = (ticker or "").upper()
+    if len(t) == 1 and config.COMMUNITY_SINGLE_LETTER_TICKER_REQUIRE_DOLLAR and not has_dollar:
+        return True
+    if t in config.COMMUNITY_TICKER_AMBIGUITY_BLACKLIST and not has_dollar:
+        return True
+    return False
+
+
 class RedditCollector:
     """
     PRAW 기반 3개 서브레딧 수집, 종목별 분류, 날짜별 파일 저장.
@@ -182,6 +235,10 @@ class RedditCollector:
                     "subreddit": name,
                     "created_utc": int(submission.created_utc),
                     "bullish": None,
+                    # community-opinion-agent §3.6 — 품질 가중 메타데이터 (additive)
+                    "flair": flair_clean,
+                    "source": "post",
+                    "source_quality_weight": source_quality_weight(flair_clean, "post"),
                 })
 
         try:
@@ -269,6 +326,9 @@ class RedditCollector:
                     "created_utc": int(comment.created_utc),
                     "bullish": None,
                     "source": "daily_thread",
+                    # community-opinion-agent §3.6 — Daily Thread 댓글은 낮은 weight
+                    "flair": "",
+                    "source_quality_weight": source_quality_weight("", "daily_thread"),
                 })
         except Exception as e:
             logger.warning(f"r/{name} Daily Thread 댓글 수집 실패: {e}")
@@ -297,11 +357,13 @@ class RedditCollector:
         }
 
         blacklist = _COMMON_WORDS | config.REDDIT_TICKER_BLACKLIST
+        # community-opinion-agent §3.6 — ambiguity 제외 통계 (forward 수집 로깅/통계용)
+        self._ambiguity_skips: dict[str, int] = {}
 
         for post in posts:
             text = f"{post['title']} {post['body_excerpt']}"
 
-            # Stage 1: $TICKER 명시 패턴 -가장 신뢰도 높음
+            # Stage 1: $TICKER 명시 패턴 -가장 신뢰도 높음 (has_dollar=True → ambiguity 통과)
             for match in _TICKER_PATTERN.finditer(text):
                 ticker = match.group(1)
                 if ticker not in blacklist:
@@ -312,17 +374,28 @@ class RedditCollector:
                 if name_upper in text.upper():
                     high_conf_posts.setdefault(symbol, []).append(post)
 
-            # Stage 3: 대문자 단어 (3자 이상, 후보 수집)
+            # Stage 3: 대문자 단어 (3자 이상, 후보 수집) — $ 없는 bare word
             for match in _WORD_TICKER_PATTERN.finditer(text):
                 word = match.group(1)
-                if word not in blacklist and len(word) >= 3:
-                    word_posts.setdefault(word, []).append(post)
+                if word in blacklist or len(word) < 3:
+                    continue
+                # ticker ambiguity filter (gated): blacklist 단어는 $ 없으면 제외
+                if is_ambiguous_ticker(word, has_dollar=False):
+                    self._ambiguity_skips[word] = self._ambiguity_skips.get(word, 0) + 1
+                    continue
+                word_posts.setdefault(word, []).append(post)
 
         # Stage 3: 2개 이상 게시글에 등장 + Stage 1/2 미수집 종목만 추가
         MIN_WORD_POSTS = 2
         for ticker, post_list in word_posts.items():
             if ticker not in high_conf_posts and len(post_list) >= MIN_WORD_POSTS:
                 high_conf_posts[ticker] = post_list
+
+        if self._ambiguity_skips:
+            logger.info(
+                f"[ticker ambiguity] $없는 모호어 제외: "
+                f"{dict(sorted(self._ambiguity_skips.items()))}"
+            )
 
         return high_conf_posts
 
