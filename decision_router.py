@@ -372,7 +372,7 @@ class DecisionRouter:
 
 # ---------------------------------------------------------------------------
 # LLMRouter — strict JSON 출력. 실제 호출은 기존 OpenAI(config.GPT_MODEL).
-# 활성화 게이팅은 DecisionRouter(self.llm_router = --llm-router 플래그 OR config flag)에서
+# 활성 게이팅은 DecisionRouter(self.llm_router = --llm-router 플래그 OR config flag)에서
 # 처리하므로, query()는 호출 시 항상 시도한다(실패/무효 JSON이면 None → rule-based fallback).
 # ---------------------------------------------------------------------------
 class LLMRouter:
@@ -413,13 +413,23 @@ class LLMRouter:
 
     @staticmethod
     def _openai_complete(prompt: str) -> str:
-        """기존 OpenAI(config.GPT_MODEL) 호출. 키/패키지 없으면 예외 → query가 fallback."""
-        from openai import OpenAI
+        """기존 OpenAI(config.GPT_MODEL) 호출. 키/패키지 없으면 예외 → query가 fallback.
+        신모델 호환: max_completion_tokens 사용, temperature 미지원 시 자동 재시도."""
+        from openai import OpenAI, BadRequestError
         client = OpenAI(api_key=config.OPENAI_API_KEY)
-        resp = client.chat.completions.create(
+        kwargs = dict(
             model=config.GPT_MODEL,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=config.COMMUNITY_LLM_ROUTER_MAX_TOKENS,
+            max_completion_tokens=config.COMMUNITY_LLM_ROUTER_MAX_TOKENS,
             temperature=config.COMMUNITY_LLM_ROUTER_TEMPERATURE,
         )
+        try:
+            resp = client.chat.completions.create(**kwargs)
+        except BadRequestError as e:
+            # 일부 신모델은 temperature 커스텀 미지원 → 제거 후 재시도
+            if "temperature" in str(e):
+                kwargs.pop("temperature", None)
+                resp = client.chat.completions.create(**kwargs)
+            else:
+                raise
         return resp.choices[0].message.content or ""
