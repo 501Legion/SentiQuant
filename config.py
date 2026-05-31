@@ -354,6 +354,13 @@ COMMUNITY_REFLECTION_FORWARD_RETURNS = [1, 3, 7, 14]
 COMMUNITY_LOW_LEVEL_REFLECTION_ENABLED = True
 COMMUNITY_HIGH_LEVEL_REFLECTION_ENABLED = True
 
+# --- v3+ Persistent DecisionLog (판단 원본 jsonl) ---
+COMMUNITY_DECISION_LOG_ENABLED = True
+COMMUNITY_DECISIONS_DIR = "data/community/decisions"          # 기본(라이브외) 경로 루트
+COMMUNITY_DECISIONS_FILE = "data/community/decisions/decision_logs.jsonl"
+COMMUNITY_BACKTEST_DECISIONS_DIR = "data/community/backtests"  # {run_id}/decisions.jsonl
+COMMUNITY_LIVE_DECISIONS_FILE = "data/community/live/decisions.jsonl"
+
 # --- v3 Decision Router / LLM Router (Design Ref: §3.5) — 기본 OFF ---
 COMMUNITY_LLM_ROUTER_ENABLED = False
 COMMUNITY_LLM_ROUTER_MODEL = "gpt4"              # 실호출은 config.GPT_MODEL로 매핑(D3)

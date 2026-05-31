@@ -30,6 +30,9 @@ class DecisionResult:
     memory_hits_used: list = field(default_factory=list)
     warnings: list = field(default_factory=list)
     router_mode: str = "rule_based"
+    # DecisionLog용 — rule 1차 판단 / LLM 원raw 판단 (로깅·추적용, 동작엔 미영향)
+    rule_action: str = ""
+    llm_action: str = ""
 
 
 @dataclass
@@ -150,9 +153,11 @@ class DecisionRouter:
             risk=risk_settings or {},
         )
         result = self._rule_based(ctx)
+        rule_action = result.action          # DecisionLog용 1차 판단 보존
         if self.llm_router:
-            result = self._apply_llm(result, ctx)   # module-8
+            result = self._apply_llm(result, ctx)   # module-8 (llm_action 설정)
         result = self._enforce_safety(result, ctx)
+        result.rule_action = rule_action
         return result
 
     # ------------------------------------------------------------------
@@ -342,6 +347,8 @@ class DecisionRouter:
             base.warnings = list(base.warnings) + ["llm_fallback_to_rule_based"]
             return base   # invalid/실패 → rule-based 유지
 
+        base.llm_action = res.action   # LLM 원raw 판단 기록 (보정 전)
+
         # confidence 낮으면 rule-based 우선
         if res.confidence < config.COMMUNITY_LLM_ROUTER_MIN_CONFIDENCE:
             base.warnings = list(base.warnings) + ["llm_low_confidence_kept_rule"]
@@ -366,6 +373,7 @@ class DecisionRouter:
             memory_hits_used=base.memory_hits_used or res.memory_hits_used,
             warnings=list(base.warnings) + list(res.warnings),
             router_mode="llm_assisted",
+            llm_action=res.action,
         )
         return merged
 
