@@ -34,6 +34,7 @@ class LowLevelReflection:
     reasoning: str = ""
     lesson: str = ""
     query: dict = field(default_factory=dict)
+    decision_id: str = ""    # DecisionLog join 키 (판단 원본 ↔ 결과 검증)
 
 
 @dataclass
@@ -61,6 +62,7 @@ class HighLevelReflection:
     mistake_type: str = ""
     improvement: str = ""
     lesson: str = ""
+    decision_id: str = ""    # DecisionLog join 키 (진입 판단 ↔ 매매 결과)
     cost_drag_pct: float = 0.0
     opinion_score_change: float = 0.0
     consensus_change: float = 0.0
@@ -91,7 +93,7 @@ def _classify_low_level(r1, r3, r7, r14) -> str:
 
 
 def build_low_level(snapshot, forward_prices: dict, entry_price: float,
-                    universe_tier: str = None) -> LowLevelReflection:
+                    universe_tier: str = None, decision_id: str = "") -> LowLevelReflection:
     """snapshot + forward_prices({1,3,7,14: price}) → LowLevelReflection.
     forward returns는 백테스트(미래가격 확정)에서만 의미. entry_price 기준 %수익."""
     def _ret(days):
@@ -138,7 +140,7 @@ def build_low_level(snapshot, forward_prices: dict, entry_price: float,
         velocity_state=velocity, opinion_trend=trend, persistence_days=persistence,
         universe_tier=tier, next_1d_return=r1, next_3d_return=r3,
         next_7d_return=r7, next_14d_return=r14, result_label=label,
-        reasoning=reasoning, lesson=lesson, query=query,
+        reasoning=reasoning, lesson=lesson, query=query, decision_id=decision_id,
     )
 
 
@@ -154,7 +156,8 @@ def _classify_decision(entry_score, net_pnl, exit_reason) -> str:
     return "good_entry_bad_exit"
 
 
-def build_high_level(entry_snap, exit_snap, trade: dict) -> HighLevelReflection:
+def build_high_level(entry_snap, exit_snap, trade: dict,
+                     decision_id: str = "") -> HighLevelReflection:
     """entry/exit opinion 상태 + 청산 trade 기록 → HighLevelReflection.
     trade: reddit_portfolio._sell 레코드(symbol,entry_date,date,entry_price,price,
            shares,gross_pnl,net_pnl,commission,reason)."""
@@ -212,7 +215,7 @@ def build_high_level(entry_snap, exit_snap, trade: dict) -> HighLevelReflection:
         entry_velocity_state=e_vel, exit_velocity_state=x_vel,
         entry_universe_tier=e_tier, exit_reason=exit_reason,
         decision_quality=decision_quality, mistake_type=mistake_type,
-        improvement=improvement, lesson=lesson,
+        improvement=improvement, lesson=lesson, decision_id=decision_id,
         cost_drag_pct=cost_drag_pct,
         opinion_score_change=round(x_score - e_score, 2),
         consensus_change=round(x_cons - e_cons, 3),

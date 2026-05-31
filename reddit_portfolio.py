@@ -25,6 +25,7 @@ class Position:
     shares: int
     highest_price: float   # 보유 이후 최고 종가 (Trailing Stop 추적용)
     size_factor: float = 1.0   # community-opinion-trend-sizing: 진입 시 적용된 사이징 factor
+    entry_decision_id: str = ""   # community-opinion-agent: 진입 판단 DecisionLog id
 
 
 class RedditPortfolio:
@@ -68,6 +69,7 @@ class RedditPortfolio:
         position_scores: dict[str, dict] = None,  # wsb_state position_scores (entry_score 저장)
         opinion_metrics: dict[str, "object"] = None,  # community-opinion-trend-sizing: 종목별 OpinionMetrics
         snapshots: dict[str, "object"] = None,  # community-opinion-agent: 종목별 DailyOpinionSnapshot (entry 보강)
+        decision_ids: dict[str, str] = None,    # community-opinion-agent: 종목별 진입 DecisionLog id
     ) -> dict:
         """
         하루 포트폴리오 처리.
@@ -85,6 +87,7 @@ class RedditPortfolio:
         atr_cache = atr_cache or {}
         opinion_metrics = opinion_metrics or {}
         snapshots = snapshots or {}
+        decision_ids = decision_ids or {}
         position_scores = position_scores if position_scores is not None else wsb_state.load_position_scores()
         daily_buys = []
         daily_sells = []
@@ -164,6 +167,7 @@ class RedditPortfolio:
             if trade:
                 daily_buys.append(trade)
                 self.positions[symbol].size_factor = size_factor
+                self.positions[symbol].entry_decision_id = decision_ids.get(symbol, "")
                 # Design Ref: §wsb-signal-v3 §4.3 + community-opinion-trend-sizing §7 — 진입 스냅샷
                 today_score = sym_scored.get("score")
                 snap = {"entry_score": today_score}

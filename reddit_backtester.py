@@ -28,6 +28,9 @@ from sentiment_provider import get_provider
 from community_memory import CommunityMemoryStore, InMemoryBackend
 from opinion_reflection import build_low_level, build_high_level
 from universe_filter import UniverseFilter
+from decision_log import (
+    build_decision_record, append_decision_log, make_decision_id, decision_log_path,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +92,9 @@ class RedditTradeRecord:
     cost_drag_pct: float = 0.0
     universe_mode: str = ""
     universe_tier: str = ""
+    # DecisionLog 연결 (reflection/decision join)
+    entry_decision_id: str = ""
+    exit_decision_id: str = ""
 
 
 @dataclass
@@ -124,6 +130,13 @@ class RedditBacktestResult:
     trades_skipped_by_ambiguity: int = 0
     trades_skipped_by_liquidity: int = 0
     universe_mode: str = ""
+    # DecisionLog 요약
+    total_decisions_logged: int = 0
+    llm_decisions_logged: int = 0
+    buy_decisions_logged: int = 0
+    skip_decisions_logged: int = 0
+    hold_decisions_logged: int = 0
+    decision_log_path: str = ""
 
 
 class RedditReplayBacktester:
@@ -217,6 +230,11 @@ class RedditReplayBacktester:
         self._decisions_log: dict[tuple, object] = {}
         self._skip_universe = self._skip_cost = 0
         self._skip_ambiguity = self._skip_liquidity = 0
+        # DecisionLog (판단 원본 영속 저장)
+        self.run_id = f"{self.strategy_key}_{self.universe_mode}_{self.from_date}_{self.to_date}"
+        self._decision_log_path = decision_log_path(run_id=self.run_id)
+        self._decision_ids: dict[tuple, str] = {}
+        self._dlog = {"total": 0, "llm": 0, "buy": 0, "skip": 0, "hold": 0}
         equity_curve: list[tuple[str, float]] = []
         invested_days = 0
         processed_days = 0
@@ -311,11 +329,16 @@ class RedditReplayBacktester:
 
             # --- 에이전트 게이팅 (opinion_trend 전용) — equal은 미게이팅(회귀 0) ---
             buy_top_n = top_n
+            day_decision_ids = None
             if is_opinion:
                 buy_top_n = self._agent_gate(
                     top_n, scored, day_snaps, univ_map, opinion_metrics,
                     portfolio, position_scores, today_ohlcv, date_str,
                 )
+                day_decision_ids = {
+                    sym: self._decision_ids[(sym, date_str)]
+                    for sym in scored if (sym, date_str) in self._decision_ids
+                }
 
             day_result = portfolio.process_day(
                 date_str=date_str,
@@ -328,6 +351,7 @@ class RedditReplayBacktester:
                 position_scores=position_scores,
                 opinion_metrics=opinion_metrics,
                 snapshots=day_snapshots,
+                decision_ids=day_decision_ids,
             )
             # G1: 당일 청산 trade → high-level reflection을 run-local에 누적
             #     (forward 순서라 결정적; 이후 날짜 결정이 과거 성공/실패를 참조)
@@ -401,6 +425,31 @@ class RedditReplayBacktester:
             )
             self._decisions_log[(sym, date_str)] = decision
 
+            # --- DecisionLog 영속 저장 (모든 후보: BUY/SKIP/HOLD/...) ---
+            dec_id = make_decision_id(date_str, sym, "reddit", self.model,
+                                      self.ranking, self.sizing, self.universe_mode)
+            self._decision_ids[(sym, date_str)] = dec_id
+            record = build_decision_record(
+                decision=decision, snapshot=snap, universe_decision=univ_dec,
+                cost_decision=cost_dec, date=date_str, symbol=sym, source="reddit",
+                model=self.model, ranking=self.ranking, sizing=self.sizing,
+                universe_mode=self.universe_mode, run_id=self.run_id,
+                current_signal=d.get("signal", ""),
+                llm_enabled=self._router.llm_router,
+                llm_model=(config.GPT_MODEL if self._router.llm_router else ""),
+            )
+            append_decision_log(record, path=self._decision_log_path)
+            self._dlog["total"] += 1
+            if decision.router_mode == "llm_assisted":
+                self._dlog["llm"] += 1
+            act = decision.action
+            if act == "BUY":
+                self._dlog["buy"] += 1
+            elif act == "SKIP":
+                self._dlog["skip"] += 1
+            elif act == "HOLD":
+                self._dlog["hold"] += 1
+
             # skip 통계
             u_reasons = getattr(univ_dec, "reason_codes", []) or []
             if not getattr(univ_dec, "allowed", True):
@@ -463,6 +512,7 @@ class RedditReplayBacktester:
                 ref = build_low_level(
                     snap, fwd, entry_price,
                     universe_tier=getattr(snap, "universe_tier", "CORE"),
+                    decision_id=self._decision_ids.get((sym, date_str), ""),
                 )
                 self._memory.add_low_level_reflection(ref)
 
@@ -474,7 +524,10 @@ class RedditReplayBacktester:
                 sym = t["symbol"]
                 entry_snap = self._snapshots.get((sym, t.get("entry_date")), {})
                 exit_snap = self._snapshots.get((sym, t.get("date")), {})
-                ref = build_high_level(entry_snap, exit_snap, t)
+                ref = build_high_level(
+                    entry_snap, exit_snap, t,
+                    decision_id=self._decision_ids.get((sym, t.get("entry_date")), ""),
+                )
                 self._memory.add_high_level_reflection(ref)
 
     def _empty_result(self) -> "RedditBacktestResult":
@@ -542,6 +595,8 @@ class RedditReplayBacktester:
                 commission_paid=commission_paid, estimated_slippage_paid=slippage,
                 cost_drag_pct=cost_drag, universe_mode=self.universe_mode,
                 universe_tier=getattr(entry_snap, "universe_tier", ""),
+                entry_decision_id=self._decision_ids.get((sym, ed), ""),
+                exit_decision_id=self._decision_ids.get((sym, xd), ""),
             ))
 
         equities = [v for _, v in equity_curve]
@@ -591,6 +646,12 @@ class RedditReplayBacktester:
             trades_skipped_by_ambiguity=self._skip_ambiguity,
             trades_skipped_by_liquidity=self._skip_liquidity,
             universe_mode=self.universe_mode,
+            total_decisions_logged=self._dlog["total"],
+            llm_decisions_logged=self._dlog["llm"],
+            buy_decisions_logged=self._dlog["buy"],
+            skip_decisions_logged=self._dlog["skip"],
+            hold_decisions_logged=self._dlog["hold"],
+            decision_log_path=(self._decision_log_path if self._dlog["total"] else ""),
         )
         logger.info(
             f"[RedditBacktest] 완료 — {self.strategy_key} ({self.universe_mode})"
@@ -779,4 +840,16 @@ def print_reddit_comparison(results: dict[str, "RedditBacktestResult"]) -> None:
         dist = r.exit_reason_dist or {}
         parts = ", ".join(f"{k}={v}" for k, v in sorted(dist.items())) or "(거래 없음)"
         print(f"    {key:<34} | {parts}")
+
+    # community-opinion-agent — DecisionLog 요약 (판단 원본 영속 저장)
+    if any(getattr(r, "total_decisions_logged", 0) for r in results.values()):
+        print(f"\n  DecisionLog (판단 원본 jsonl):")
+        for key, r in sorted(results.items()):
+            tot = getattr(r, "total_decisions_logged", 0)
+            if not tot:
+                continue
+            print(f"    {key:<34} | total={tot} buy={r.buy_decisions_logged}"
+                  f" skip={r.skip_decisions_logged} hold={r.hold_decisions_logged}"
+                  f" llm={r.llm_decisions_logged}")
+            print(f"      → {r.decision_log_path}")
     print(f"{'='*92}\n")
