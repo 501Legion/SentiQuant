@@ -370,6 +370,15 @@ COMMUNITY_LLM_ROUTER_MAX_TOKENS = 1200
 COMMUNITY_LLM_ROUTER_TEMPERATURE = 0.0
 COMMUNITY_LLM_ROUTER_MIN_CONFIDENCE = 0.5        # 미만 시 rule-based 우선
 
+# --- Community Opinion Agent — Live (KIS 모의투자 배선, community-opinion-agent-live) ---
+# 실매매 전략 스위치: "agent"=커뮤니티 여론 에이전트 / "news"=기존 뉴스-RSI (가역)
+# scheduler가 이 값으로 분기 (module-5). 변경 전엔 동작 영향 없음.
+LIVE_STRATEGY = "agent"
+COMMUNITY_LIVE_UNIVERSE_MODE = "community_liquid"   # 라이브 universe 기본
+COMMUNITY_LIVE_DRY_RUN_DEFAULT = True               # --agent-run-now 기본 dry-run (실모의주문 차단)
+COMMUNITY_LLM_LIVE_MAX_CALLS = 50                   # 라이브 1회 구동당 LLM 호출 상한(초과→rule fallback)
+COMMUNITY_LIVE_STRATEGY_KEY = "agent_live"          # 라이브 포트폴리오 state 파일 키
+
 # --- API 요청 설정 ---
 REQUEST_MAX_RETRIES = 3
 REQUEST_RETRY_BASE_DELAY = 1.0     # 초 (지수 백오프 기반)
