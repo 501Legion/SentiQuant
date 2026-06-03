@@ -54,6 +54,18 @@ def signal_calculation_job() -> None:
         logger.info("오늘은 NYSE 휴장일 — 신호 계산 잡 스킵")
         return
 
+    # community-opinion-agent-live FR-03/D2: LIVE_STRATEGY="agent"이면 에이전트 경로로 분기.
+    # "news"(기본 외)면 아래 기존 뉴스-RSI 신호 계산이 그대로 실행 (회귀 0).
+    if config.LIVE_STRATEGY == "agent":
+        logger.info("[LIVE_STRATEGY=agent] 신호 잡 → Reddit 수집 (에이전트 입력 준비)")
+        try:
+            from reddit_collector import RedditCollector
+            RedditCollector().collect()
+        except Exception as e:
+            logger.error(f"[agent] Reddit 수집 실패: {e}", exc_info=True)
+        logger.info("=== 신호 계산 잡 완료 (agent) ===")
+        return
+
     try:
         # FR-14/SC-06: KIS 매매 가능 종목 마스터 갱신 — data/kis_symbols.json 캐시 생성/갱신.
         # 신호 생성 시 generate_signals_for_all이 이 캐시로 종목을 필터링한다.
@@ -91,6 +103,18 @@ def order_processing_job(dry_run: bool = False) -> None:
 
     if not is_trading_day():
         logger.info("오늘은 NYSE 휴장일 — 주문 처리 잡 스킵")
+        return
+
+    # community-opinion-agent-live FR-03/D2: LIVE_STRATEGY="agent"이면 에이전트 라이브 구동으로 분기.
+    # "news"(기본 외)면 아래 기존 뉴스-RSI 주문 경로가 그대로 실행 (회귀 0).
+    if config.LIVE_STRATEGY == "agent":
+        logger.info(f"[LIVE_STRATEGY=agent] 주문 잡 → community_live.run_live ({label})")
+        try:
+            import community_live
+            community_live.run_live(dry_run=dry_run)
+        except Exception as e:
+            logger.error(f"[agent] 라이브 구동 실패: {e}", exc_info=True)
+        logger.info(f"=== 주문 처리 잡 완료 (agent, {label}) ===")
         return
 
     try:
