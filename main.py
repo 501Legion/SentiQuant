@@ -19,6 +19,11 @@ News-RSI Stock Trading System
     python main.py --report-reddit              # 12전략 수익률 비교 (전체 기간)
     python main.py --report-reddit --from 2026-04-17 --to 2026-05-17
 
+    # 여론 에이전트 라이브 (KIS 모의투자) — community-opinion-agent-live
+    python main.py --agent-run-now              # 라이브 1일 구동 (dry-run 기본 — 실주문 X)
+    python main.py --agent-run-now --no-dry-run # 실제 KIS 모의주문 전송
+    python main.py --agent-run-now --llm-router --universe community_liquid
+
     # Reddit Replay 백테스팅 (단일 전략)
     python main.py --backtest --source reddit \\
         --model finbert --ranking mentions --sizing equal \\
@@ -214,6 +219,17 @@ def main() -> None:
         action="store_true",
         help="--order-now와 함께 사용 — KIS 주문 직전까지 시뮬레이션 (실주문 없음)",
     )
+    # community-opinion-agent-live FR-02: 에이전트 라이브 구동 (dry-run 기본 ON)
+    parser.add_argument(
+        "--agent-run-now",
+        action="store_true",
+        help="여론 에이전트 라이브 1일 구동 (community_live.run_live) — dry-run 기본",
+    )
+    parser.add_argument(
+        "--no-dry-run",
+        action="store_true",
+        help="--agent-run-now와 함께 — 실제 KIS 모의주문 전송 (기본 dry-run 해제)",
+    )
     parser.add_argument(
         "--backtest",
         action="store_true",
@@ -284,7 +300,24 @@ def main() -> None:
 
     _check_env()
 
-    if args.reddit_run_now:
+    if args.agent_run_now:
+        import community_live
+
+        dry = False if args.no_dry_run else None  # None → config 기본(dry-run True)
+        label = "LIVE(모의주문)" if args.no_dry_run else "DRY-RUN"
+        logger.info(f"여론 에이전트 라이브 구동 ({label})")
+        result = community_live.run_live(
+            dry_run=dry, llm_router=args.llm_router, universe_mode=args.universe,
+        )
+        s = result["summary"]
+        print(
+            f"\n[에이전트 라이브 {label}] {s['date']}\n"
+            f"  후보 {s['candidates']}건 · 매수 {s['buys']} · 매도 {s['sells']}"
+            f" · 체결 {s['placed']} · LLM호출 {s['llm_calls']}\n"
+            f"  decision log: {result['decision_log_path']}"
+        )
+
+    elif args.reddit_run_now:
         _run_reddit_collect()
 
     elif args.report_reddit:

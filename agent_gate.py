@@ -70,8 +70,9 @@ def evaluate_candidate(
     texts: list = None,
     market_filter_status: str = "NORMAL",
     cash: float = None,
-) -> tuple["DecisionResult", OrderIntent]:
-    """후보 1건 → (DecisionResult, OrderIntent). 순수(부수효과 없음)."""
+) -> tuple["DecisionResult", OrderIntent, "DailyOpinionSnapshot"]:
+    """후보 1건 → (DecisionResult, OrderIntent, snapshot). 순수(부수효과 없음).
+    snapshot은 드라이버가 영속 저장(append_daily_snapshot)·memory 누적·decision log 보강에 사용."""
     date_str = run_meta.get("date", "")
 
     # 1. universe
@@ -150,4 +151,4 @@ def evaluate_candidate(
         reason=(decision.reasoning or "")[:200],
         snapshot_summary=getattr(snap, "summary", ""),
     )
-    return decision, intent
+    return decision, intent, snap

@@ -56,7 +56,8 @@ def _eval(symbol="NVDA", scored=None, position=None, **over):
               avg_dollar_volume=config.COMMUNITY_MIN_AVG_DOLLAR_VOLUME * 3,
               recent_volatility_pct=5.0, rsi=45.0, current_position=position)
     kw.update(over)
-    return evaluate_candidate(**kw)
+    dec, intent, _snap = evaluate_candidate(**kw)   # live-iterate: 3-tuple (snapshot 추가)
+    return dec, intent
 
 
 # --- T1: BUY → OrderIntent side BUY, 사이징 = equity×pct×size_factor/price ---
@@ -127,6 +128,21 @@ def test_t7_schema():
     for fld in ("symbol", "action", "side", "shares", "size_factor",
                 "decision_id", "reason", "snapshot_summary"):
         assert hasattr(intent, fld), fld
+
+
+# --- T8: snapshot 반환 (live-iterate Gap-1/2 — 영속·로그 보강용) ---
+def test_t8_returns_snapshot():
+    uf, cf, mem, router = _filters()
+    scored = {"bullish": 6, "bearish": 1, "neutral": 1, "score": 85, "mentions": 8,
+              "neutral_ratio": 0.12, "velocity_state": "NORMAL", "signal": "BUY"}
+    dec, intent, snap = evaluate_candidate(
+        symbol="NVDA", scored_entry=scored, history=[], run_meta=_RUN_META,
+        universe_filter=uf, cost_filter=cf, memory=mem, router=router,
+        open_price=_PRICE, account_equity=_EQUITY,
+        avg_dollar_volume=config.COMMUNITY_MIN_AVG_DOLLAR_VOLUME * 3, recent_volatility_pct=5.0)
+    assert snap is not None
+    assert getattr(snap, "symbol", None) == "NVDA"
+    assert hasattr(snap, "opinion_score")
 
 
 def _run_standalone() -> int:
