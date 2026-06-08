@@ -281,7 +281,19 @@ def run_live(
             if prior:
                 posts_date = prior[-1]
                 posts_by_symbol = RedditCollector.load_posts(posts_date)
-                logger.info(f"오늘({date}) 수집분 없음 → 최근 수집일({posts_date}) 여론 사용")
+                # stale 가시화: 캐시가 며칠 전 것인지 명시. 한도 초과 시 WARNING (조용한 stale 방지)
+                try:
+                    age_days = (_date.fromisoformat(date) - _date.fromisoformat(posts_date)).days
+                except ValueError:
+                    age_days = -1
+                if age_days > config.COMMUNITY_LIVE_MAX_POSTS_AGE_DAYS:
+                    logger.warning(
+                        f"오늘({date}) 수집분 없음 → 최근 수집일({posts_date}, {age_days}일 전) 여론 사용"
+                        f" — 한도 {config.COMMUNITY_LIVE_MAX_POSTS_AGE_DAYS}일 초과(stale)."
+                        f" 신선한 수집 권장: python main.py --reddit-run-now"
+                    )
+                else:
+                    logger.info(f"오늘({date}) 수집분 없음 → 최근 수집일({posts_date}, {age_days}일 전) 여론 사용")
         if not posts_by_symbol:
             try:
                 posts_by_symbol = RedditCollector().collect(date) or {}
@@ -472,7 +484,7 @@ def run_live(
         logger.warning(f"포트폴리오 상태 저장 실패: {e}")
 
     summary = {
-        "date": date, "candidates": len(decisions),
+        "date": date, "posts_date": posts_date, "candidates": len(decisions),
         "buys": sum(1 for o in orders if o.get("side") == "BUY"),
         "sells": sum(1 for o in orders if o.get("side") == "SELL"),
         "llm_calls": llm_calls, "dry_run": dry_run,
@@ -480,5 +492,19 @@ def run_live(
         "reflections": refl_counts,
     }
     logger.info(f"=== run_live 완료 — {summary} ===")
+
+    # 10. 일일 결정 보고서 (daily-decision-report §6.2) — read-only, 비침습(D3/NFR-01).
+    #     보고서 생성 실패가 run_live 결과·주문에 영향 0 (try/except 격리).
+    report_path = None
+    try:
+        from decision_report import ReportContext, build_daily_report
+        report_path = build_daily_report(ReportContext(
+            date=date, signal_details=signal_details, decisions=decisions,
+            orders=orders, snapshots=snap_by_key, summary=summary,
+        ))
+    except Exception as e:  # noqa: BLE001 — 보고서 실패 ≠ 매매 실패
+        logger.warning(f"decision report 생성 실패(무시): {e}")
+
     return {"decisions": decisions, "orders": orders,
-            "decision_log_path": log_path, "summary": summary}
+            "decision_log_path": log_path, "summary": summary,
+            "report_path": report_path}

@@ -1,0 +1,68 @@
+{
+  "date": "2026-05-20",
+  "strategy_key": "finbert_sentiment_opinion_trend",
+  "cash": 73374.4,
+  "total_value": 99592.08,
+  "positions": {
+    "MSTR": {
+      "entry_date": "2026-05-18",
+      "entry_price": 169.175,
+      "shares": 42,
+      "highest_price": 169.175
+    },
+    "META": {
+      "entry_date": "2026-05-19",
+      "entry_price": 608.92,
+      "shares": 10,
+      "highest_price": 608.92
+    },
+    "HOOD": {
+      "entry_date": "2026-05-20",
+      "entry_price": 74.75,
+      "shares": 91,
+      "highest_price": 74.75
+    },
+    "PLTR": {
+      "entry_date": "2026-05-20",
+      "entry_price": 134.145,
+      "shares": 46,
+      "highest_price": 134.145
+    }
+  },
+  "daily_trades": [
+    {
+      "type": "sell",
+      "symbol": "RDDT",
+      "date": "2026-05-20",
+      "price": 146.72,
+      "shares": 32,
+      "trade_value": 4695.04,
+      "commission": 11.74,
+      "gross_pnl": -368.32,
+      "net_pnl": -392.72,
+      "pnl_pct": -7.76,
+      "reason": "stop_loss",
+      "entry_price": 158.23,
+      "entry_date": "2026-05-19",
+      "size_factor": 0.6
+    },
+    {
+      "type": "buy",
+      "symbol": "HOOD",
+      "date": "2026-05-20",
+      "price": 74.75,
+      "shares": 91,
+      "trade_value": 6802.25,
+      "commission": 17.01
+    },
+    {
+      "type": "buy",
+      "symbol": "PLTR",
+      "date": "2026-05-20",
+      "price": 134.145,
+      "shares": 46,
+      "trade_value": 6170.67,
+      "commission": 15.43
+    }
+  ]
+}

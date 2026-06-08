@@ -86,7 +86,8 @@ def evaluate_candidate(
         recent_volatility_pct = _recent_volatility_pct(ohlcv)
     snap = build_daily_snapshot(
         symbol, scored_entry, history, universe_decision=univ_dec,
-        texts=texts, atr=None, prev_close=_prev_close(ohlcv), date_str=date_str,
+        texts=texts, labeled_posts=scored_entry.get("labeled_posts"),  # 댓글 가중 활성화 (M4)
+        atr=None, prev_close=_prev_close(ohlcv), date_str=date_str,
     )
 
     # 3. cost

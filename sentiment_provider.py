@@ -134,16 +134,52 @@ class FinBERTProvider(SentimentProvider):
                 f"[FinBERT-WSB] 전처리 완료: {len(original)}건 중 {changed}건 변환"
             )
 
+    @staticmethod
+    def _expand_articles(articles: list[dict]) -> list[dict]:
+        """본문 + 댓글을 개별 감성 데이터포인트(article-like dict)로 확장.
+        # Design Ref: §7.2 / D1 — score() 단일 확장 지점 (백테스트·라이브 공용)
+        # Plan SC: SC-03 본문+댓글 개별 분류
+
+        각 post → [본문 unit(location="body")] + [top_comments별 unit(location="comment")].
+        댓글은 부모 글의 source_quality_weight를 상속. 뉴스 기사는 top_comments가 없어
+        본문 1건만 생성 → 기존 동작과 동일(무영향, D6).
+        location/source_quality_weight를 unit에 부착해 detail까지 전파한다.
+        """
+        expanded: list[dict] = []
+        for a in articles:
+            sqw = float(a.get("source_quality_weight", 1.0))
+            body = dict(a)
+            body["location"] = "body"
+            body["source_quality_weight"] = sqw
+            expanded.append(body)
+            for c in a.get("top_comments", []) or []:
+                if not c:
+                    continue
+                expanded.append({
+                    "title": "",
+                    "body_excerpt": c,
+                    "location": "comment",
+                    "source_quality_weight": sqw,
+                })
+        return expanded
+
     def score(self, articles: list[dict]) -> tuple[float, list[dict]]:
         if not articles:
             logger.warning("FinBERT: 뉴스 기사 없음 — 기본값 50.0 반환")
             return 50.0, []
 
+        # 본문+댓글 개별 확장 (location/source_quality_weight 부착). 뉴스는 본문만.
+        # Design Ref: §7.2 — 루프 진입 전 확장. n_valid(≥10 게이트)가 댓글 포함으로 동작(D3).
+        units = self._expand_articles(articles)
+        if not units:
+            return 50.0, []
+
         # Plan SC SC-01: finbert-wsb 실행 시 전처리 활성화
+        # 전처리는 텍스트만 가공하므로 location/sqw는 원본 units에서 읽는다(전처리가 키를 떨궈도 안전).
+        proc_units = units
         if self.preprocessor:
-            original_articles = articles
-            articles = [self.preprocessor.preprocess_post(a) for a in articles]
-            self._log_preprocessing_samples(original_articles, articles)
+            proc_units = [self.preprocessor.preprocess_post(u) for u in units]
+            self._log_preprocessing_samples(units, proc_units)
 
         # indicators 모듈에서 공유 파이프라인 가져옴 (ONNX 캐시 재사용)
         import indicators
@@ -156,8 +192,10 @@ class FinBERTProvider(SentimentProvider):
         article_details = []
         fallback_scores = []  # 폴백용: avg(p - n)
 
-        for article in articles:
-            # Reddit 게시글은 body_excerpt, 뉴스 기사는 description 사용
+        for src, article in zip(units, proc_units):
+            location = src.get("location", "body")
+            sqw = float(src.get("source_quality_weight", 1.0))
+            # Reddit 게시글은 body_excerpt, 뉴스 기사는 description, 댓글은 body_excerpt 사용
             # Design Ref: §3.2 — WSB Daily Thread 댓글(title="")은 body_excerpt가 핵심 텍스트
             body = article.get("description", "") or article.get("body_excerpt", "")
             text = f"{article.get('title', '')} {body}".strip()
@@ -169,6 +207,8 @@ class FinBERTProvider(SentimentProvider):
                     "finbert_label": "neutral",
                     "scores": {"positive": 0.0, "negative": 0.0, "neutral": 1.0},
                     "included": False,
+                    "location": location,
+                    "source_quality_weight": sqw,
                 })
                 continue
 
@@ -193,6 +233,8 @@ class FinBERTProvider(SentimentProvider):
                         "neutral": round(neutral, 4),
                     },
                     "included": included,
+                    "location": location,
+                    "source_quality_weight": sqw,
                 })
             except Exception as e:
                 logger.warning(f"FinBERT 개별 기사 분석 실패: {e}")
@@ -201,6 +243,8 @@ class FinBERTProvider(SentimentProvider):
                     "finbert_label": "neutral",
                     "scores": {"positive": 0.0, "negative": 0.0, "neutral": 1.0},
                     "included": False,
+                    "location": location,
+                    "source_quality_weight": sqw,
                 })
 
         valid = [a for a in article_details if a["included"]]

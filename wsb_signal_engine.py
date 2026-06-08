@@ -332,6 +332,9 @@ class WSBSignalEngine:
                 "passed_consensus": symbol in passed_consensus,
                 "in_top_n": symbol in top_n,
                 "rank": top_n.index(symbol) + 1 if symbol in top_n else None,
+                # 라이브 경로 전파: community_live가 scored_entry로 evaluate_candidate에 전달
+                # → build_daily_snapshot 댓글 가중 활성화 (M4 / Open-1)
+                "labeled_posts": data.get("labeled_posts", []),
             })
 
         logger.info(
@@ -361,11 +364,24 @@ class WSBSignalEngine:
                 logger.warning(f"[{symbol}] 감성 분석 실패: {e} — 중립 처리")
                 score, details = 50.0, []
 
-            # bullish/bearish/neutral count (GPTProvider label 사용)
-            bullish = sum(1 for d in details if d.get("label") == "bullish"
-                          or d.get("finbert_label") == "positive")
-            bearish = sum(1 for d in details if d.get("label") == "bearish"
-                          or d.get("finbert_label") == "negative")
+            # bullish/bearish/neutral count (GPTProvider label / FinBERT finbert_label)
+            # + labeled_posts: 댓글 가중(<1) 활성화용 (Design Ref: §7.3 / D2)
+            # Plan SC: SC-04 본문(1.0)·댓글(0.5) 가중 합산, N=글+댓글
+            labeled_posts = []
+            for d in details:
+                if d.get("label") == "bullish" or d.get("finbert_label") == "positive":
+                    lab = "bullish"
+                elif d.get("label") == "bearish" or d.get("finbert_label") == "negative":
+                    lab = "bearish"
+                else:
+                    lab = "neutral"
+                labeled_posts.append({
+                    "label": lab,
+                    "location": d.get("location", "body"),
+                    "source_quality_weight": float(d.get("source_quality_weight", 1.0)),
+                })
+            bullish = sum(1 for p in labeled_posts if p["label"] == "bullish")
+            bearish = sum(1 for p in labeled_posts if p["label"] == "bearish")
             neutral = len(details) - bullish - bearish
             total = bullish + bearish
             ratio = bullish / total if total > 0 else 0.0
@@ -377,6 +393,7 @@ class WSBSignalEngine:
                 "ratio": round(ratio, 4),
                 "mentions": len(posts),
                 "score": score,
+                "labeled_posts": labeled_posts,
             }
             logger.debug(
                 f"[{symbol}] bullish={bullish}, bearish={bearish},"

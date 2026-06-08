@@ -289,6 +289,7 @@ class RedditReplayBacktester:
                 texts = [f"{p.get('title','')} {p.get('body_excerpt','')}" for p in posts]
                 snap = build_daily_snapshot(
                     sym, d, hist, universe_decision=univ_dec, texts=texts,
+                    labeled_posts=d.get("labeled_posts"),  # 댓글 가중 활성화 (M4)
                     atr=atr_cache.get(sym),
                     prev_close=today_ohlcv.get(sym, {}).get("prev_close"),
                     date_str=date_str,
