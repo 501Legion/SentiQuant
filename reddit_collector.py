@@ -126,6 +126,28 @@ def is_ambiguous_ticker(ticker: str, *, has_dollar: bool) -> bool:
     return False
 
 
+def _is_dd_flair(flair: str | None) -> bool:
+    """flair가 DD형(심층분석)인지 판별 (Design Ref: §7.1 / Plan FR-02).
+    DD형이면 댓글을 COMMENT_COLLECT_DD개까지 대량 수집한다."""
+    f = (flair or "").strip().lower()
+    if not f:
+        return False
+    return f in {d.lower() for d in config.DD_FLAIRS}
+
+
+def _is_quality_comment(body: str | None, author: str | None) -> bool:
+    """댓글 품질 필터 (Design Ref: §7.1 / Plan FR-08).
+    삭제/제거/봇/초단문 댓글 제외 → bull/bear 오카운팅·노이즈 방지."""
+    b = (body or "").strip()
+    if not b or b in ("[deleted]", "[removed]"):
+        return False
+    if len(b) < config.COMMENT_MIN_LEN:
+        return False
+    if author and author in config.COMMENT_BOT_AUTHORS:
+        return False
+    return True
+
+
 class RedditCollector:
     """
     PRAW 기반 3개 서브레딧 수집, 종목별 분류, 날짜별 파일 저장.
@@ -188,6 +210,37 @@ class RedditCollector:
         self._save_posts(date_str, filtered)
         return filtered
 
+    def _collect_comments(self, submission, is_dd: bool) -> list[str]:
+        """글의 댓글을 품질 필터 적용해 상위 N개 수집 (Design Ref: §7.1 / Plan FR-01·08).
+        DD형이면 COMMENT_COLLECT_DD, 아니면 COMMENT_COLLECT_NORMAL까지.
+        비용 가드: replace_more 한도 + wall-clock 타임아웃."""
+        limit = config.COMMENT_COLLECT_DD if is_dd else config.COMMENT_COLLECT_NORMAL
+        out: list[str] = []
+        start = time.time()
+        try:
+            submission.comments.replace_more(limit=config.COMMENT_REPLACE_MORE_LIMIT)
+        except Exception as e:  # noqa: BLE001 — 일부 확장 실패해도 로드분으로 진행
+            logger.debug(f"replace_more 실패: {e}")
+        try:
+            for comment in submission.comments.list():
+                if len(out) >= limit:
+                    break
+                if time.time() - start > config.COMMENT_COLLECT_TIMEOUT_SEC:
+                    logger.debug(
+                        f"[{getattr(submission, 'id', '?')}] 댓글 수집 타임아웃 "
+                        f"— {len(out)}개에서 중단"
+                    )
+                    break
+                body = getattr(comment, "body", None)
+                author = getattr(comment, "author", None)
+                author_name = getattr(author, "name", None) if author else None
+                if not _is_quality_comment(body, author_name):
+                    continue
+                out.append(body.strip()[:config.COMMENT_TEXT_MAX])
+        except Exception as e:  # noqa: BLE001 — 댓글 수집 실패는 빈 리스트로 폴백
+            logger.debug(f"댓글 수집 중 예외: {e}")
+        return out
+
     def _fetch_subreddit(self, name: str) -> list[dict]:
         """
         단일 서브레딧 new + hot 피드 병행 수집 (중복 제거).
@@ -204,6 +257,7 @@ class RedditCollector:
 
         seen_ids: set[str] = set()
         posts = []
+        dd_used = [0]  # 서브레딧당 DD형 대량수집 글 수 (비용 가드 상한)
 
         def _process_feed(feed):
             for submission in feed:
@@ -217,16 +271,14 @@ class RedditCollector:
                 if flair_clean in excluded_flairs:
                     continue
 
-                top_comments = []
-                try:
-                    submission.comments.replace_more(limit=0)
-                    for comment in submission.comments[:config.GPT_TOP_COMMENTS]:
-                        if hasattr(comment, "body"):
-                            top_comments.append(
-                                comment.body[:config.GPT_COMMENT_MAX]
-                            )
-                except Exception:
-                    pass
+                # comment-aware-sentiment: flair로 댓글 수집 규모 결정 (DD형 대량)
+                # Design Ref: §7.1 — DD 상한 초과 시 일반 한도로 강등(비용 가드)
+                is_dd = _is_dd_flair(flair_clean)
+                if is_dd and dd_used[0] >= config.COMMENT_MAX_DD_POSTS_PER_SUB:
+                    is_dd = False
+                top_comments = self._collect_comments(submission, is_dd)
+                if is_dd:
+                    dd_used[0] += 1
 
                 posts.append({
                     "title": submission.title[:config.GPT_POST_TITLE_MAX],

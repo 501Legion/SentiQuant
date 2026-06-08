@@ -1,6 +1,6 @@
 [
   {
-    "timestamp": "2026-04-05T12:37:20.872Z",
+    "timestamp": "2026-06-04T17:20:28.505Z",
     "errorType": "unknown",
     "category": "unknown",
     "severity": "low",
@@ -9,97 +9,7 @@
     "message": ""
   },
   {
-    "timestamp": "2026-04-16T15:45:21.601Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": null,
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-04-17T04:49:32.013Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": null,
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-04-22T05:04:40.201Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": null,
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-04-22T05:07:52.794Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": "acf9af7ab20614b75",
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-05-01T17:17:01.474Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": null,
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-05-02T06:40:45.241Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": "ae49c5fd7d5359281",
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-05-02T06:41:13.228Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": "a2a21b6e66f7a4417",
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-05-02T07:16:36.780Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": "ac7ccdcaa4cabe208",
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-05-02T17:25:15.967Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": null,
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-05-02T17:28:48.496Z",
-    "errorType": "unknown",
-    "category": "unknown",
-    "severity": "low",
-    "agentId": "a07e554668d39d39d",
-    "agentType": null,
-    "message": ""
-  },
-  {
-    "timestamp": "2026-05-16T09:42:05.628Z",
+    "timestamp": "2026-06-08T11:09:59.824Z",
     "errorType": "unknown",
     "category": "unknown",
     "severity": "low",

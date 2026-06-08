@@ -99,6 +99,9 @@ def _live_env(*, decisions_path, llm_router_cls=None, strategy="agent"):
     _save(community_live, "WSBSignalEngine"); community_live.WSBSignalEngine = _FakeEngine
     # decision log → tmp
     _save(config, "COMMUNITY_LIVE_DECISIONS_FILE"); config.COMMUNITY_LIVE_DECISIONS_FILE = decisions_path
+    # decision report → tmp (daily-decision-report: 실 data/community/live/reports 미오염)
+    _save(config, "COMMUNITY_LIVE_REPORTS_DIR")
+    config.COMMUNITY_LIVE_REPORTS_DIR = os.path.join(os.path.dirname(decisions_path), "reports")
     _save(config, "LIVE_STRATEGY"); config.LIVE_STRATEGY = strategy
     if llm_router_cls is not None:
         _save(community_live, "DecisionRouter"); community_live.DecisionRouter = llm_router_cls
@@ -136,6 +139,9 @@ def test_t1_dry_run_no_order(tmp_path=None):
         assert broker._order_seq == 0, "dry-run인데 place_order 호출됨"
         assert all(not o.get("executed") for o in res["orders"])
         assert res["summary"]["placed"] == 0
+        # SC-01 (daily-decision-report): run_live 종료 시 보고서 자동 생성
+        assert res["report_path"] and os.path.exists(res["report_path"])
+        assert res["report_path"].endswith(f"{_DATE}.md")
 
 
 # --- T2: --no-dry-run → place_order(paper) 호출 (SC-03) ---------------------

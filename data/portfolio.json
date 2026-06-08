@@ -1,27 +1,5 @@
 {
   "cash": 100000.0,
-  "positions": {
-    "AAPL": {
-      "symbol": "AAPL",
-      "shares": 1,
-      "avg_price": 290.0,
-      "buy_date": "2026-05-17T20:42:44.553014",
-      "total_cost": 290.0
-    },
-    "TSLA": {
-      "symbol": "TSLA",
-      "shares": 1,
-      "avg_price": 400.0,
-      "buy_date": "2026-05-17T20:56:27.611123",
-      "total_cost": 400.0
-    },
-    "PLTR": {
-      "symbol": "PLTR",
-      "shares": 1,
-      "avg_price": 130.0,
-      "buy_date": "2026-05-18T13:23:36.498159",
-      "total_cost": 130.0
-    }
-  },
-  "updated_at": "2026-05-18T13:23:36.498228"
+  "positions": {},
+  "updated_at": "2026-05-31T01:33:20.086250"
 }

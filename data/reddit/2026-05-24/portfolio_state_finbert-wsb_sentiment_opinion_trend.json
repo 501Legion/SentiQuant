@@ -1,0 +1,27 @@
+{
+  "date": "2026-05-24",
+  "strategy_key": "finbert-wsb_sentiment_opinion_trend",
+  "cash": 88484.82,
+  "total_value": 99971.28,
+  "positions": {
+    "XPEV": {
+      "entry_date": "2026-05-21",
+      "entry_price": 15.495,
+      "shares": 278,
+      "highest_price": 15.59
+    },
+    "NIO": {
+      "entry_date": "2026-05-22",
+      "entry_price": 5.22,
+      "shares": 791,
+      "highest_price": 5.22
+    },
+    "RDDT": {
+      "entry_date": "2026-05-22",
+      "entry_price": 145.23,
+      "shares": 21,
+      "highest_price": 145.23
+    }
+  },
+  "daily_trades": []
+}
