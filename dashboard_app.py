@@ -121,7 +121,7 @@ with tab_pf:
         st.caption("⚠️ 현재가는 커밋된 가격 스냅샷의 최신 종가 — 실시간 아님(준실시간).")
         if rows:
             st.subheader("📊 보유 종목 개요")
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
         else:
             st.write("현재 보유 포지션 없음.")
 
@@ -137,7 +137,7 @@ with tab_pf:
                 chart = alt.Chart(hist).mark_line().encode(
                     x="date:T", y=alt.Y("close:Q", scale=alt.Scale(zero=False)),
                     tooltip=["date:T", "close:Q"])
-                st.altair_chart(chart, use_container_width=True)
+                st.altair_chart(chart, width="stretch")
                 st.caption(f"{sel}: {len(hist)}일치 ({hist['date'].min():%Y-%m-%d} ~ {hist['date'].max():%Y-%m-%d})")
         else:
             st.info("가격 스냅샷(data/backtest_snapshots) 없음")
@@ -154,7 +154,7 @@ with tab_trades:
             if len(closed):
                 win = (closed["net_profit_pct"] > 0).mean() * 100
                 st.metric("승률(청산 기준)", f"{win:.0f}%")
-        st.dataframe(df.tail(200), use_container_width=True, hide_index=True)
+        st.dataframe(df.tail(200), width="stretch", hide_index=True)
 
 # ── ③ 일일 결정 funnel ───────────────────────────────────────────────────────
 with tab_funnel:
@@ -172,7 +172,7 @@ with tab_funnel:
             st.write(f"최근 결정 일자: {last_date}")
             if "final_action" in df:
                 st.bar_chart(df[df.get("date") == last_date]["final_action"].value_counts())
-            st.dataframe(df.tail(100), use_container_width=True, hide_index=True)
+            st.dataframe(df.tail(100), width="stretch", hide_index=True)
         else:
             st.warning("리포트/decision 데이터 없음 (아직 라이브 구동 전이거나 미동기화)")
 
@@ -194,10 +194,10 @@ with tab_opinion:
             st.altair_chart(
                 alt.Chart(g).mark_bar().encode(x="date:T", y="consensus_buy:Q",
                                                 tooltip=["date", "consensus_buy", "n"]),
-                use_container_width=True)
+                width="stretch")
             st.subheader("일자별 평균 opinion_score")
             st.altair_chart(
                 alt.Chart(g).mark_line(point=True).encode(x="date:T", y="avg_score:Q",
                                                           tooltip=["date", "avg_score"]),
-                use_container_width=True)
+                width="stretch")
         st.caption(f"스냅샷 {len(df):,}건")
