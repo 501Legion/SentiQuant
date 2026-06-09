@@ -417,6 +417,12 @@ REQUEST_MAX_RETRIES = 3
 REQUEST_RETRY_BASE_DELAY = 1.0     # 초 (지수 백오프 기반)
 REQUEST_TIMEOUT = 10               # 초
 
+# --- 라이브 OHLCV 수집 (Polygon 무료 429 회피, live-scheduler) ---
+# 종목별 최근 스냅샷이 이 일수 내면 재사용(정확 범위 무관) → 매일 전종목 재요청 방지.
+LIVE_OHLCV_CACHE_MAX_AGE_DAYS = 4   # 주말 포함 ~최근 거래일
+# 실제 신규 수집이 필요한 종목 간 대기(초). 무료 플랜 분당 5회 → 13초. 0이면 throttle 끔.
+POLYGON_REQUEST_DELAY = 13.0
+
 # --- KIS (한국투자증권) Design Ref: §4.1 — 모의투자 OpenAPI 연동 ---
 KIS_APP_KEY: str = os.getenv("KIS_APP_KEY", "")
 KIS_APP_SECRET: str = os.getenv("KIS_APP_SECRET", "")

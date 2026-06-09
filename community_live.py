@@ -88,20 +88,61 @@ class OrderExecutor:
 # =============================================================================
 # OHLCV (라이브: 최근 ~100일 캐시 슬라이스 — backtester._get_ohlcv_snapshot 재사용)
 # =============================================================================
+def _recent_cached_ohlcv(sym: str, end_date: str, max_age_days: int):
+    """종목의 최근 ohlcv 스냅샷이 max_age_days 내면 재사용(정확 범위 무관). 없으면 None.
+    # live-scheduler: 매일 end_date가 바뀌어도 최근 캐시 재사용 → Polygon 429 회피."""
+    import glob
+    import os
+    import pandas as pd
+    from backtester import _normalize_ohlcv_df
+
+    paths = glob.glob(os.path.join(config.BACKTEST_SNAPSHOT_DIR, "v2", "ohlcv", f"{sym}_*.csv"))
+    if not paths:
+        return None
+
+    def _end_tag(p):  # 파일명 끝 토큰 = end date(YYYY-MM-DD)
+        return os.path.basename(p)[:-4].rsplit("_", 1)[-1]
+
+    latest = max(paths, key=_end_tag)
+    try:
+        age = (datetime.strptime(end_date, "%Y-%m-%d")
+               - datetime.strptime(_end_tag(latest), "%Y-%m-%d")).days
+    except ValueError:
+        return None
+    if age < 0 or age > max_age_days:
+        return None
+    try:
+        df = pd.read_csv(latest)
+    except Exception:  # noqa: BLE001
+        return None
+    return _normalize_ohlcv_df(df) if not df.empty else None
+
+
 def _fetch_ohlcv_full(symbols, end_date: str) -> dict:
-    """종목별 (end_date-120일 ~ end_date) OHLCV DataFrame. CSV 스냅샷 캐시 재사용."""
+    """종목별 (end_date-120일 ~ end_date) OHLCV DataFrame. 최근 캐시 재사용 + 신규만 throttle 수집."""
+    import time
     from backtester import _get_ohlcv_snapshot
 
     start = (datetime.strptime(end_date, "%Y-%m-%d") - timedelta(days=120)).strftime("%Y-%m-%d")
     out: dict[str, "pd.DataFrame"] = {}
+    fetched = 0
     for sym in sorted(set(symbols)):
+        cached = _recent_cached_ohlcv(sym, end_date, config.LIVE_OHLCV_CACHE_MAX_AGE_DAYS)
+        if cached is not None:
+            out[sym] = cached
+            continue
         try:
+            if fetched > 0 and config.POLYGON_REQUEST_DELAY > 0:
+                time.sleep(config.POLYGON_REQUEST_DELAY)   # 무료 플랜 분당 5회 회피
             df = _get_ohlcv_snapshot(sym, start, end_date)
+            fetched += 1
         except Exception as e:  # noqa: BLE001
             logger.warning(f"[{sym}] OHLCV 수집 실패: {e} — 제외")
             df = None
         if df is not None and not getattr(df, "empty", True):
             out[sym] = df
+    logger.info(f"[OHLCV] 캐시재사용 {len(out)-fetched} · 신규수집 {fetched}"
+                f"(throttle {config.POLYGON_REQUEST_DELAY}s)")
     return out
 
 
