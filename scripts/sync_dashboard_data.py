@@ -69,6 +69,13 @@ def curate(src: Path, staging: Path) -> list[str]:
     for rel in SYNC_CODE + SYNC_ALLOWLIST:
         _copy(rel)
 
+    # Streamlit Cloud는 배포 브랜치 루트의 requirements.txt를 자동 감지 → 슬림 deps를 그 이름으로 제공.
+    # (main의 무거운 requirements.txt는 이 orphan 브랜치에 없음)
+    slim = src / "requirements-dashboard.txt"
+    if slim.exists():
+        shutil.copy2(slim, staging / "requirements.txt")
+        included.append("requirements.txt")
+
     # last_sync.json (D6)
     try:
         sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=src,
