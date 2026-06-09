@@ -1,0 +1,25 @@
+{
+  "date": "2026-05-18",
+  "strategy_key": "finbert_sentiment_opinion_trend",
+  "cash": 92876.89,
+  "total_value": 99875.35,
+  "positions": {
+    "MSTR": {
+      "entry_date": "2026-05-18",
+      "entry_price": 169.175,
+      "shares": 42,
+      "highest_price": 169.175
+    }
+  },
+  "daily_trades": [
+    {
+      "type": "buy",
+      "symbol": "MSTR",
+      "date": "2026-05-18",
+      "price": 169.175,
+      "shares": 42,
+      "trade_value": 7105.35,
+      "commission": 17.76
+    }
+  ]
+}

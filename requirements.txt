@@ -1,0 +1,21 @@
+massive>=1.0.0
+newsapi-python>=0.2.7
+textblob>=0.17.1
+pandas>=2.0.0
+numpy>=1.24.0
+APScheduler>=3.10.0
+pandas_market_calendars>=4.3.0
+praw>=7.7.0                # Reddit 수집 (reddit_collector) — live-scheduler-deploy FR-10
+python-dotenv>=1.0.0
+openai>=2.33.0
+requests>=2.31.0
+polygon-api-client>=1.16.0
+pytz>=2024.1
+transformers>=4.40.0
+optimum[onnxruntime]>=1.18.0
+onnxruntime>=1.18.0
+torch>=2.2.0
+streamlit>=1.30.0
+watchdog>=3.0.0
+# KIS 모의투자: requests로 직접 OpenAPI 호출 (python-kis 미사용 — 실전 키 강제 요구 회피)
+pytest>=8.0.0   # 단위 테스트 (tests/test_kis_paper_trading.py)

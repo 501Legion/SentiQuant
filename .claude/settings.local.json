@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(python)",
+      "Bash(mv C:/Users/auto_stock/docs/01-plan/features/news-rsi-trading.plan.md C:/Users/auto_stock/docs/archive/2026-04/news-rsi-trading/)",
+      "Bash(mv C:/Users/auto_stock/docs/02-design/features/news-rsi-trading.design.md C:/Users/auto_stock/docs/archive/2026-04/news-rsi-trading/)",
+      "Bash(mv C:/Users/auto_stock/docs/03-analysis/news-rsi-trading.analysis.md C:/Users/auto_stock/docs/archive/2026-04/news-rsi-trading/)",
+      "Bash(mv C:/Users/auto_stock/docs/01-plan/features/polygon-massive-migration.plan.md C:/Users/auto_stock/docs/archive/2026-04/polygon-massive-migration/)",
+      "Bash(mv C:/Users/auto_stock/docs/03-analysis/polygon-massive-migration.analysis.md C:/Users/auto_stock/docs/archive/2026-04/polygon-massive-migration/)",
+      "Bash(venv/Scripts/python.exe *)",
+      "Bash(timeout 60 powershell -NoProfile -Command \"Start-Sleep -Seconds 50\")",
+      "Bash(cd /c/Users/auto_stock)",
+      "Bash(ls data/reddit/2026-06-08/)",
+      "Bash(ls data/reddit/2026-06-07/)",
+      "Bash(python main.py --agent-run-now)",
+      "Bash(sed 's#data/reddit/##')",
+      "Bash(python -)",
+      "Bash(python main.py --reddit-run-now)"
+    ]
+  }
+}

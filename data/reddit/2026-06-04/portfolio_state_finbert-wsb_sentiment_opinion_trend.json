@@ -1,0 +1,25 @@
+{
+  "date": "2026-06-04",
+  "strategy_key": "finbert-wsb_sentiment_opinion_trend",
+  "cash": 91106.57,
+  "total_value": 100750.59,
+  "positions": {
+    "AMZN": {
+      "entry_date": "2026-06-04",
+      "entry_price": 253.12,
+      "shares": 38,
+      "highest_price": 253.12
+    }
+  },
+  "daily_trades": [
+    {
+      "type": "buy",
+      "symbol": "AMZN",
+      "date": "2026-06-04",
+      "price": 253.12,
+      "shares": 38,
+      "trade_value": 9618.56,
+      "commission": 24.05
+    }
+  ]
+}

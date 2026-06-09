@@ -1,0 +1,11 @@
+# streamlit-dashboard-deploy FR-04 — 대시보드 동기화 타이머 (30분마다)
+[Unit]
+Description=auto-stock dashboard sync timer
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=30min
+Unit=sync-dashboard.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,33 @@
+{
+  "date": "2026-05-28",
+  "signals": {
+    "NVDA": {
+      "rsi": 51.28,
+      "rsi_ma": 57.31,
+      "sentiment": 49.56,
+      "sentiment_textblob": 55.73,
+      "sentiment_finbert": 43.4,
+      "volume_ma20": 162019475.0,
+      "volume_spike": false,
+      "market_rsi": 74.89,
+      "market_filter_applied": false,
+      "signal": "NEUTRAL",
+      "signal_original": "NEUTRAL",
+      "timestamp": "2026-05-28T23:44:41.908867"
+    },
+    "TSLA": {
+      "rsi": 63.18,
+      "rsi_ma": 56.65,
+      "sentiment": 61.38,
+      "sentiment_textblob": 54.25,
+      "sentiment_finbert": 68.52,
+      "volume_ma20": 53523299.0,
+      "volume_spike": false,
+      "market_rsi": 74.89,
+      "market_filter_applied": false,
+      "signal": "NEUTRAL",
+      "signal_original": "NEUTRAL",
+      "timestamp": "2026-05-28T23:44:41.908867"
+    }
+  }
+}

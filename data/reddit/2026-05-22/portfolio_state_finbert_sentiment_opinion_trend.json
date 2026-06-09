@@ -1,0 +1,59 @@
+{
+  "date": "2026-05-22",
+  "strategy_key": "finbert_sentiment_opinion_trend",
+  "cash": 75712.0,
+  "total_value": 99313.52,
+  "positions": {
+    "META": {
+      "entry_date": "2026-05-19",
+      "entry_price": 608.92,
+      "shares": 10,
+      "highest_price": 610.26
+    },
+    "WMT": {
+      "entry_date": "2026-05-21",
+      "entry_price": 124.408,
+      "shares": 50,
+      "highest_price": 124.408
+    },
+    "INTU": {
+      "entry_date": "2026-05-21",
+      "entry_price": 312.285,
+      "shares": 18,
+      "highest_price": 319.94
+    },
+    "HAS": {
+      "entry_date": "2026-05-22",
+      "entry_price": 90.08,
+      "shares": 65,
+      "highest_price": 90.08
+    }
+  },
+  "daily_trades": [
+    {
+      "type": "sell",
+      "symbol": "PLTR",
+      "date": "2026-05-22",
+      "price": 136.88,
+      "shares": 46,
+      "trade_value": 6296.48,
+      "commission": 15.74,
+      "gross_pnl": 125.81,
+      "net_pnl": 94.64,
+      "pnl_pct": 1.53,
+      "reason": "consensus_break",
+      "entry_price": 134.145,
+      "entry_date": "2026-05-20",
+      "size_factor": 0.792
+    },
+    {
+      "type": "buy",
+      "symbol": "HAS",
+      "date": "2026-05-22",
+      "price": 90.08,
+      "shares": 65,
+      "trade_value": 5855.2,
+      "commission": 14.64
+    }
+  ]
+}

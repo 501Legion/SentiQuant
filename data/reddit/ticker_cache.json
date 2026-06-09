@@ -1,0 +1,1630 @@
+{
+  "TSLA": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "AAPL": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "IBRX": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "KEEL": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "BITF": {
+    "valid": false,
+    "checked": "2026-04-18"
+  },
+  "AMC": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "NVDA": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "GOOGL": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "META": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "MSTR": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "SABR": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "ETOR": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "HOOD": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "VXUS": {
+    "valid": true,
+    "checked": "2026-06-05"
+  },
+  "PLTR": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "MSFT": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "AMZN": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "HIMS": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "NVO": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "IBIT": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "FIG": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "ADBE": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "SOFI": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "COIN": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "NFLX": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "LMT": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "NOC": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "XOVR": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "AVGO": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "KORU": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "RDDT": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "ASTS": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "IGV": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "XOM": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "IBKR": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "STO": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "GOOG": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "COST": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "CAR": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "SNDK": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "UAMY": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "RKT": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "RIVN": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "SPYI": {
+    "valid": true,
+    "checked": "2026-04-18"
+  },
+  "GRPN": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "HAS": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "BNTX": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "LW": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "APPL": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "AMD": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "GE": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "QSI": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "AST": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "UNH": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "DELL": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "NOT": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "CNBC": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "LVMH": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "CAGR": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "ETSY": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "USAR": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "TRUMP": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "TACO": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "SAFRY": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "SOXX": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "RTX": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "POET": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "WTF": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "TALKS": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "YOU": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "LMAO": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "CLOSE": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "ARE": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "AGAIN": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "TIGHT": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "USO": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "CNN": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "RIGHT": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "RIP": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "OIL": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "FUCK": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "AVIS": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "THINK": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "BYND": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "WAR": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "SNIP": {
+    "valid": false,
+    "checked": "2026-04-22"
+  },
+  "SNAP": {
+    "valid": true,
+    "checked": "2026-04-22"
+  },
+  "X": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "RKLB": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "FLY": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "PSUS": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "PS": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "WEN": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "INDI": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "LAC": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "MP": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "CAT": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "INTC": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "MRVL": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "HPE": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "COVID": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "USA": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "MARCH": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "PCE": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "PRICE": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "INDEX": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "RISES": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "EST": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "CORE": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "JPM": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "NACHO": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "GOING": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "BACK": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "ALL": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "EOD": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "CAN": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "LETS": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "HOW": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "WAS": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "CVNA": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "ONLY": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "GET": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "BEARS": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "USS": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "TODAY": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "CAPEX": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "GUH": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "TRADE": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "WHO": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "BLOOD": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "BOJ": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "NXXT": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "AWS": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "VIXY": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "SWPPX": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "SMH": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "NTDOY": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "YORK": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "WFH": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "FCF": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "FAA": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "LSEG": {
+    "valid": false,
+    "checked": "2026-05-01"
+  },
+  "ATI": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "GAAP": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "LLY": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "MONEY": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "AMT": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "USLM": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "KDP": {
+    "valid": true,
+    "checked": "2026-05-01"
+  },
+  "ARVN": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "SOUN": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "GME": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "PL": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "TEAM": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "SPIR": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "RDW": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "NOK": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "MARA": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "VIAV": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "FDA": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "OPRA": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "CRAZY": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "FISH": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "WSJ": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "HERE": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "TWO": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "EOY": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "YOUR": {
+    "valid": false,
+    "checked": "2026-06-05"
+  },
+  "MAKE": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "WRONG": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "WAY": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "WANT": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "LIKE": {
+    "valid": false,
+    "checked": "2026-06-05"
+  },
+  "MUCH": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "RBLX": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "DONT": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "HYSA": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "SGOV": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "LULU": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "IES": {
+    "valid": false,
+    "checked": "2026-05-02"
+  },
+  "FEIM": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "SOXL": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "AXTI": {
+    "valid": true,
+    "checked": "2026-05-02"
+  },
+  "NBIS": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "SONY": {
+    "valid": true,
+    "checked": "2026-06-05"
+  },
+  "MU": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "REKR": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "DRIP": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "SE": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "VRT": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "PPI": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "CHTR": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "DID": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "RED": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "ITS": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "HOLY": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "DRAM": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "WOULD": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "THANK": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "LET": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "ANY": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "THAN": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "BULLS": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "EVERY": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "APRIL": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "RISE": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "POS": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "WAIT": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "IREN": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "CRWV": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "TIME": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "SOLD": {
+    "valid": false,
+    "checked": "2026-06-05"
+  },
+  "EIA": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "EOSE": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "NEED": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "LIVE": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "ARKF": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "DXYZ": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "IALT": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "KION": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "CBO": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "CVI": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "CEG": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "DRTS": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "GBM": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "QCOM": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "CLS": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "PMH": {
+    "valid": false,
+    "checked": "2026-05-14"
+  },
+  "TOS": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "AAOI": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "AMAT": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "NXT": {
+    "valid": true,
+    "checked": "2026-05-14"
+  },
+  "F": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "LYFT": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "SOXS": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "GPRO": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "ORCL": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "GDC": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "PZZA": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "WOLF": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "UPST": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "ONE": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "JPOW": {
+    "valid": false,
+    "checked": "2026-05-15"
+  },
+  "BERS": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "OUT": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "WHY": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "BOLS": {
+    "valid": false,
+    "checked": "2026-05-15"
+  },
+  "SAW": {
+    "valid": false,
+    "checked": "2026-05-15"
+  },
+  "OPEX": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "GLP": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "QQQM": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "CBRS": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "CME": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "SPXW": {
+    "valid": false,
+    "checked": "2026-05-15"
+  },
+  "IRS": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "CHEX": {
+    "valid": false,
+    "checked": "2026-05-15"
+  },
+  "STX": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "PAAS": {
+    "valid": true,
+    "checked": "2026-05-15"
+  },
+  "ABAT": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "YAHU": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "CRSR": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "SHOP": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "MELI": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "KTOS": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "RCAT": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "AVAV": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "UMAC": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "ONDS": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "SFIX": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "OSUR": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "SNOW": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "MDB": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "GOT": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "CRM": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "ARR": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "BER": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "HIT": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "FLOOR": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "RGB": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "RAM": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "MOU": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "POTUS": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "WEEK": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "FUK": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "DAY": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "NEVER": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "GREEN": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "REACH": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "FINAL": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "LOVE": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "LUNR": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "MODEL": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "PEACE": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "EOW": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "DEAD": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "GOD": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "IBD": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "NVIDA": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "DICK": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "TTMI": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "ACH": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "GEV": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "LPL": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "APY": {
+    "valid": false,
+    "checked": "2026-05-29"
+  },
+  "MES": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "STC": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "WULF": {
+    "valid": true,
+    "checked": "2026-05-29"
+  },
+  "ROPE": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "CORN": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "MDT": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "ARLP": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "QST": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "SMCI": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "EWJ": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "SPCE": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "QQSN": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "OFF": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "ARM": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "CRWD": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "BRO": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "PDT": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "IBM": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "SPCX": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "YEAR": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "DOWN": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "COM": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "WMT": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "CQQQ": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "BYD": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "RBC": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "STM": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "FUD": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "SAAS": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "MIAX": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "VEEV": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "PWRL": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "VCX": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "VPG": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "BWB": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "BMNR": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "LNZA": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "SMBS": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "SATS": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "CIEN": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "ADI": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "WORLD": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "LMFAO": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "RALLY": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "KEEP": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "EOM": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "STOP": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "SPACE": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "GATES": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "READY": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "ANET": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "ADP": {
+    "valid": true,
+    "checked": "2026-06-04"
+  },
+  "CAD": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "AUD": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "XCME": {
+    "valid": false,
+    "checked": "2026-06-04"
+  },
+  "EWY": {
+    "valid": true,
+    "checked": "2026-06-05"
+  },
+  "IXIC": {
+    "valid": false,
+    "checked": "2026-06-05"
+  },
+  "GREAT": {
+    "valid": false,
+    "checked": "2026-06-05"
+  },
+  "LOSE": {
+    "valid": false,
+    "checked": "2026-06-05"
+  },
+  "KNOW": {
+    "valid": true,
+    "checked": "2026-06-05"
+  },
+  "OCF": {
+    "valid": false,
+    "checked": "2026-06-05"
+  },
+  "PCS": {
+    "valid": true,
+    "checked": "2026-06-05"
+  },
+  "CDS": {
+    "valid": false,
+    "checked": "2026-06-05"
+  },
+  "ALTO": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "KXIAY": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "NAND": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "XOP": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "SHIT": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "MOVE": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "DJT": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "AFTER": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "NFP": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "MANGO": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "HIS": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "PAMP": {
+    "valid": false,
+    "checked": "2026-06-06"
+  },
+  "IVV": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "DOW": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "SAP": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "IOT": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "HCC": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "OUST": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "PDS": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "FNGU": {
+    "valid": true,
+    "checked": "2026-06-06"
+  },
+  "CASY": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "SILJ": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "AG": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "API": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "HUD": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "END": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "ARMED": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "WARN": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "FARS": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "TOOK": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "CANT": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "BUG": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "MUU": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "HALTS": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "AMID": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "LFVN": {
+    "valid": true,
+    "checked": "2026-06-08"
+  },
+  "ECB": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "KOSPI": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "KST": {
+    "valid": false,
+    "checked": "2026-06-08"
+  },
+  "DOE": {
+    "valid": false,
+    "checked": "2026-06-08"
+  }
+}

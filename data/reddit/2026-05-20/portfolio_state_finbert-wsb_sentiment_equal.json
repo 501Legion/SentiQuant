@@ -1,0 +1,15 @@
+{
+  "date": "2026-05-20",
+  "strategy_key": "finbert-wsb_sentiment_equal",
+  "cash": 89983.36,
+  "total_value": 99955.7,
+  "positions": {
+    "BWMN": {
+      "entry_date": "2026-05-19",
+      "entry_price": 31.03,
+      "shares": 322,
+      "highest_price": 31.03
+    }
+  },
+  "daily_trades": []
+}

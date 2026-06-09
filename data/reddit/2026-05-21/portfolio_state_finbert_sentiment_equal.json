@@ -1,0 +1,76 @@
+{
+  "date": "2026-05-21",
+  "strategy_key": "finbert_sentiment_equal",
+  "cash": 43457.38,
+  "total_value": 99305.6,
+  "positions": {
+    "MSTR": {
+      "entry_date": "2026-05-18",
+      "entry_price": 169.175,
+      "shares": 59,
+      "highest_price": 169.175
+    },
+    "PPI": {
+      "entry_date": "2026-05-18",
+      "entry_price": 21.69,
+      "shares": 414,
+      "highest_price": 21.7471
+    },
+    "META": {
+      "entry_date": "2026-05-19",
+      "entry_price": 608.92,
+      "shares": 13,
+      "highest_price": 608.92
+    },
+    "OMER": {
+      "entry_date": "2026-05-19",
+      "entry_price": 11.57,
+      "shares": 568,
+      "highest_price": 12.38
+    },
+    "HOOD": {
+      "entry_date": "2026-05-20",
+      "entry_price": 74.75,
+      "shares": 88,
+      "highest_price": 75.92
+    },
+    "PLTR": {
+      "entry_date": "2026-05-20",
+      "entry_price": 134.145,
+      "shares": 44,
+      "highest_price": 137.415
+    },
+    "WMT": {
+      "entry_date": "2026-05-21",
+      "entry_price": 124.408,
+      "shares": 42,
+      "highest_price": 124.408
+    },
+    "INTU": {
+      "entry_date": "2026-05-21",
+      "entry_price": 312.285,
+      "shares": 15,
+      "highest_price": 312.285
+    }
+  },
+  "daily_trades": [
+    {
+      "type": "buy",
+      "symbol": "WMT",
+      "date": "2026-05-21",
+      "price": 124.408,
+      "shares": 42,
+      "trade_value": 5225.14,
+      "commission": 13.06
+    },
+    {
+      "type": "buy",
+      "symbol": "INTU",
+      "date": "2026-05-21",
+      "price": 312.285,
+      "shares": 15,
+      "trade_value": 4684.28,
+      "commission": 11.71
+    }
+  ]
+}
