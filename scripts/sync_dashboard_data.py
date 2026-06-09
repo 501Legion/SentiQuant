@@ -97,6 +97,9 @@ def push_branch(staging: Path) -> None:
     subprocess.run(["git", "worktree", "remove", "--force", str(wt)], cwd=ROOT,
                    capture_output=True)
     shutil.rmtree(wt, ignore_errors=True)
+    subprocess.run(["git", "worktree", "prune"], cwd=ROOT, capture_output=True)
+    # 멱등성: 기존 로컬 브랜치가 있으면 삭제(다음 -b 충돌 방지)
+    subprocess.run(["git", "branch", "-D", BRANCH], cwd=ROOT, capture_output=True)
     # orphan 브랜치를 빈 상태로 새로 만든 워크트리
     subprocess.run(["git", "worktree", "add", "--force", "--orphan",
                     "-b", BRANCH, str(wt)], cwd=ROOT, check=True)
