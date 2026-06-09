@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "lastUpdated": "2026-06-08T16:02:38.367Z",
+  "lastUpdated": "2026-06-09T11:47:02.639Z",
   "activeFeatures": [
     "comment-aware-sentiment",
     "daily-decision-report",
@@ -73,9 +73,9 @@
       },
       "timestamps": {
         "started": "2026-03-31T17:48:06.569Z",
-        "lastUpdated": "2026-06-08T15:50:08.720Z"
+        "lastUpdated": "2026-06-09T11:43:40.811Z"
       },
-      "lastFile": "C:\\Users\\auto_stock\\community_live.py"
+      "lastFile": "C:\\Users\\auto_stock\\dashboard_app.py"
     },
     "tests": {
       "phase": "do",
@@ -86,9 +86,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-05-16T08:31:12.167Z",
-        "lastUpdated": "2026-06-08T15:50:51.344Z"
+        "lastUpdated": "2026-06-09T11:46:53.512Z"
       },
-      "lastFile": "C:\\Users\\auto_stock\\tests\\test_runtime_guard.py"
+      "lastFile": "C:\\Users\\auto_stock\\tests\\test_sync_dashboard.py"
     },
     "scripts": {
       "phase": "do",
@@ -99,9 +99,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-05-30T03:14:04.456Z",
-        "lastUpdated": "2026-06-08T16:02:38.365Z"
+        "lastUpdated": "2026-06-09T11:47:02.637Z"
       },
-      "lastFile": "C:\\Users\\auto_stock\\scripts\\watchdog_check.py"
+      "lastFile": "C:\\Users\\auto_stock\\scripts\\sync_dashboard_data.py"
     },
     "community-opinion-agent-live": {
       "phase": "check",
@@ -204,6 +204,30 @@
         "module-4": "done",
         "module-5": "done"
       }
+    },
+    "streamlit-dashboard-deploy": {
+      "phase": "completed",
+      "phaseNumber": 6,
+      "matchRate": 95,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {
+        "plan": "docs/01-plan/features/streamlit-dashboard-deploy.plan.md",
+        "design": "docs/02-design/features/streamlit-dashboard-deploy.design.md",
+        "analysis": "docs/03-analysis/streamlit-dashboard-deploy.analysis.md",
+        "report": "docs/04-report/features/streamlit-dashboard-deploy.report.md"
+      },
+      "timestamps": {
+        "started": "2026-06-09T00:00:00Z",
+        "lastUpdated": "2026-06-09T02:20:00Z"
+      },
+      "lastFile": "docs/04-report/features/streamlit-dashboard-deploy.report.md",
+      "architecture": "Option C — 독립 슬림앱",
+      "scopeProgress": {
+        "module-1": "done",
+        "module-2": "done",
+        "module-3": "done"
+      }
     }
   },
   "pipeline": {
@@ -214,7 +238,7 @@
   "session": {
     "startedAt": "2026-03-31T15:36:13.245Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-06-08T16:02:38.367Z"
+    "lastActivity": "2026-06-09T11:47:02.639Z"
   },
   "history": [
     {
@@ -2481,6 +2505,36 @@
     },
     {
       "timestamp": "2026-06-08T16:02:38.367Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-09T11:43:40.815Z",
+      "feature": "auto_stock",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-09T11:44:30.414Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-09T11:45:32.453Z",
+      "feature": "tests",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-09T11:46:53.514Z",
+      "feature": "tests",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-09T11:47:02.639Z",
       "feature": "scripts",
       "phase": "do",
       "action": "updated"

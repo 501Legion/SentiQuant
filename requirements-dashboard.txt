@@ -1,0 +1,5 @@
+# streamlit-dashboard-deploy — Streamlit Cloud 슬림 의존성 (Plan FR-02 / SC-02)
+# 읽기전용 대시보드 전용. torch/transformers/optimum/onnxruntime/openai/praw/polygon/kis 전부 제외(RAM<1GB).
+streamlit>=1.30.0
+pandas>=2.0.0
+altair>=5.0.0
