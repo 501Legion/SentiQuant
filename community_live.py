@@ -468,6 +468,18 @@ def run_live(
             sell_trades.append(trade)
         wsb_state.remove_position_score(position_scores, intent.symbol)
 
+    # live-scheduler-deploy §6.2 D2 — 매수 실행 전 일일/노출 한도 게이트 (Plan SC-04)
+    #   매도 실행 직후라 portfolio.positions가 현재 보유를 반영. today_buy_count=0(런당 상한);
+    #   교차-런 누적은 절대 노출%(현재 포지션 기준)가 방어. 신호/사이징 판단은 불변.
+    import runtime_guard
+    _pos_val = {s: p.shares * (today_ohlcv.get(s, {}).get("close") or p.entry_price)
+                for s, p in portfolio.positions.items()}
+    buy_intents, _blocked = runtime_guard.filter_by_limits(
+        buy_intents, equity=account_equity, positions_value=sum(_pos_val.values()),
+        position_value_by_symbol=_pos_val, today_buy_count=0)
+    if _blocked:
+        logger.info(f"[한도 게이트] 매수 차단 {len(_blocked)}건: {_blocked}")
+
     for intent, price in buy_intents:
         if price <= 0 or intent.shares <= 0:
             continue

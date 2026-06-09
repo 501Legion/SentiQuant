@@ -1,0 +1,21 @@
+# live-scheduler-deploy FR-01 — 메인 스케줄러 systemd 유닛
+# 설치: docs/ops/live-scheduler.md 참고. 경로는 환경에 맞게 수정.
+[Unit]
+Description=auto-stock live trading scheduler (community agent, KIS paper)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=auto-stock
+WorkingDirectory=/opt/auto-stock
+EnvironmentFile=/opt/auto-stock/.env
+ExecStart=/opt/auto-stock/venv/bin/python main.py
+Restart=always
+RestartSec=10
+# stdout/stderr → journald (journalctl -u auto-stock)
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

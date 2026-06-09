@@ -1,25 +1,8 @@
 {
   "date": "2026-05-21",
   "strategy_key": "finbert-wsb_sentiment_opinion_trend",
-  "cash": 95681.62,
-  "total_value": 100026.76,
-  "positions": {
-    "XPEV": {
-      "entry_date": "2026-05-21",
-      "entry_price": 15.495,
-      "shares": 278,
-      "highest_price": 15.495
-    }
-  },
-  "daily_trades": [
-    {
-      "type": "buy",
-      "symbol": "XPEV",
-      "date": "2026-05-21",
-      "price": 15.495,
-      "shares": 278,
-      "trade_value": 4307.61,
-      "commission": 10.77
-    }
-  ]
+  "cash": 100000.0,
+  "total_value": 100000.0,
+  "positions": {},
+  "daily_trades": []
 }

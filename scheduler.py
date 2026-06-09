@@ -11,6 +11,8 @@ from apscheduler.triggers.cron import CronTrigger
 
 import config
 import collector
+import notifier
+import runtime_guard
 import signals as sig_module
 import trader
 from kis_broker import get_broker
@@ -61,8 +63,10 @@ def signal_calculation_job() -> None:
         try:
             from reddit_collector import RedditCollector
             RedditCollector().collect()
+            runtime_guard.write_heartbeat("signal")   # 성공 시각 기록(워치독)
         except Exception as e:
             logger.error(f"[agent] Reddit 수집 실패: {e}", exc_info=True)
+            notifier.notify("error", f"agent Reddit 수집 실패: {e}")
         logger.info("=== 신호 계산 잡 완료 (agent) ===")
         return
 
@@ -105,6 +109,19 @@ def order_processing_job(dry_run: bool = False) -> None:
         logger.info("오늘은 NYSE 휴장일 — 주문 처리 잡 스킵")
         return
 
+    # live-scheduler-deploy §6.2 — 주문 전 안전 게이트 (Plan SC-03/06)
+    # Design Ref: §6.2 D4 — 자가점검 실패 시 주문 차단 + 알림
+    _fails = runtime_guard.selfcheck()
+    if _fails:
+        logger.error(f"기동 자가점검 실패 — 주문 차단: {_fails}")
+        notifier.notify("healthcheck", "기동 자가점검 실패 — 주문 차단", {"fails": _fails})
+        return
+    # Design Ref: §6.2 D3 — 키스위치(파일/env) 활성 시 주문만 스킵(스케줄러 유지)
+    if runtime_guard.is_halted():
+        logger.warning("TRADING_HALT 활성 — 주문 스킵(스케줄러는 유지)")
+        notifier.notify("halt", "키스위치 활성 — 주문 스킵")
+        return
+
     # community-opinion-agent-live FR-03/D2: LIVE_STRATEGY="agent"이면 에이전트 라이브 구동으로 분기.
     # "news"(기본 외)면 아래 기존 뉴스-RSI 주문 경로가 그대로 실행 (회귀 0).
     if config.LIVE_STRATEGY == "agent":
@@ -112,8 +129,10 @@ def order_processing_job(dry_run: bool = False) -> None:
         try:
             import community_live
             community_live.run_live(dry_run=dry_run)
+            runtime_guard.write_heartbeat("order")   # 성공 시각 기록(워치독, SC-09)
         except Exception as e:
             logger.error(f"[agent] 라이브 구동 실패: {e}", exc_info=True)
+            notifier.notify("error", f"agent 라이브 구동 실패: {e}")
         logger.info(f"=== 주문 처리 잡 완료 (agent, {label}) ===")
         return
 
@@ -164,9 +183,11 @@ def order_processing_job(dry_run: bool = False) -> None:
 
         print_portfolio_report(portfolio, current_prices)
         logger.info(f"주문 처리 완료: {len(trades)}건 체결 ({label})")
+        runtime_guard.write_heartbeat("order")   # 성공 시각 기록(워치독, SC-09)
 
     except Exception as e:
         logger.error(f"주문 처리 잡 실패: {e}", exc_info=True)
+        notifier.notify("error", f"주문 처리 잡 실패: {e}")
 
     logger.info(f"=== 주문 처리 잡 완료 ({label}) ===")
 
