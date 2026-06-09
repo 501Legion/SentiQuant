@@ -17,13 +17,13 @@
 # 1) 클론
 git clone <repo> /opt/auto-stock && cd /opt/auto-stock
 
-# 2) Python 3.11 venv + 의존성
-python3.11 -m venv venv
-./venv/bin/pip install -r requirements.txt
+# 2) Python 3.11 venv + 의존성 — 헬퍼 한 줄 (CPU torch 먼저)
+bash scripts/install_server.sh
+#   ⚠️ 그냥 `pip install -r requirements.txt`만 하면 Linux는 CUDA torch ~3GB 받음(GPU 없으면 낭비).
+#      헬퍼가 CPU torch(--index-url .../whl/cpu)를 먼저 깔아 회피.
 
-# 3) FinBERT 모델 전송 (개발 PC에서 — clone에 없음, ~418MB)
-#    개발 PC: scp -r models/finbert-onnx auto-stock@SERVER:/opt/auto-stock/models/
-mkdir -p models && ls models/finbert-onnx/model.onnx   # 존재 확인
+# 3) FinBERT 모델 — scp 불필요! 첫 --agent-run-now 시 HuggingFace에서 자동 다운로드+ONNX 변환(~1분).
+#    (시간 아끼려면 개발PC에서 scp -r models/finbert-onnx auto-stock@SERVER:/opt/auto-stock/models/ — 선택)
 
 # 4) .env 작성
 cp .env.example .env && nano .env        # KIS/Reddit/Polygon 키, KIS_PAPER_TRADING=true

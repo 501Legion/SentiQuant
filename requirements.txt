@@ -14,6 +14,9 @@ pytz>=2024.1
 transformers>=4.40.0
 optimum[onnxruntime]>=1.18.0
 onnxruntime>=1.18.0
+# torch: Linux는 PyPI 기본 휠이 CUDA(~3GB)라 GPU 없는 서버는 CPU 전용으로 설치할 것.
+#   권장: bash scripts/install_server.sh  (CPU torch 먼저 → 나머지)
+#   수동: pip install torch --index-url https://download.pytorch.org/whl/cpu  먼저 실행
 torch>=2.2.0
 streamlit>=1.30.0
 watchdog>=3.0.0
