@@ -7,3 +7,6 @@ venv/
 *.egg-info/
 .DS_Store
 models/
+
+# 런타임 비밀(24h OAuth 토큰) — 커밋 금지
+data/kis_token.json
