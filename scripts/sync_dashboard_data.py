@@ -24,6 +24,7 @@ SYNC_ALLOWLIST = [
     "data/community/live/reports",                  # 디렉터리
     "data/community/live/decisions.jsonl",
     "data/community/daily_opinion_snapshots.jsonl",
+    "data/backtest_snapshots/v2/ohlcv",             # 가격 차트용(공개 시세, 비밀 아님)
 ]
 SYNC_CODE = [
     "dashboard_app.py",

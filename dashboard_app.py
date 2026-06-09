@@ -18,6 +18,7 @@ LIVE_DECISIONS = DATA / "community" / "live" / "decisions.jsonl"
 SNAPSHOTS = DATA / "community" / "daily_opinion_snapshots.jsonl"
 PORTFOLIO = DATA / "portfolio.json"
 TRADES = DATA / "trades.csv"
+OHLCV_DIR = DATA / "backtest_snapshots" / "v2" / "ohlcv"   # 커밋된 가격 스냅샷(읽기전용)
 LAST_SYNC = ROOT / "last_sync.json"
 
 st.set_page_config(page_title="auto-stock dashboard", page_icon="📈", layout="wide")
@@ -44,6 +45,40 @@ def _read_jsonl(path: Path) -> list[dict]:
     return out
 
 
+def _load_ohlcv(symbol: str) -> pd.DataFrame:
+    """커밋된 ohlcv 스냅샷({symbol}_*.csv) 병합. Cloud-안전(Polygon/KIS 호출 없음).
+    # Design Ref: A 포팅 — app.py load_ohlcv_snapshot 읽기전용 이식."""
+    if not OHLCV_DIR.exists():
+        return pd.DataFrame()
+    frames = []
+    for p in sorted(OHLCV_DIR.glob(f"{symbol}_*.csv")):
+        try:
+            df = pd.read_csv(p)
+        except Exception:
+            continue
+        if {"date", "close"}.issubset(df.columns):
+            frames.append(df)
+    if not frames:
+        return pd.DataFrame()
+    c = pd.concat(frames, ignore_index=True)
+    c["date"] = pd.to_datetime(c["date"], errors="coerce")
+    c = c.dropna(subset=["date"]).sort_values("date").drop_duplicates("date", keep="last")
+    return c.reset_index(drop=True)
+
+
+def _available_symbols() -> list[str]:
+    if not OHLCV_DIR.exists():
+        return []
+    return sorted({p.name.split("_")[0] for p in OHLCV_DIR.glob("*.csv")})
+
+
+def _latest_close(symbol: str) -> float | None:
+    df = _load_ohlcv(symbol)
+    if df.empty:
+        return None
+    return float(df["close"].iloc[-1])
+
+
 # ── 헤더 + 마지막 sync 배지 (D6) ─────────────────────────────────────────────
 st.title("📈 auto-stock — 여론 에이전트 대시보드")
 _sync = _read_json(LAST_SYNC, {})
@@ -56,23 +91,56 @@ st.info("읽기 전용 대시보드입니다. 실제 매매·주문은 우분투
 tab_pf, tab_trades, tab_funnel, tab_opinion = st.tabs(
     ["💼 포트폴리오", "📜 매매 이력", "🔎 일일 결정 funnel", "🗣️ 여론 추세"])
 
-# ── ① 포트폴리오 ─────────────────────────────────────────────────────────────
+# ── ① 포트폴리오 (보유 개요 + 평가) ──────────────────────────────────────────
 with tab_pf:
     pf = _read_json(PORTFOLIO, {})
     if not pf:
         st.warning("portfolio.json 없음/비어있음")
     else:
         positions = pf.get("positions", {}) or {}
-        c1, c2, c3 = st.columns(3)
-        c1.metric("현금(모의)", f"${pf.get('cash', 0):,.0f}")
-        c2.metric("보유 종목 수", len(positions))
-        c3.metric("갱신 시각", str(pf.get("updated_at", "-"))[:19])
-        if positions:
-            rows = [{"종목": s, "수량": v.get("shares"), "진입가": v.get("entry_price")}
-                    for s, v in positions.items()]
+        cash = float(pf.get("cash", 0) or 0)
+        # 보유 평가액 (커밋 스냅샷 최신 종가 기준)
+        rows, holdings_val = [], 0.0
+        for s, v in positions.items():
+            shares = v.get("shares") or 0
+            entry = v.get("entry_price") or 0
+            last = _latest_close(s)
+            eval_val = (last or entry) * shares
+            holdings_val += eval_val
+            pnl = ((last - entry) / entry * 100) if (last and entry) else None
+            rows.append({"종목": s, "수량": shares, "진입가": round(entry, 2),
+                         "현재가": round(last, 2) if last else "-",
+                         "평가액": round(eval_val, 2),
+                         "손익%": round(pnl, 2) if pnl is not None else "-"})
+        equity = cash + holdings_val
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("현금(모의)", f"${cash:,.0f}")
+        c2.metric("보유 평가액", f"${holdings_val:,.0f}")
+        c3.metric("총 자산", f"${equity:,.0f}")
+        c4.metric("보유 종목 수", len(positions))
+        st.caption("⚠️ 현재가는 커밋된 가격 스냅샷의 최신 종가 — 실시간 아님(준실시간).")
+        if rows:
+            st.subheader("📊 보유 종목 개요")
             st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
         else:
             st.write("현재 보유 포지션 없음.")
+
+        # 가격 차트 (보유 종목 우선, 없으면 스냅샷 보유 종목 전체)
+        st.subheader("📈 가격 차트")
+        syms = list(positions.keys()) or _available_symbols()
+        if syms:
+            sel = st.selectbox("종목 선택", syms)
+            hist = _load_ohlcv(sel)
+            if hist.empty:
+                st.info(f"{sel} 가격 스냅샷 없음")
+            else:
+                chart = alt.Chart(hist).mark_line().encode(
+                    x="date:T", y=alt.Y("close:Q", scale=alt.Scale(zero=False)),
+                    tooltip=["date:T", "close:Q"])
+                st.altair_chart(chart, use_container_width=True)
+                st.caption(f"{sel}: {len(hist)}일치 ({hist['date'].min():%Y-%m-%d} ~ {hist['date'].max():%Y-%m-%d})")
+        else:
+            st.info("가격 스냅샷(data/backtest_snapshots) 없음")
 
 # ── ② 매매 이력 ──────────────────────────────────────────────────────────────
 with tab_trades:
