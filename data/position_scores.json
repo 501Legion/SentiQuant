@@ -236,24 +236,5 @@
     "entry_summary": "PLTR 2026-05-20: score 72, consensus 2.00 (bull 2.0/bear 1.0), neutral 0%, trend FLAT 1d, attention RISING, tier CORE. BUY consensus.",
     "entry_query_opinion_trend": "PLTR trend FLAT persistence 1d",
     "entry_query_risk": "PLTR neutral 0.00 velocity HIGH_MOMENTUM tier CORE"
-  },
-  "RDDT": {
-    "entry_score": 62.61,
-    "yesterday_below": false,
-    "rsi_held": false,
-    "entry_bullish_count": 3,
-    "entry_bearish_count": 0,
-    "entry_neutral_count": 5,
-    "entry_neutral_ratio": 0.625,
-    "entry_consensus_ratio": 2.0,
-    "entry_velocity_state": "NORMAL",
-    "entry_opinion_trend": "UP",
-    "entry_persistence_days": 2,
-    "size_factor": 0.33809999999999996,
-    "entry_universe_tier": "COMMUNITY_LIQUID",
-    "entry_tradeability_score": 1.0,
-    "entry_summary": "RDDT 2026-05-22: score 63, consensus 3.00 (bull 3.0/bear 0.0), neutral 62%, trend UP 2d, attention NORMAL, tier COMMUNITY_LIQUID. BUY consensus.",
-    "entry_query_opinion_trend": "RDDT trend UP persistence 2d",
-    "entry_query_risk": "RDDT neutral 0.62 velocity NORMAL tier COMMUNITY_LIQUID"
   }
 }

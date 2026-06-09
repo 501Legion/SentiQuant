@@ -65,6 +65,14 @@
 | FR-08 | **헬스체크/하트비트**: 각 잡 성공 시 `data/heartbeat.json`에 `{job, last_success_utc}` 기록. 기동 시 **자가점검**(KIS 자격·Reddit/Polygon 키·TIMEZONE·필수 파일) 후 실패 시 알림+로그(주문은 안전상 중단). |
 | FR-09 | **외부 워치독 (Approach B)**: `deploy/watchdog.timer`+`watchdog.service`(systemd timer, N분 주기) 또는 cron이 `heartbeat.json` 신선도 검사 → **stale(=hang 추정)이면 알림 + `systemctl restart auto-stock`**. crash(Restart=always)가 못 잡는 "살아있는데 멈춤"을 복구. 워치독 자체는 주문 안 함(관측·재시작만). |
 
+### FR — Provisioning (fresh clone 부팅, 2026-06-08 확인된 갭)
+| ID | 내용 |
+|----|------|
+| FR-10 | **의존성 완전성**: `requirements.txt`에 **`praw` 누락**(reddit_collector가 `import praw`) → 추가 필수. fresh 설치 시 Reddit 수집 `ModuleNotFoundError` 방지. (확인: 현재 praw 없음) |
+| FR-11 | **FinBERT 모델 전달**: `models/finbert-onnx/model.onnx`(**418MB**)는 `.gitignore: models/`로 **clone에 미포함** → 서버 배포 시 별도 전달 절차 필요(재export 스크립트 / scp / Git LFS / S3 중 택1, design 확정). 누락 시 FinBERT 로드 실패→전부 neutral→매수 0. |
+| FR-12 | **`.env` 템플릿**: `.env`(KIS·Reddit·Polygon 키)는 미추적 → `.env.example` 제공 + runbook에 작성 절차. 자가점검(FR-08)이 누락 키 차단. |
+| FR-13 | **Python 3.11 고정**: torch `c10.dll`이 3.13에서 깨짐(실측) → 3.11 venv 명시(runbook/systemd ExecStart 경로). **`data/kis_token.json`이 git 추적 중**(만료 토큰 커밋) → .gitignore 이전 검토. |
+
 ### NFR
 | ID | 내용 |
 |----|------|
@@ -88,6 +96,9 @@
 | `scheduler.py` | 수정 | 주문잡 시작부 키스위치·자가점검, 잡 종료 하트비트, 알림 훅 |
 | `config.py` | 수정 | `TRADING_HALT_FILE`, `MAX_DAILY_BUYS`, `MAX_TOTAL_EXPOSURE_PCT`, `MAX_SYMBOL_WEIGHT_PCT`, `SLACK_WEBHOOK_URL`, `HEARTBEAT_FILE` |
 | `tests/test_runtime_guard.py` | 신규 | 키스위치·한도·하트비트·자가점검 단위 |
+| `requirements.txt` | 수정 | **`praw` 추가**(FR-10) |
+| `.env.example` | 신규 | 키 템플릿(FR-12) |
+| `scripts/export_finbert_onnx.py` 또는 모델 전달 절차 | 신규/문서 | model.onnx 418MB 전달(FR-11, design 확정) |
 
 > 일일 한도(FR-06)의 실제 적용 지점(community_live 주문 실행 직전 vs agent_gate)은 **설계에서 확정** — 판단 로직 불변(NFR-01) 원칙상 "주문 실행 게이트"로 넣는 것이 1순위.
 
@@ -119,6 +130,8 @@
 | 자격증명 누락/만료로 잡 실패 누적 | 중간 | FR-08 기동 자가점검 + 오류 알림 |
 | 비밀 노출(로그/알림/리포) | 중간 | NFR-04 마스킹·.env |
 | KIS API 장애/429 중 주문 | 중간 | 기존 graceful degradation 유지 + 오류 알림 |
+| **fresh clone이 안 돎** (model 418MB·.env 미포함, praw 누락, py3.13 torch 깨짐) | 높음 | FR-10~13 provisioning + runbook 자가점검(FR-08)으로 기동 전 차단 |
+| `data/kis_token.json` git 커밋(비밀 노출) | 중간 | .gitignore 이전 + 토큰 회전 (FR-13) |
 
 ---
 
