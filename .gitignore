@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 __pycache__/
 *.pyc
 *.pyo
@@ -10,3 +12,45 @@ models/
 
 # 런타임 비밀(24h OAuth 토큰) — 커밋 금지
 data/kis_token.json
+
+# Local editor / tool state
+.idea/
+.claude/
+.pytest_cache/
+.bkit-memory.json
+
+# Temporary files and local backups
+*.bak
+*.bak.*
+*.backup
+*.tmp
+*.swp
+
+# Dashboard sync scratch worktrees
+.dashboard-staging/
+.dashboard-worktree/
+
+# Runtime credentials and account state
+data/portfolio.json
+data/trades.csv
+data/trading.log
+data/heartbeat.json
+data/watchdog_restart_state.json
+data/kis_exchange_map.json
+
+# Runtime caches and generated strategy state
+data/articles_detail.json
+data/backtest_cache.json
+data/gpt_cache.json
+data/mention_history.json
+data/position_scores.json
+data/score_history.json
+data/signals.json
+data/reddit/
+data/community/live/
+data/community/memory/
+data/community/daily_opinion_snapshots.jsonl
+
+# Generated market data / diagnostics
+data/backtest_snapshots/v2/ohlcv/
+data/pip-freeze-*.txt
