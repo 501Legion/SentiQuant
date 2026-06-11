@@ -27,35 +27,6 @@ st.set_page_config(page_title="auto-stock dashboard", page_icon="📈", layout="
 st.markdown(
     """
     <style>
-    .sq-brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 2px 0 18px 0;
-    }
-    .sq-brand-mark {
-        align-items: center;
-        background: #2563eb;
-        border-radius: 7px;
-        color: #ffffff;
-        display: inline-flex;
-        font-size: 0.95rem;
-        font-weight: 800;
-        height: 30px;
-        justify-content: center;
-        width: 30px;
-    }
-    .sq-brand-name {
-        color: #f8fafc;
-        font-size: 1.35rem;
-        font-weight: 800;
-        line-height: 1;
-    }
-    .sq-brand-subtitle {
-        color: #94a3b8;
-        font-size: 0.78rem;
-        margin-top: 3px;
-    }
     .stock-card-panel {
         background: #171b22;
         border: 1px solid #2f3744;
@@ -377,19 +348,6 @@ with tab_pf:
         total_profit = sum(r["profit"] for r in rows if r["profit"] is not None)
         priced_count = sum(1 for r in rows if r["last"] is not None)
         equity = cash + holdings_val
-
-        st.markdown(
-            """
-            <div class="sq-brand">
-                <div class="sq-brand-mark">SQ</div>
-                <div>
-                    <div class="sq-brand-name">SentiQuant</div>
-                    <div class="sq-brand-subtitle">Sentiment analysis based portfolio monitor</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
 
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("현금(모의)", f"${cash:,.0f}")
