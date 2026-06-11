@@ -394,6 +394,9 @@ MAX_TOTAL_EXPOSURE_PCT = 60.0                # 총자산 대비 보유 평가액
 MAX_SYMBOL_WEIGHT_PCT = 20.0                 # 종목당 비중 상한 %
 WATCHDOG_STALE_MINUTES = 90                  # alive heartbeat 한도 — 프로세스 hang 추정
 WATCHDOG_ORDER_STALE_MINUTES = 5760          # order heartbeat 한도 4일 — 주말·휴장 감안
+WATCHDOG_ORDER_GRACE_MINUTES = 90            # 09:35 ET 주문 잡 완료 유예시간
+WATCHDOG_SIGNAL_GRACE_MINUTES = 180          # 16:30 ET 신호 잡 완료 유예시간
+WATCHDOG_RESTART_STATE_FILE = "data/watchdog_restart_state.json"  # 일일 잡 재시작 중복 방지
 HEARTBEAT_ALIVE_INTERVAL_MINUTES = 5         # alive heartbeat 갱신 주기
 SLACK_WEBHOOK_URL = ""                       # 미설정 시 알림 no-op (env로 주입 권장)
 
