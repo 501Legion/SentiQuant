@@ -209,11 +209,15 @@ def test_t5_scheduler_switch():
         # 스케줄러 선택적 의존성(pandas_market_calendars 등) 미설치 환경 → 스킵
         print(f"  SKIP  test_t5_scheduler_switch (의존성 없음: {e.name})")
         return
+    import runtime_guard
     saved = {"trading": scheduler.is_trading_day, "run_live": community_live.run_live,
              "load_signals": getattr(scheduler, "load_signals", None),
-             "strategy": config.LIVE_STRATEGY}
+             "strategy": config.LIVE_STRATEGY,
+             "heartbeat": runtime_guard.write_heartbeat}
     calls = {"n": 0}
     try:
+        # 실 운영 data/heartbeat.json 오염 방지 — 워치독이 stale 감지를 못 하게 됨
+        runtime_guard.write_heartbeat = lambda *a, **k: None
         scheduler.is_trading_day = lambda: True
         community_live.run_live = lambda *a, **k: calls.__setitem__("n", calls["n"] + 1)
         scheduler.load_signals = lambda: {}        # 뉴스 경로 조기 종료
@@ -231,6 +235,7 @@ def test_t5_scheduler_switch():
         if saved["load_signals"] is not None:
             scheduler.load_signals = saved["load_signals"]
         config.LIVE_STRATEGY = saved["strategy"]
+        runtime_guard.write_heartbeat = saved["heartbeat"]
 
 
 # --- T7: 청산 시 high-level reflection 생성 (FR-09) -------------------------

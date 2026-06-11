@@ -225,6 +225,17 @@ def start_scheduler() -> None:
         misfire_grace_time=300,
     )
 
+    # alive heartbeat — 워치독은 이걸로 프로세스 hang을 판단(SC-09).
+    # order heartbeat는 하루 1회 갱신이라 짧은 한도로 감시하면 오탐 → 무한 재시작.
+    scheduler.add_job(
+        lambda: runtime_guard.write_heartbeat("alive"),
+        "interval",
+        minutes=config.HEARTBEAT_ALIVE_INTERVAL_MINUTES,
+        id="alive_heartbeat",
+        name="Alive Heartbeat Job",
+    )
+    runtime_guard.write_heartbeat("alive")  # 기동 직후 1회 — 초기 stale 오탐 방지
+
     print(f"\n스케줄러 시작 ({config.TIMEZONE})")
     print(f"  신호 계산: 매 거래일 {config.SIGNAL_JOB_HOUR:02d}:{config.SIGNAL_JOB_MINUTE:02d} ET")
     print(f"  주문 처리: 매 거래일 {config.ORDER_JOB_HOUR:02d}:{config.ORDER_JOB_MINUTE:02d} ET")
