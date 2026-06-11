@@ -30,7 +30,8 @@ REDDIT_SUBREDDITS = [
 ]
 REDDIT_ALLOWED_FLAIRS = ["DD", "Discussion", "Fundamentals", "Daily Discussion", "Earnings"]
 REDDIT_LOOKBACK_HOURS = 24          # 최근 24시간 게시글 수집
-REDDIT_DAILY_THREAD_COMMENTS = 1000  # Daily Discussion Thread 수집 댓글 수 (wsb-daily-comments)
+REDDIT_DAILY_THREAD_COMMENTS = 1000  # Daily Discussion Thread 수집 댓글 수 — 품질 필터 통과분 기준 (wsb-daily-comments)
+REDDIT_DAILY_THREAD_REPLACE_MORE = 10  # Daily Thread MoreComments 확장 횟수 — 대형 스레드(WSB 8천+)에서 1000개 확보용
 
 # --- comment-aware-sentiment: 댓글 개별 감성 집계 (Design Ref: §6) ---
 COMMENT_COLLECT_NORMAL = 100         # 일반 글 댓글 상위 N

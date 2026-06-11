@@ -358,18 +358,21 @@ class RedditCollector:
 
         posts = []
         try:
-            thread.comments.replace_more(limit=3)  # top-level MoreComments 3개까지 확장
-            # top 댓글 순 정렬 (score 내림차순)
+            thread.comments.replace_more(limit=config.REDDIT_DAILY_THREAD_REPLACE_MORE)
+            # 품질 필터(삭제/봇/초단문 FR-08) 먼저 적용 → score 상위 N개가 전부 유효 댓글이 되도록
+            quality = [
+                c for c in thread.comments
+                if hasattr(c, "body") and _is_quality_comment(
+                    getattr(c, "body", None),
+                    str(c.author) if getattr(c, "author", None) else None,
+                )
+            ]
             top_comments = sorted(
-                [c for c in thread.comments if hasattr(c, "body")],
-                key=lambda c: getattr(c, "score", 0),
-                reverse=True,
+                quality, key=lambda c: getattr(c, "score", 0), reverse=True,
             )[:config.REDDIT_DAILY_THREAD_COMMENTS]
 
             for comment in top_comments:
                 body = comment.body.strip()
-                if not body or body == "[deleted]" or body == "[removed]":
-                    continue
                 posts.append({
                     "title": "",  # 댓글은 제목 없음
                     "body_excerpt": body[:config.GPT_POST_BODY_MAX],
