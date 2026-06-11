@@ -8,27 +8,26 @@ set -euo pipefail
 
 PY="${PYTHON:-python3.11}"
 VENV="${VENV:-venv}"
+PIP="./$VENV/bin/pip"
+PYBIN="./$VENV/bin/python"
+CONSTRAINTS="${CONSTRAINTS:-constraints-server.txt}"
 
 echo "[install] venv 생성 ($PY)"
 "$PY" -m venv "$VENV"
 
 echo "[install] pip 업그레이드"
-"./$VENV/bin/pip" install --upgrade pip
+"$PIP" install --upgrade pip
 
 echo "[install] CPU 전용 torch 먼저 (CUDA 휠 회피)"
-"./$VENV/bin/pip" install "torch==2.3.1+cpu" --index-url https://download.pytorch.org/whl/cpu
+"$PIP" install "torch==2.3.1+cpu" --index-url https://download.pytorch.org/whl/cpu
 
-echo "[install] 나머지 의존성 (torch 이미 충족 → CUDA 안 받음)"
-"./$VENV/bin/pip" install -r requirements.txt
+echo "[install] 나머지 의존성 ($CONSTRAINTS 적용)"
+"$PIP" install -r requirements.txt -c "$CONSTRAINTS"
 
-echo "[install] optimum-onnx ORTModel support 추가 (metadata mismatch 회피)"
-"./$VENV/bin/pip" install --no-deps "optimum-onnx==0.1.0"
+echo "[install] optimum-onnx ORTModel support 추가 (known metadata mismatch는 검증 스크립트에서 허용)"
+"$PIP" install --no-deps "optimum-onnx==0.1.0"
 
-echo "[install] FinBERT 호환 패키지 확인"
-"./$VENV/bin/python" - <<PYVERS
-import importlib.metadata as m
-for name in ["torch", "transformers", "optimum", "optimum-onnx", "onnxruntime", "numpy"]:
-    print(name, m.version(name))
-PYVERS
+echo "[install] 서버 패키지 핀/known exception 검증"
+"$PYBIN" scripts/check_server_packages.py
 
 echo "[install] 완료. 다음: cp .env.example .env && nano .env  →  python main.py --agent-run-now"

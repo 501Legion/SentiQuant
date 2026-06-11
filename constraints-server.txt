@@ -1,0 +1,18 @@
+# Server runtime constraints for Ubuntu CPU deployments.
+#
+# This file captures the package set verified on the live scheduler host.
+# Use scripts/install_server.sh instead of installing this file directly:
+# it installs torch from the PyTorch CPU wheel index first, then applies
+# these constraints to the rest of requirements.txt.
+#
+# Note: optimum-onnx 0.1.0 declares optimum~=2.1.0, but this project keeps
+# optimum 1.18.1 because the newer stack failed FinBERT ONNX export/import
+# on the production server. scripts/check_server_packages.py treats that
+# single pip check warning as an accepted compatibility exception.
+numpy==1.26.4
+torch==2.3.1+cpu
+transformers==4.39.3
+tokenizers==0.15.2
+optimum==1.18.1
+optimum-onnx==0.1.0
+onnxruntime==1.18.1

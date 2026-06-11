@@ -11,8 +11,12 @@ openai>=2.33.0
 requests>=2.31.0
 polygon-api-client>=1.16.0
 pytz>=2024.1
-# FinBERT ONNX server pins: newer torch/transformers/optimum combos can fail during export.
-# install_server.sh adds optimum-onnx==0.1.0 with --no-deps for ORTModel support.
+# FinBERT ONNX server pins:
+#   - Exact server reproducibility lives in constraints-server.txt.
+#   - Install with scripts/install_server.sh; it installs CPU torch first and
+#     validates the known optimum-onnx/optimum metadata exception.
+#   - Do not blindly upgrade torch/transformers/optimum: newer combos failed
+#     FinBERT ONNX export/import on the production Ubuntu host.
 transformers==4.39.3
 optimum==1.18.1
 onnxruntime==1.18.1

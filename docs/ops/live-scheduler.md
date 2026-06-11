@@ -7,43 +7,46 @@
 | 항목 | 비고 |
 |------|------|
 | **Python 3.11** | 3.13은 torch `c10.dll` 깨짐. `python3.11 -m venv venv` |
-| **FinBERT 모델 418MB** | `.gitignore: models/` → clone에 없음. **개발 PC에서 scp 필요**(아래) |
+| **FinBERT 모델 418MB** | `.gitignore: models/` → clone에 없음. 첫 agent 실행 시 자동 다운로드+ONNX 변환 |
 | **.env** | `.gitignore` 대상 → 수동 작성(아래) |
-| **praw** 등 | `pip install -r requirements.txt` |
+| **서버 패키지 핀** | `constraints-server.txt` + `scripts/check_server_packages.py`로 검증 |
 
 ## 1. 설치
 
 ```bash
 # 1) 클론
-git clone <repo> /opt/auto-stock && cd /opt/auto-stock
+git clone <repo> /home/ubuntu/auto_stock && cd /home/ubuntu/auto_stock
 
 # 2) Python 3.11 venv + 의존성 — 헬퍼 한 줄 (CPU torch 먼저)
 bash scripts/install_server.sh
 #   ⚠️ 그냥 `pip install -r requirements.txt`만 하면 Linux는 CUDA torch ~3GB 받음(GPU 없으면 낭비).
-#      헬퍼가 CPU torch(--index-url .../whl/cpu)를 먼저 깔아 회피.
+#      헬퍼가 CPU torch(--index-url .../whl/cpu)를 먼저 깔고 constraints-server.txt를 적용.
+#   ⚠️ pip check에는 optimum-onnx 0.1.0 ↔ optimum 1.18.1 known mismatch가 남는다.
+#      이 조합은 서버에서 FinBERT ONNX가 검증된 조합이며 scripts/check_server_packages.py가 예외로 허용한다.
 
 # 3) FinBERT 모델 — scp 불필요! 첫 --agent-run-now 시 HuggingFace에서 자동 다운로드+ONNX 변환(~1분).
-#    (시간 아끼려면 개발PC에서 scp -r models/finbert-onnx auto-stock@SERVER:/opt/auto-stock/models/ — 선택)
+#    (시간 아끼려면 개발PC에서 scp -r models/finbert-onnx ubuntu@SERVER:/home/ubuntu/auto_stock/models/ — 선택)
 
 # 4) .env 작성
 cp .env.example .env && nano .env        # KIS/Reddit/Polygon 키, KIS_PAPER_TRADING=true
 
 # 5) 자가점검 (자격/모델/paper/TZ — 누락 시 항목 출력)
+./venv/bin/python scripts/check_server_packages.py
 ./venv/bin/python -c "import runtime_guard as r; print(r.selfcheck() or 'OK')"
 ```
 
 ## 2. systemd 등록
 
 ```bash
-# 유저/경로 맞게 deploy/*.service 수정 후
+# deploy/*.service는 /home/ubuntu/auto_stock + User=ubuntu 기준
 sudo cp deploy/auto-stock.service deploy/watchdog.service deploy/watchdog.timer /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now auto-stock.service     # 부팅 자동시작 + 즉시 시작
 sudo systemctl enable --now watchdog.timer         # 워치독 15분 주기
 ```
 
-> 워치독이 `systemctl restart` 하려면 서비스 유저에 권한 필요:
-> `/etc/sudoers.d/auto-stock` → `auto-stock ALL=NOPASSWD: /bin/systemctl restart auto-stock` (또는 user-level service).
+> 워치독이 `systemctl restart` 하려면 서비스 유저에 제한 sudo 권한 필요:
+> `/etc/sudoers.d/auto-stock-watchdog` → `ubuntu ALL=NOPASSWD: /usr/bin/systemctl restart auto-stock.service`
 
 ## 3. 운영 명령
 
