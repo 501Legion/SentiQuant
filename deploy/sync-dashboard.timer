@@ -4,6 +4,7 @@ Description=auto-stock dashboard sync timer
 
 [Timer]
 OnBootSec=10min
+OnActiveSec=30min
 OnUnitActiveSec=30min
 Unit=sync-dashboard.service
 

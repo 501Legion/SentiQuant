@@ -4,6 +4,7 @@ Description=auto-stock watchdog timer
 
 [Timer]
 OnBootSec=5min
+OnActiveSec=15min
 OnUnitActiveSec=15min
 Unit=watchdog.service
 
