@@ -1,7 +1,7 @@
 """streamlit-dashboard-deploy 동기화 단위 테스트 (M3 / Plan SC-03,01,05).
 
 curate() allowlist·비밀 차단 + dashboard_app heavy-import 0 검증.
-git push는 서버 전용(원격 인증)이라 테스트 제외 — 큐레이션/안전 로직만 검증.
+push_branch()는 임시 git repo + bare origin으로 멱등성만 검증.
 
 실행:
   pytest tests/test_sync_dashboard.py
@@ -10,6 +10,7 @@ git push는 서버 전용(원격 인증)이라 테스트 제외 — 큐레이션
 from __future__ import annotations
 
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -115,6 +116,49 @@ def test_tc05_dashboard_no_heavy_import():
                  "praw", "reddit_collector"]
     hits = [f for f in forbidden if any(f in ln for ln in import_lines)]
     assert hits == [], f"대시보드가 무거운 모듈 import: {hits}"
+
+
+# --- TC-06: push_branch 멱등성 (기존 dashboard-data 로컬 브랜치 있어도 2회차 성공) ---
+def test_tc06_push_branch_reuses_existing_dashboard_branch():
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d) / "repo"
+        origin = Path(d) / "origin.git"
+        staging = Path(d) / "staging"
+        root.mkdir()
+        staging.mkdir()
+
+        def run(args, cwd=root):
+            return subprocess.run(args, cwd=cwd, check=True, capture_output=True, text=True)
+
+        run(["git", "init", "-q"])
+        run(["git", "config", "user.email", "test@example.com"])
+        run(["git", "config", "user.name", "Test User"])
+        (root / "README.md").write_text("main\n", encoding="utf-8")
+        run(["git", "add", "README.md"])
+        run(["git", "commit", "-q", "-m", "init"])
+        run(["git", "init", "-q", "--bare", str(origin)], cwd=Path(d))
+        run(["git", "remote", "add", "origin", str(origin)])
+
+        old_root = sync.ROOT
+        try:
+            sync.ROOT = root
+            (staging / "dashboard_app.py").write_text("first\n", encoding="utf-8")
+            sync.push_branch(staging)
+
+            first = run(["git", "rev-parse", "dashboard-data"]).stdout.strip()
+            assert run(["git", "branch", "--list", "dashboard-data"]).stdout.strip()
+            assert run(["git", "ls-tree", "-r", "--name-only", "dashboard-data"]).stdout.strip() == "dashboard_app.py"
+
+            (staging / "dashboard_app.py").write_text("second\n", encoding="utf-8")
+            sync.push_branch(staging)
+
+            second = run(["git", "rev-parse", "dashboard-data"]).stdout.strip()
+            remote = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
+            assert second != first
+            assert second == remote
+            assert "second" in run(["git", "show", "dashboard-data:dashboard_app.py"]).stdout
+        finally:
+            sync.ROOT = old_root
 
 
 def _run_standalone() -> int:
