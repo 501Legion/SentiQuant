@@ -16,12 +16,19 @@ echo "[install] pip 업그레이드"
 "./$VENV/bin/pip" install --upgrade pip
 
 echo "[install] CPU 전용 torch 먼저 (CUDA 휠 회피)"
-"./$VENV/bin/pip" install torch --index-url https://download.pytorch.org/whl/cpu
+"./$VENV/bin/pip" install "torch==2.3.1+cpu" --index-url https://download.pytorch.org/whl/cpu
 
 echo "[install] 나머지 의존성 (torch 이미 충족 → CUDA 안 받음)"
 "./$VENV/bin/pip" install -r requirements.txt
 
-echo "[install] torch 빌드 확인 (+cpu 여야 정상)"
-"./$VENV/bin/python" -c "import torch; print('torch', torch.__version__)"
+echo "[install] optimum-onnx ORTModel support 추가 (metadata mismatch 회피)"
+"./$VENV/bin/pip" install --no-deps "optimum-onnx==0.1.0"
+
+echo "[install] FinBERT 호환 패키지 확인"
+"./$VENV/bin/python" - <<PYVERS
+import importlib.metadata as m
+for name in ["torch", "transformers", "optimum", "optimum-onnx", "onnxruntime", "numpy"]:
+    print(name, m.version(name))
+PYVERS
 
 echo "[install] 완료. 다음: cp .env.example .env && nano .env  →  python main.py --agent-run-now"
