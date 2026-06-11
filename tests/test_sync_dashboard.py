@@ -47,6 +47,8 @@ def _build_fake_src(root: Path):
     (root / "requirements-dashboard.txt").write_text("streamlit\n", encoding="utf-8")
     (root / ".streamlit").mkdir()
     (root / ".streamlit/config.toml").write_text("[server]\n", encoding="utf-8")
+    (root / "assets").mkdir()
+    (root / "assets/sentiquant-logo.jpeg").write_bytes(b"JPEG")
 
 
 # --- TC-01: allowlist 데이터 포함 ---
@@ -64,6 +66,7 @@ def test_tc01_allowlist_included():
         assert "data/community/live/reports/2026-06-08.md" in incset
         # 코드도 포함
         assert "dashboard_app.py" in incset and "requirements-dashboard.txt" in incset
+        assert "assets/sentiquant-logo.jpeg" in incset
 
 
 # --- TC-02: 비밀/모델/캐시 절대 제외 ---

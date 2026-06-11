@@ -30,6 +30,7 @@ SYNC_CODE = [
     "dashboard_app.py",
     "requirements-dashboard.txt",
     ".streamlit/config.toml",
+    "assets/sentiquant-logo.jpeg",
 ]
 # 방어적 차단 — 경로에 이 문자열이 있으면 절대 복사 금지(비밀/모델/캐시)
 DENY_SUBSTR = [".env", "kis_token", "models/", "models\\", "cache", "secret", ".key", "token"]

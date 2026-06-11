@@ -3,6 +3,7 @@
 # 불가침 원칙: KIS·FinBERT·실주문·무거운 모듈(torch/transformers/community_live/backtester)
 #            절대 import 금지. streamlit·pandas·altair·표준 라이브러리만.
 # Plan SC: SC-01(heavy import 0), SC-05(실주문 호출 0)
+import base64
 import json
 import re
 from datetime import datetime, timedelta, timezone
@@ -21,12 +22,50 @@ PORTFOLIO = DATA / "portfolio.json"
 TRADES = DATA / "trades.csv"
 OHLCV_DIR = DATA / "backtest_snapshots" / "v2" / "ohlcv"   # 커밋된 가격 스냅샷(읽기전용)
 LAST_SYNC = ROOT / "last_sync.json"
+LOGO = ROOT / "assets" / "sentiquant-logo.jpeg"
 
-st.set_page_config(page_title="auto-stock dashboard", page_icon="📈", layout="wide")
+st.set_page_config(page_title="SentiQuant Dashboard", page_icon="📈", layout="wide")
 
 st.markdown(
     """
     <style>
+    .brand-bar {
+        align-items: center;
+        display: flex;
+        gap: 12px;
+        margin: 4px 0 24px 0;
+    }
+    .brand-mark {
+        align-items: center;
+        background: #2563eb;
+        border-radius: 9px;
+        color: #ffffff;
+        display: inline-flex;
+        font-size: 1.05rem;
+        font-weight: 800;
+        height: 42px;
+        justify-content: center;
+        width: 42px;
+    }
+    .brand-logo {
+        border-radius: 9px;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+        display: block;
+        height: 42px;
+        object-fit: cover !important;
+        width: 42px;
+    }
+    .brand-name {
+        color: #f8fafc;
+        font-size: 2.05rem;
+        font-weight: 800;
+        line-height: 1.05;
+    }
+    .brand-subtitle {
+        color: #94a3b8;
+        font-size: 0.92rem;
+        margin-top: 3px;
+    }
     .stock-card-panel {
         background: #171b22;
         border: 1px solid #2f3744;
@@ -122,6 +161,14 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+def _logo_data_uri() -> str | None:
+    try:
+        encoded = base64.b64encode(LOGO.read_bytes()).decode("ascii")
+    except OSError:
+        return None
+    return f"data:image/jpeg;base64,{encoded}"
 
 
 def _read_json(path: Path, default=None):
@@ -319,7 +366,24 @@ def _parse_funnel(md: str) -> dict[str, int]:
 
 
 # ── 헤더 + 마지막 sync 배지 (D6) ─────────────────────────────────────────────
-st.title("📈 auto-stock — 여론 에이전트 대시보드")
+_logo_uri = _logo_data_uri()
+_logo_html = (
+    f'<img class="brand-logo" src="{_logo_uri}" alt="SentiQuant logo">'
+    if _logo_uri
+    else '<div class="brand-mark">SQ</div>'
+)
+st.markdown(
+    f"""
+    <div class="brand-bar">
+        {_logo_html}
+        <div>
+            <div class="brand-name">SentiQuant</div>
+            <div class="brand-subtitle">Sentiment 분석 기반의 투자 지원</div>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 _sync = _read_json(LAST_SYNC, {})
 if _sync.get("synced_at"):
     try:
