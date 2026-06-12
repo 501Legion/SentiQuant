@@ -187,6 +187,52 @@ def test_t3b_run_summary_persists_even_without_candidates(tmp_path=None):
         assert res["summary"]["candidates"] == 0
 
 
+def test_t3c_state_overrides_isolate_replay_outputs(tmp_path=None):
+    import tempfile
+
+    class _EngWritesMention(_FakeEngine):
+        def run_pipeline(self, posts_by_symbol, ohlcv_cache, date_str=None):
+            os.makedirs(os.path.dirname(config.MENTION_HISTORY_FILE), exist_ok=True)
+            with open(config.MENTION_HISTORY_FILE, "w", encoding="utf-8") as f:
+                json.dump({"override_seen": [1]}, f)
+            return super().run_pipeline(posts_by_symbol, ohlcv_cache, date_str)
+
+    with tempfile.TemporaryDirectory() as d:
+        live_dir = os.path.join(d, "live")
+        replay_dir = os.path.join(d, "replay")
+        path = os.path.join(live_dir, "dec.jsonl")
+        original_mention_path = config.MENTION_HISTORY_FILE
+        overrides = {
+            "mention_history": os.path.join(replay_dir, "mention_history.json"),
+            "score_history": os.path.join(replay_dir, "score_history.json"),
+            "position_scores": os.path.join(replay_dir, "position_scores.json"),
+            "daily_snapshots": os.path.join(replay_dir, "daily_snapshots.jsonl"),
+            "decisions": os.path.join(replay_dir, "decisions.jsonl"),
+            "run_summaries": os.path.join(replay_dir, "run_summaries.jsonl"),
+            "reports_dir": os.path.join(replay_dir, "reports"),
+            "memory_dir": os.path.join(replay_dir, "memory"),
+            "reddit_data_dir": os.path.join(replay_dir, "reddit"),
+        }
+        with _live_env(decisions_path=path):
+            community_live.WSBSignalEngine = _EngWritesMention
+            res = community_live.run_live(
+                date=_DATE, dry_run=True, universe_mode="community_liquid",
+                broker=MockBroker(tradable=["NVDA", "AAPL"]),
+                posts_by_symbol={"NVDA": [{"title": "NVDA moon", "body_excerpt": "calls"}]},
+                ohlcv_full={"NVDA": _make_df("NVDA")}, portfolio=_portfolio(),
+                memory=CommunityMemoryStore(backend=InMemoryBackend()),
+                state_overrides=overrides,
+            )
+
+        assert os.path.exists(overrides["mention_history"])
+        assert os.path.exists(overrides["decisions"])
+        assert os.path.exists(overrides["run_summaries"])
+        assert res["decision_log_path"] == overrides["decisions"]
+        assert res["report_path"].startswith(overrides["reports_dir"])
+        assert not os.path.exists(path), "replay override 중 live decision path가 오염됨"
+        assert config.MENTION_HISTORY_FILE == original_mention_path
+
+
 # --- T4: LLM 일일 상한 초과 → rule fallback (SC-05) -------------------------
 class _FakeLLMRouter:
     """llm_router ON이면 llm_assisted, 강등 후엔 rule_based 반환."""

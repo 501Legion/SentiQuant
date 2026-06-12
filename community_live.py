@@ -11,6 +11,7 @@
 import json
 import logging
 import os
+from contextlib import contextmanager
 from datetime import date as _date, datetime, timedelta
 
 import config
@@ -39,6 +40,42 @@ logger = logging.getLogger(__name__)
 _LIVE_MODEL = "finbert-wsb"
 _LIVE_RANKING = "sentiment"
 _LIVE_SIZING = "opinion_trend"
+
+
+_RUN_STATE_PATH_KEYS = {
+    "mention_history": "MENTION_HISTORY_FILE",
+    "score_history": "SCORE_HISTORY_FILE",
+    "position_scores": "POSITION_SCORES_FILE",
+    "daily_snapshots": "COMMUNITY_DAILY_SNAPSHOT_FILE",
+    "decisions": "COMMUNITY_LIVE_DECISIONS_FILE",
+    "run_summaries": "COMMUNITY_LIVE_RUN_SUMMARIES_FILE",
+    "reports_dir": "COMMUNITY_LIVE_REPORTS_DIR",
+    "memory_dir": "COMMUNITY_MEMORY_DIR",
+    "reddit_data_dir": "REDDIT_DATA_DIR",
+}
+
+
+@contextmanager
+def _temporary_run_state_paths(overrides: dict | None):
+    """Temporarily redirect run_live state files for replay/testing, then restore config."""
+    if not overrides:
+        yield
+        return
+
+    unknown = sorted(set(overrides) - set(_RUN_STATE_PATH_KEYS))
+    if unknown:
+        raise ValueError(f"Unknown run_live state override keys: {', '.join(unknown)}")
+
+    saved = {}
+    try:
+        for key, value in overrides.items():
+            attr = _RUN_STATE_PATH_KEYS[key]
+            saved[attr] = getattr(config, attr)
+            setattr(config, attr, value)
+        yield
+    finally:
+        for attr, value in saved.items():
+            setattr(config, attr, value)
 
 
 def append_run_summary(summary: dict, path: str = None) -> None:
@@ -311,12 +348,22 @@ def run_live(
     ohlcv_full: dict = None,        # 테스트/오프라인 주입 (None → fetch)
     portfolio: RedditPortfolio = None,
     memory: CommunityMemoryStore = None,
+    state_overrides: dict = None,   # 재실행/검증용: 영속 상태 파일 경로 임시 전환
 ) -> dict:
     """라이브 1일 구동 → {decisions, orders, decision_log_path, summary}.
 
     dry_run 기본 = config.COMMUNITY_LIVE_DRY_RUN_DEFAULT (True) → 실주문 0.
     뉴스/백테스트 경로 비침습 (신규 드라이버, LIVE_STRATEGY 스위치로 호출).
     """
+    if state_overrides:
+        with _temporary_run_state_paths(state_overrides):
+            return run_live(
+                date=date, dry_run=dry_run, llm_router=llm_router,
+                universe_mode=universe_mode, broker=broker,
+                posts_by_symbol=posts_by_symbol, ohlcv_full=ohlcv_full,
+                portfolio=portfolio, memory=memory,
+            )
+
     if date is None:
         date = _date.today().isoformat()
     if dry_run is None:
