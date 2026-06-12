@@ -98,6 +98,8 @@ def test_tc03_last_sync_written():
         import json
         meta = json.loads((stg / "last_sync.json").read_text(encoding="utf-8"))
         assert "synced_at" in meta
+        assert len(meta.get("payload_hash", "")) == 64
+        assert meta.get("payload_file_count", 0) > 0
 
 
 # --- TC-04: _denied 차단 로직 ---
@@ -162,6 +164,54 @@ def test_tc06_push_branch_reuses_existing_dashboard_branch():
             assert second != first
             assert second == remote
             assert "second" in run(["git", "show", "dashboard-data:dashboard_app.py"]).stdout
+        finally:
+            sync.ROOT = old_root
+
+
+# --- TC-07: payload 변화가 없으면 last_sync만 달라도 push 생략 ---
+def test_tc07_push_branch_skips_unchanged_payload():
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d) / "repo"
+        origin = Path(d) / "origin.git"
+        staging = Path(d) / "staging"
+        root.mkdir()
+        staging.mkdir()
+
+        def run(args, cwd=root):
+            return subprocess.run(args, cwd=cwd, check=True, capture_output=True, text=True)
+
+        run(["git", "init", "-q"])
+        run(["git", "config", "user.email", "test@example.com"])
+        run(["git", "config", "user.name", "Test User"])
+        (root / "README.md").write_text("main\n", encoding="utf-8")
+        run(["git", "add", "README.md"])
+        run(["git", "commit", "-q", "-m", "init"])
+        run(["git", "init", "-q", "--bare", str(origin)], cwd=Path(d))
+        run(["git", "remote", "add", "origin", str(origin)])
+
+        old_root = sync.ROOT
+        try:
+            sync.ROOT = root
+            (staging / "dashboard_app.py").write_text("same\n", encoding="utf-8")
+            first_hash = sync.payload_hash(staging)
+            (staging / "last_sync.json").write_text(
+                f'{{"synced_at":"2026-06-12T00:00:00+00:00","payload_hash":"{first_hash}"}}',
+                encoding="utf-8",
+            )
+            sync.push_branch(staging)
+            first = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
+
+            (staging / "last_sync.json").write_text(
+                f'{{"synced_at":"2026-06-12T00:30:00+00:00","payload_hash":"{first_hash}"}}',
+                encoding="utf-8",
+            )
+            sync.push_branch(staging)
+            second = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
+
+            assert second == first
+            assert "2026-06-12T00:00:00+00:00" in run(
+                ["git", "show", "origin/dashboard-data:last_sync.json"]
+            ).stdout
         finally:
             sync.ROOT = old_root
 

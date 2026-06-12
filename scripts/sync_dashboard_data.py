@@ -11,6 +11,7 @@ import os
 import shutil
 import subprocess
 import sys
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -40,6 +41,36 @@ DENY_SUBSTR = [".env", "kis_token", "models/", "models\\", "cache", "secret", ".
 def _denied(rel: str) -> bool:
     low = rel.replace("\\", "/").lower()
     return any(s.replace("\\", "/") in low for s in DENY_SUBSTR)
+
+
+def _read_json(path: Path) -> dict:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _payload_files(staging: Path) -> list[Path]:
+    return sorted(
+        p for p in staging.rglob("*")
+        if p.is_file() and p.relative_to(staging).as_posix() != "last_sync.json"
+    )
+
+
+def payload_hash(staging: Path) -> str:
+    """last_sync.json 자체를 제외한 대시보드 페이로드 해시.
+
+    last_sync.synced_at은 매 실행마다 달라지므로, 실제 앱/데이터 변경 여부는
+    이 해시로 판단한다.
+    """
+    digest = hashlib.sha256()
+    for path in _payload_files(staging):
+        rel = path.relative_to(staging).as_posix()
+        digest.update(rel.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 
 def curate(src: Path, staging: Path) -> list[str]:
@@ -84,9 +115,12 @@ def curate(src: Path, staging: Path) -> list[str]:
                              capture_output=True, text=True, timeout=10).stdout.strip()
     except Exception:
         sha = ""
+    current_payload_hash = payload_hash(staging)
     (staging / "last_sync.json").write_text(json.dumps({
         "synced_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "source_commit": sha,
+        "payload_hash": current_payload_hash,
+        "payload_file_count": len(_payload_files(staging)),
     }), encoding="utf-8")
     included.append("last_sync.json")
     return included
@@ -100,12 +134,27 @@ def push_branch(staging: Path) -> None:
                    capture_output=True)
     shutil.rmtree(wt, ignore_errors=True)
     subprocess.run(["git", "worktree", "prune"], cwd=ROOT, capture_output=True)
-    # 멱등성: 기존 로컬 브랜치가 있으면 삭제(다음 -b 충돌 방지)
+    subprocess.run(["git", "fetch", "origin", BRANCH], cwd=ROOT,
+                   capture_output=True)
+    has_remote = subprocess.run(
+        ["git", "rev-parse", "--verify", f"origin/{BRANCH}"],
+        cwd=ROOT, capture_output=True
+    ).returncode == 0
+    # 멱등성: 기존 로컬 브랜치가 있으면 삭제(다음 -b/-B 충돌 방지)
     subprocess.run(["git", "branch", "-D", BRANCH], cwd=ROOT, capture_output=True)
-    # orphan 브랜치를 빈 상태로 새로 만든 워크트리
-    subprocess.run(["git", "worktree", "add", "--force", "--orphan",
-                    "-b", BRANCH, str(wt)], cwd=ROOT, check=True)
+    if has_remote:
+        subprocess.run(["git", "worktree", "add", "--force", "-B",
+                        BRANCH, str(wt), f"origin/{BRANCH}"], cwd=ROOT, check=True)
+    else:
+        # orphan 브랜치를 빈 상태로 새로 만든 워크트리
+        subprocess.run(["git", "worktree", "add", "--force", "--orphan",
+                        "-b", BRANCH, str(wt)], cwd=ROOT, check=True)
     try:
+        previous_payload_hash = _read_json(wt / "last_sync.json").get("payload_hash")
+        current_payload_hash = _read_json(staging / "last_sync.json").get("payload_hash")
+        if previous_payload_hash and previous_payload_hash == current_payload_hash:
+            print("[sync] dashboard payload 변경 없음 - push 생략")
+            return
         # 워크트리 내용 비우고 staging 복사
         for p in wt.iterdir():
             if p.name == ".git":
@@ -117,9 +166,15 @@ def push_branch(staging: Path) -> None:
                 (wt / rel).parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(f, wt / rel)
         subprocess.run(["git", "add", "-A"], cwd=wt, check=True)
-        subprocess.run(["git", "commit", "-q", "-m",
-                        f"dashboard sync {datetime.now(timezone.utc):%Y-%m-%dT%H:%M:%SZ}"],
-                       cwd=wt, check=True)
+        has_head = subprocess.run(["git", "rev-parse", "--verify", "HEAD"], cwd=wt,
+                                  capture_output=True).returncode == 0
+        commit_message = f"dashboard sync {datetime.now(timezone.utc):%Y-%m-%dT%H:%M:%SZ}"
+        if has_head:
+            subprocess.run(["git", "commit", "--amend", "-q", "-m", commit_message],
+                           cwd=wt, check=True)
+        else:
+            subprocess.run(["git", "commit", "-q", "-m", commit_message],
+                           cwd=wt, check=True)
         subprocess.run(["git", "push", "--force", "origin", BRANCH], cwd=wt, check=True)
     finally:
         subprocess.run(["git", "worktree", "remove", "--force", str(wt)], cwd=ROOT,
