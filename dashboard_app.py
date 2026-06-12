@@ -619,6 +619,21 @@ def _parse_observation_candidates(md: str) -> list[dict]:
     return rows
 
 
+def _compact_report_markdown(md: str) -> str:
+    """보고서 원문 내용을 유지하되 대시보드 안에서는 제목 크기를 낮춘다."""
+    out = []
+    for line in md.splitlines():
+        if line.startswith("### "):
+            out.append("##### " + line[4:])
+        elif line.startswith("## "):
+            out.append("#### " + line[3:])
+        elif line.startswith("# "):
+            out.append("### " + line[2:])
+        else:
+            out.append(line)
+    return "\n".join(out)
+
+
 def _daily_no_order_message(funnel: dict) -> str:
     if not funnel:
         return ""
@@ -996,7 +1011,7 @@ with tab_funnel:
 
         if md:
             with st.expander("📄 상세 보고서 원문"):
-                st.markdown(md)
+                st.markdown(_compact_report_markdown(md))
 
 # ── ④ 여론 추세 ──────────────────────────────────────────────────────────────
 with tab_opinion:
