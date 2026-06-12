@@ -131,8 +131,11 @@ def test_tc07_empty_meaningful_report():
     f = _derive_funnel(ctx)
     md = dr._format_markdown(ctx, f)
     assert f["input_n"] == 0
-    assert "일일 매매 결정 보고서" in md
-    assert "매수 없음" in md and "매도 없음" in md
+    assert "오늘의 매매 판단" in md
+    assert "검토할 종목이 없어" in md
+    assert "매수 주문 없음" in md and "매도 주문 없음" in md
+    assert "run_live" not in md
+    assert "summary:" not in md
 
 
 # --- TC-08: 파일 저장 + 재구동 덮어쓰기 ---

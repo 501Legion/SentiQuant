@@ -133,55 +133,99 @@ def _fmt_num(v, nd=2) -> str:
     return f"{v:.{nd}f}" if isinstance(v, (int, float)) else "-"
 
 
+def _status_sentence(funnel: dict) -> str:
+    buy_n = len(funnel["buys"])
+    sell_n = len(funnel["sells"])
+    if buy_n or sell_n:
+        return f"오늘은 매수 {buy_n}건, 매도 {sell_n}건의 주문 판단이 있었습니다."
+    return "오늘은 매수/매도 주문이 없었습니다."
+
+
+def _hold_reason_sentence(funnel: dict) -> str:
+    input_n = funnel["input_n"]
+    neutral_n = len(funnel["neutral_dropped"])
+    consensus_n = len(funnel["consensus_dropped"])
+    gate_n = len(funnel["gate_dropped"])
+    candidate_n = len(funnel["buys"]) + len(funnel["sells"])
+    if input_n == 0:
+        return "검토할 종목이 없어 새 주문 판단을 만들지 않았습니다."
+    if candidate_n == 0:
+        if neutral_n and not (consensus_n or gate_n):
+            return f"검토한 {input_n}개 종목 모두 여론 방향성이 충분히 뚜렷하지 않아 보류되었습니다."
+        if neutral_n or consensus_n or gate_n:
+            return f"검토한 {input_n}개 종목 중 매매 기준을 통과한 후보가 없었습니다."
+        return f"검토한 {input_n}개 종목에서 새 주문 후보가 나오지 않았습니다."
+    return f"검토한 {input_n}개 종목 중 최종 주문 후보 {candidate_n}개가 확인되었습니다."
+
+
 def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
     """funnel → 한국어 Markdown 보고서 본문 (Design §6.1 / D7). 순수 함수."""
     date = ctx.date
+    neutral_n = len(funnel["neutral_dropped"])
+    consensus_n = len(funnel["consensus_dropped"])
+    gate_n = len(funnel["gate_dropped"])
+    hold_n = neutral_n + consensus_n + gate_n
     L = [
-        f"# 일일 매매 결정 보고서 — {date}",
+        f"# 오늘의 매매 판단 — {date}",
         "",
-        "> run_live 판단 funnel: 입력 → 중립필터 → 컨센서스 → 게이트 → 매수/매도. read-only 집계.",
+        _status_sentence(funnel),
         "",
-        "## 요약 (Funnel)",
+        _hold_reason_sentence(funnel),
         "",
-        "| 단계 | 통과/처리 | 탈락 |",
-        "|------|----------|------|",
-        f"| ① 입력 | {funnel['input_n']} 종목 | — |",
-        f"| ② 중립필터 | — | {len(funnel['neutral_dropped'])} |",
-        f"| ③ 컨센서스 | — | {len(funnel['consensus_dropped'])} |",
-        f"| ④ 게이트(universe/cost/router) | — | {len(funnel['gate_dropped'])} |",
-        f"| ⑤ 최종 매수 | {len(funnel['buys'])} | — |",
-        f"| ⑥ 최종 매도 | {len(funnel['sells'])} | — |",
+        "## 요약",
+        "",
+        "| 항목 | 결과 |",
+        "|------|------|",
+        f"| 검토 종목 | {funnel['input_n']}개 |",
+        f"| 매매 후보 | {len(funnel['buys']) + len(funnel['sells'])}개 |",
+        f"| 매수 | {len(funnel['buys'])}개 |",
+        f"| 매도 | {len(funnel['sells'])}개 |",
+        f"| 보류 | {hold_n}개 |",
         "",
     ]
 
     # ⑤ 매수
-    L += ["## 🟢 매수", ""]
+    L += ["## 매수", ""]
     if funnel["buys"]:
-        L += ["| 종목 | score | 합의비율 | size | shares | 체결 |",
+        L += ["| 종목 | 여론 점수 | 합의 비율 | 비중 | 수량 | 체결 |",
               "|------|------|---------|------|--------|------|"]
         for b in funnel["buys"]:
             L.append(f"| {b['symbol']} | {_fmt_num(b['score'], 1)} | {_fmt_num(b['consensus_ratio'])}"
                      f" | {_fmt_num(b['size_factor'])} | {b['shares']} | {'✅' if b['executed'] else '❌'} |")
     else:
-        L.append("_매수 없음._")
+        L.append("_매수 주문 없음._")
     L.append("")
 
     # ⑥ 매도
-    L += ["## 🔴 매도", ""]
+    L += ["## 매도", ""]
     if funnel["sells"]:
-        L += ["| 종목 | action | 사유 | shares | 체결 |",
+        L += ["| 종목 | 판단 | 사유 | 수량 | 체결 |",
               "|------|--------|------|--------|------|"]
         for s in funnel["sells"]:
             L.append(f"| {s['symbol']} | {s['action']} | {s['reason']} | {s['shares']}"
                      f" | {'✅' if s['executed'] else '❌'} |")
     else:
-        L.append("_매도 없음._")
+        L.append("_매도 주문 없음._")
     L.append("")
 
-    # ④ 게이트 탈락
-    L += ["## ⚠️ 게이트 탈락 (컨센서스는 통과했으나 미매수)", ""]
+    L += ["## 보류된 이유", ""]
+    if hold_n:
+        L += [
+            "| 이유 | 종목 수 |",
+            "|------|--------|",
+            f"| 여론 방향성이 충분히 뚜렷하지 않음 | {neutral_n}개 |",
+            f"| 매매 합의 기준 미충족 | {consensus_n}개 |",
+            f"| 최종 위험/비용 기준에서 보류 | {gate_n}개 |",
+            "",
+        ]
+    else:
+        L.append("_보류된 종목 없음._")
+        L.append("")
+
+    # ④ 상세: 최종 기준 보류
+    L += ["## 상세 기록", "", "### 최종 기준에서 보류", ""]
     if funnel["gate_dropped"]:
-        L += ["| 종목 | 최종 action | reason_codes |", "|------|-----------|--------------|"]
+        L += ["| 종목 | 최종 판단 | 참고 코드 |", "|------|-----------|-----------|"]
         for g in funnel["gate_dropped"]:
             L.append(f"| {g['symbol']} | {g['final_action']} | {', '.join(g['reason_codes']) or '-'} |")
     else:
@@ -189,7 +233,7 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
     L.append("")
 
     # ③ 컨센서스 탈락
-    L += ["## 컨센서스 탈락", ""]
+    L += ["### 매매 합의 기준 미충족", ""]
     if funnel["consensus_dropped"]:
         L += ["| 종목 | 상승 | 하락 | 사유 |", "|------|------|------|------|"]
         for c in funnel["consensus_dropped"]:
@@ -199,7 +243,7 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
     L.append("")
 
     # ② 중립필터 탈락
-    L += ["## 중립필터 탈락", ""]
+    L += ["### 여론 방향성 부족", ""]
     if funnel["neutral_dropped"]:
         L += ["| 종목 | 중립비율 |", "|------|----------|"]
         for n in funnel["neutral_dropped"]:
@@ -208,7 +252,7 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
         L.append("_없음._")
     L.append("")
 
-    L += ["---", f"_생성: {datetime.now(timezone.utc).isoformat()} · summary: {ctx.summary}_"]
+    L += ["---", f"_생성: {datetime.now(timezone.utc).isoformat()}_"]
     return "\n".join(L)
 
 
