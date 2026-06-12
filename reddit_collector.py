@@ -546,22 +546,45 @@ class RedditCollector:
 
         return cached_valid
 
+    def _archive_posts_snapshot(self, date_str: str, payload: dict) -> str:
+        """실행 시각별 원본 입력을 보존한다. 최신 파일 덮어쓰기와 별도로 replay 근거로 사용."""
+        run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+        archive_dir = os.path.join(config.REDDIT_DATA_DIR, date_str, "runs", run_id)
+        os.makedirs(archive_dir, exist_ok=True)
+
+        archive_path = os.path.join(archive_dir, "wsb_posts.json")
+        with open(archive_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+
+        metadata = {
+            "date": date_str,
+            "archived_at": datetime.now(timezone.utc).isoformat(),
+            "symbols": sorted(k for k in payload if k != "date"),
+            "symbol_count": max(len(payload) - 1, 0),
+            "latest_path": os.path.join(config.REDDIT_DATA_DIR, date_str, "wsb_posts.json"),
+        }
+        with open(os.path.join(archive_dir, "metadata.json"), "w", encoding="utf-8") as f:
+            json.dump(metadata, f, ensure_ascii=False, indent=2)
+
+        return archive_path
+
     def _save_posts(self, date_str: str, posts_by_symbol: dict) -> None:
         """
         data/reddit/{date_str}/wsb_posts.json 저장.
-        기존 파일이 있으면 덮어씀.
+        기존 최신 파일은 덮어쓰되, runs/{timestamp}/에도 원본을 보존한다.
         """
         dir_path = os.path.join(config.REDDIT_DATA_DIR, date_str)
         os.makedirs(dir_path, exist_ok=True)
         file_path = os.path.join(dir_path, "wsb_posts.json")
 
         payload = {"date": date_str, **posts_by_symbol}
+        archive_path = self._archive_posts_snapshot(date_str, payload)
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=2)
 
         logger.info(
             f"wsb_posts.json 저장 완료: {file_path}"
-            f" ({len(posts_by_symbol)}개 종목)"
+            f" ({len(posts_by_symbol)}개 종목, archive={archive_path})"
         )
 
     @staticmethod
