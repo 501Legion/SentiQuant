@@ -649,7 +649,7 @@ with tab_pf:
                 unsafe_allow_html=True,
             )
 
-        st.caption("현재가는 커밋된 가격 스냅샷의 최신 종가입니다. 실시간 주문/동기화는 이 화면에서 실행하지 않습니다.")
+        st.caption("가격은 서버가 동기화한 최신 종가 기준입니다. 이 화면에서는 주문을 실행하지 않습니다.")
 
         if not rows:
             run_summary = _latest_live_run_summary()
@@ -672,7 +672,7 @@ with tab_pf:
                 run_value = "실행 기록 없음"
                 run_sub = "라이브 실행 후 표시됩니다."
             decision_caption = (
-                f"최근 후보 판단: {decision['date']} · {decision['unique_total']}개 종목 "
+                f"마지막 후보 기록: {decision['date']} · {decision['unique_total']}개 종목 "
                 f"(기록 {decision['total']}건)"
                 if decision else ""
             )
