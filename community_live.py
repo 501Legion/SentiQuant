@@ -91,6 +91,50 @@ def append_run_summary(summary: dict, path: str = None) -> None:
         logger.warning(f"run summary append 실패(무시): {e}")
 
 
+def _snapshot_diagnostics(
+    *,
+    input_symbols: int,
+    scored_symbols: int,
+    ranked_symbols: int,
+    candidate_symbols: int,
+    snapshot_count: int,
+    snapshot_failures: int,
+) -> dict:
+    """대시보드가 실행 성공과 스냅샷 생성 성공을 분리해 보여줄 수 있는 요약."""
+    if snapshot_count > 0 and snapshot_failures == 0:
+        status = "created"
+        reason = ""
+    elif snapshot_count > 0:
+        status = "partial"
+        reason = "partial_snapshot_write_failure"
+    elif snapshot_failures > 0:
+        status = "failed"
+        reason = "snapshot_write_failed"
+    elif input_symbols <= 0:
+        status = "missing"
+        reason = "no_posts"
+    elif scored_symbols <= 0:
+        status = "missing"
+        reason = "no_scored_symbols"
+    elif ranked_symbols <= 0 and candidate_symbols <= 0:
+        status = "missing"
+        reason = "filtered_out_all"
+    else:
+        status = "missing"
+        reason = "no_candidate_snapshots"
+
+    return {
+        "input_symbols": input_symbols,
+        "scored_symbols": scored_symbols,
+        "ranked_symbols": ranked_symbols,
+        "candidate_symbols": candidate_symbols,
+        "snapshot_count": snapshot_count,
+        "snapshot_failures": snapshot_failures,
+        "snapshot_status": status,
+        "no_snapshot_reason": reason,
+    }
+
+
 # =============================================================================
 # OrderExecutor (Design §3.2) — dry-run이면 의도만 로그, 아니면 KIS 모의주문
 # =============================================================================
@@ -410,6 +454,10 @@ def run_live(
                    "buys": 0, "sells": 0, "llm_calls": 0,
                    "dry_run": dry_run, "placed": 0,
                    "reflections": {"high": 0, "low": 0}}
+        summary.update(_snapshot_diagnostics(
+            input_symbols=0, scored_symbols=0, ranked_symbols=0,
+            candidate_symbols=0, snapshot_count=0, snapshot_failures=0,
+        ))
         append_run_summary(summary)
         return {"decisions": [], "orders": [], "decision_log_path": decision_log_path(live=True),
                 "summary": summary}
@@ -480,6 +528,8 @@ def run_live(
     buy_intents: list = []
     sell_intents: list = []
     snap_by_key: dict[tuple, object] = {}      # (sym, date) → snapshot (reflection join용)
+    snapshot_count = 0
+    snapshot_failures = 0
 
     position_scores = wsb_state.load_position_scores()
 
@@ -508,9 +558,14 @@ def run_live(
         # snapshot 영속 누적 (Design §2/§4, Plan D5 — 라이브 memory 성장)
         try:
             wsb_state.append_daily_snapshot(snap)
+            snapshot_count += 1
+        except Exception as e:  # noqa: BLE001
+            snapshot_failures += 1
+            logger.warning(f"[{sym}] snapshot 영속 실패: {e}")
+        try:
             memory.add_opinion_snapshot(snap)
         except Exception as e:  # noqa: BLE001
-            logger.warning(f"[{sym}] snapshot 영속 실패: {e}")
+            logger.warning(f"[{sym}] memory snapshot 영속 실패: {e}")
 
         # DecisionLog 영속 저장 (BUY/SKIP/HOLD/SELL/... 모두 — FR-05/SC-04, snapshot 보강)
         record = build_decision_record(
@@ -611,7 +666,23 @@ def run_live(
         "placed": sum(1 for o in orders if o.get("executed")),
         "reflections": refl_counts,
     }
+    summary.update(_snapshot_diagnostics(
+        input_symbols=len(posts_by_symbol),
+        scored_symbols=len(scored),
+        ranked_symbols=len(top_n),
+        candidate_symbols=len(candidates),
+        snapshot_count=snapshot_count,
+        snapshot_failures=snapshot_failures,
+    ))
     append_run_summary(summary)
+    if summary["snapshot_status"] != "created":
+        logger.warning(
+            "스냅샷 미생성/부분생성: "
+            f"status={summary['snapshot_status']} reason={summary['no_snapshot_reason']} "
+            f"input={summary['input_symbols']} scored={summary['scored_symbols']} "
+            f"ranked={summary['ranked_symbols']} candidates={summary['candidate_symbols']} "
+            f"written={summary['snapshot_count']} failures={summary['snapshot_failures']}"
+        )
     logger.info(f"=== run_live 완료 — {summary} ===")
 
     # 10. 일일 결정 보고서 (daily-decision-report §6.2) — read-only, 비침습(D3/NFR-01).

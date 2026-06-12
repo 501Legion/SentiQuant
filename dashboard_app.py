@@ -452,6 +452,50 @@ def _latest_live_run_summary() -> dict:
     return max(valid, key=lambda s: (s.get("date") or "", s.get("created_at") or ""))
 
 
+def _run_int(summary: dict, key: str) -> int:
+    try:
+        return int(summary.get(key) or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _missing_snapshot_message(summary: dict, date_label: str) -> str:
+    reason = summary.get("no_snapshot_reason") or ""
+    if reason == "no_posts":
+        detail = "수집된 Reddit 입력이 없습니다."
+    elif reason == "no_scored_symbols":
+        detail = "입력은 있었지만 점수화된 종목이 없습니다."
+    elif reason == "filtered_out_all":
+        detail = "점수화 이후 랭킹/필터를 통과한 표시 후보가 없습니다."
+    elif reason == "snapshot_write_failed":
+        detail = "후보는 있었지만 스냅샷 파일 저장에 실패했습니다."
+    elif reason == "partial_snapshot_write_failure":
+        detail = "일부 종목 스냅샷만 저장됐습니다."
+    elif reason == "no_candidate_snapshots":
+        detail = "표시 가능한 후보가 없어 종목별 스냅샷이 없습니다."
+    else:
+        detail = "이 날짜의 종목별 표시 스냅샷은 생성되지 않았습니다."
+    return f"{date_label} 실행은 완료됐지만 {detail}"
+
+
+def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
+    reason = summary.get("no_snapshot_reason") or ""
+    message = _missing_snapshot_message(summary, date_label)
+    if reason in {"snapshot_write_failed", "partial_snapshot_write_failure"}:
+        st.warning(message)
+    else:
+        st.info(message)
+
+    if any(k in summary for k in ("input_symbols", "scored_symbols", "ranked_symbols", "snapshot_count")):
+        st.caption(
+            "진단: "
+            f"입력 {_run_int(summary, 'input_symbols')}개 · "
+            f"점수화 {_run_int(summary, 'scored_symbols')}개 · "
+            f"랭킹 통과 {_run_int(summary, 'ranked_symbols')}개 · "
+            f"스냅샷 저장 {_run_int(summary, 'snapshot_count')}개"
+        )
+
+
 def _latest_trade_summary() -> dict:
     if not TRADES.exists():
         return {}
@@ -857,7 +901,7 @@ with tab_opinion:
     run_date = run_summary.get("date")
     if not snaps:
         if run_date:
-            st.info(f"{run_date} 실행은 완료됐지만 이 날짜의 종목별 표시 스냅샷은 생성되지 않았습니다.")
+            _render_missing_snapshot_notice(run_summary, run_date)
             c1, c2, c3, c4 = st.columns(4)
             c1.metric("신규 표시 종목", "0개")
             c2.metric("서버 판단 종목", f"{int(run_summary.get('candidates') or 0)}개")
@@ -910,7 +954,7 @@ with tab_opinion:
             } for _, r in top.iterrows()]
             st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
         elif latest:
-            st.info(f"{latest} 실행은 완료됐지만 이 날짜의 종목별 표시 스냅샷은 생성되지 않았습니다.")
+            _render_missing_snapshot_notice(run_summary, latest)
             c1, c2, c3, c4 = st.columns(4)
             c1.metric("신규 표시 종목", "0개")
             c2.metric("서버 판단 종목", f"{int(run_summary.get('candidates') or 0)}개")

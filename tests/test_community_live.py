@@ -184,6 +184,9 @@ def test_t3b_run_summary_persists_even_without_candidates(tmp_path=None):
         recs = [json.loads(line) for line in open(summary_path, encoding="utf-8") if line.strip()]
         assert recs[-1]["date"] == _DATE
         assert recs[-1]["candidates"] == 0
+        assert recs[-1]["snapshot_status"] == "missing"
+        assert recs[-1]["no_snapshot_reason"] == "no_posts"
+        assert recs[-1]["input_symbols"] == 0
         assert res["summary"]["candidates"] == 0
 
 
@@ -231,6 +234,33 @@ def test_t3c_state_overrides_isolate_replay_outputs(tmp_path=None):
         assert res["report_path"].startswith(overrides["reports_dir"])
         assert not os.path.exists(path), "replay override 중 live decision path가 오염됨"
         assert config.MENTION_HISTORY_FILE == original_mention_path
+
+
+def test_t3d_run_summary_explains_filtered_out_snapshots(tmp_path=None):
+    import tempfile
+
+    class _EngNoRanked(_FakeEngine):
+        def run_pipeline(self, posts_by_symbol, ohlcv_cache, date_str=None):
+            return [], [_BUY_SCORED]
+
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "dec.jsonl")
+        with _live_env(decisions_path=path):
+            community_live.WSBSignalEngine = _EngNoRanked
+            res = community_live.run_live(
+                date=_DATE, dry_run=True, universe_mode="community_liquid",
+                broker=MockBroker(tradable=["NVDA"]),
+                posts_by_symbol={"NVDA": [{"title": "NVDA moon", "body_excerpt": "calls"}]},
+                ohlcv_full={"NVDA": _make_df("NVDA")}, portfolio=_portfolio(),
+                memory=CommunityMemoryStore(backend=InMemoryBackend()),
+            )
+
+        assert res["summary"]["snapshot_status"] == "missing"
+        assert res["summary"]["no_snapshot_reason"] == "filtered_out_all"
+        assert res["summary"]["input_symbols"] == 1
+        assert res["summary"]["scored_symbols"] == 1
+        assert res["summary"]["ranked_symbols"] == 0
+        assert res["summary"]["snapshot_count"] == 0
 
 
 # --- T4: LLM 일일 상한 초과 → rule fallback (SC-05) -------------------------
