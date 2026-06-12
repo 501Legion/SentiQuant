@@ -478,7 +478,7 @@ def _missing_snapshot_message(summary: dict, date_label: str) -> str:
     elif reason == "filtered_out_all":
         detail = "점수화 이후 랭킹/필터를 통과한 표시 후보가 없습니다."
     elif reason == "snapshot_write_failed":
-        detail = "후보는 있었지만 스냅샷 파일 저장에 실패했습니다."
+        detail = "후보는 있었지만 종목별 기록 저장에 실패했습니다."
     elif reason == "partial_snapshot_write_failure":
         detail = "일부 종목 스냅샷만 저장됐습니다."
     elif reason == "no_candidate_snapshots":
@@ -712,13 +712,13 @@ st.markdown(
 )
 
 tab_pf, tab_trades, tab_funnel, tab_opinion = st.tabs(
-    ["💼 포트폴리오", "📜 매매 이력", "🔎 오늘 판단", "🗣️ 여론 흐름"])
+    ["💼 포트폴리오", "📜 매매 이력", "🔎 일일 판단", "🗣️ 여론 흐름"])
 
 # ── ① 포트폴리오 (보유 개요 + 평가) ──────────────────────────────────────────
 with tab_pf:
     pf = _read_json(PORTFOLIO, {})
     if not pf:
-        st.warning("portfolio.json 없음/비어있음")
+        st.warning("포트폴리오 데이터가 아직 동기화되지 않았습니다.")
     else:
         positions = pf.get("positions", {}) or {}
         cash = float(pf.get("cash", 0) or 0)
@@ -825,7 +825,7 @@ with tab_pf:
                     if not hist.empty:
                         st.altair_chart(_price_chart(hist), width="stretch")
             else:
-                st.info("가격 스냅샷(data/backtest_snapshots) 없음")
+                st.info("가격 데이터가 아직 동기화되지 않았습니다.")
         else:
             symbols = [r["symbol"] for r in rows]
             current = st.session_state.get("dashboard_selected_symbol")
@@ -917,9 +917,9 @@ with tab_pf:
                         st.dataframe(trades[trades["symbol"] == selected["symbol"]].tail(5),
                                      width="stretch", hide_index=True)
                     else:
-                        st.caption("trades.csv에 symbol 컬럼이 없습니다.")
+                        st.caption("거래 기록 형식을 확인할 수 없습니다.")
                 else:
-                    st.caption("trades.csv 없음")
+                    st.caption("거래 기록이 아직 동기화되지 않았습니다.")
 
             with col_side:
                 profit_rate = _signed_percent(selected["profit_pct"]) if selected["profit_pct"] is not None else "가격 미조회"
@@ -948,7 +948,7 @@ with tab_pf:
 # ── ② 매매 이력 ──────────────────────────────────────────────────────────────
 with tab_trades:
     if not TRADES.exists():
-        st.warning("trades.csv 없음")
+        st.warning("매매 이력이 아직 동기화되지 않았습니다.")
     else:
         df = pd.read_csv(TRADES)
         st.metric("총 거래", len(df))
