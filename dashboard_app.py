@@ -384,15 +384,13 @@ def _funnel_stat_grid(stats: list[tuple[str, object, str]]) -> str:
     for label, value, unit in stats:
         unit_html = f"<span class=\"funnel-stat-unit\">{_html(unit)}</span>" if unit else ""
         items.append(
-            f"""
-            <div class="funnel-stat">
-                <div class="funnel-stat-label">{_html(label)}</div>
-                <div class="funnel-stat-value">
-                    <span class="funnel-stat-number">{_html(value)}</span>
-                    {unit_html}
-                </div>
-            </div>
-            """
+            "<div class=\"funnel-stat\">"
+            f"<div class=\"funnel-stat-label\">{_html(label)}</div>"
+            "<div class=\"funnel-stat-value\">"
+            f"<span class=\"funnel-stat-number\">{_html(value)}</span>"
+            f"{unit_html}"
+            "</div>"
+            "</div>"
         )
     return f"<div class=\"funnel-stat-grid\">{''.join(items)}</div>"
 
