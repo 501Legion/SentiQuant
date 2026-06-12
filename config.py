@@ -417,8 +417,10 @@ WATCHDOG_RESTART_STATE_FILE = "data/watchdog_restart_state.json"  # 일일 잡 �
 HEARTBEAT_ALIVE_INTERVAL_MINUTES = 5         # alive heartbeat 갱신 주기
 SLACK_WEBHOOK_URL = ""                       # 미설정 시 알림 no-op (env로 주입 권장)
 
-# --- v3 Decision Router / LLM Router (Design Ref: §3.5) — 기본 OFF ---
-COMMUNITY_LLM_ROUTER_ENABLED = False
+# --- v3 Decision Router / LLM Router (Design Ref: §3.5) ---
+# 2026-06-13 ON 전환 — rule 1차 판단의 승인/축소/보류만 가능(자율매매 불가, rule SKIP
+# 못 뒤집음). 비용: gpt-5.4-mini, 라이브 일일 상한 COMMUNITY_LLM_LIVE_MAX_CALLS(50).
+COMMUNITY_LLM_ROUTER_ENABLED = True
 COMMUNITY_LLM_ROUTER_MODEL = "gpt4"              # 실호출은 config.GPT_MODEL로 매핑(D3)
 COMMUNITY_LLM_ROUTER_REQUIRE_STRICT_JSON = True
 COMMUNITY_LLM_ROUTER_FALLBACK_TO_RULE_BASED = True
