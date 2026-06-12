@@ -66,6 +66,20 @@ st.markdown(
         font-size: 0.92rem;
         margin-top: 3px;
     }
+    .readonly-note {
+        background: rgba(59, 130, 246, 0.10);
+        border-left: 3px solid #3b82f6;
+        border-radius: 6px;
+        color: #9ca3af;
+        font-size: 0.86rem;
+        line-height: 1.35;
+        margin: 10px 0 18px 0;
+        padding: 8px 11px;
+    }
+    .readonly-note strong {
+        color: #bfdbfe;
+        font-weight: 800;
+    }
     .stock-card-panel {
         background: #171b22;
         border: 1px solid #2f3744;
@@ -394,7 +408,14 @@ if _sync.get("synced_at"):
     st.caption(f"🔄 데이터 기준 시각: **{_kst} (한국시간)** — 매매 서버가 30분마다 자동 동기화")
 else:
     st.caption("🔄 동기화 기록 없음 — 로컬 데이터 기준")
-st.info("읽기 전용 대시보드입니다. 실제 매매·주문은 우분투 서버에서만 수행됩니다. (KIS 모의투자)", icon="ℹ️")
+st.markdown(
+    """
+    <div class="readonly-note">
+        <strong>읽기 전용</strong> · 실제 매매와 주문은 우분투 서버에서만 수행됩니다. KIS 모의투자 기준입니다.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 tab_pf, tab_trades, tab_funnel, tab_opinion = st.tabs(
     ["💼 포트폴리오", "📜 매매 이력", "🔎 일일 결정", "🗣️ 여론 추세"])
