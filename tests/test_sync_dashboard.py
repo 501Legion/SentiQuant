@@ -100,6 +100,8 @@ def test_tc03_last_sync_written():
         assert "synced_at" in meta
         assert len(meta.get("payload_hash", "")) == 64
         assert meta.get("payload_file_count", 0) > 0
+        assert meta.get("payload_changed") is True
+        assert meta.get("payload_changed_at") == meta.get("synced_at")
 
 
 # --- TC-04: _denied 차단 로직 ---
@@ -150,14 +152,16 @@ def test_tc06_push_branch_reuses_existing_dashboard_branch():
         try:
             sync.ROOT = root
             (staging / "dashboard_app.py").write_text("first\n", encoding="utf-8")
-            assert sync.push_branch(staging) is True
+            assert sync.push_branch(staging) == "changed"
 
             first = run(["git", "rev-parse", "dashboard-data"]).stdout.strip()
             assert run(["git", "branch", "--list", "dashboard-data"]).stdout.strip()
-            assert run(["git", "ls-tree", "-r", "--name-only", "dashboard-data"]).stdout.strip() == "dashboard_app.py"
+            assert run(["git", "ls-tree", "-r", "--name-only", "dashboard-data"]).stdout.strip() == (
+                "dashboard_app.py\nlast_sync.json"
+            )
 
             (staging / "dashboard_app.py").write_text("second\n", encoding="utf-8")
-            assert sync.push_branch(staging) is True
+            assert sync.push_branch(staging) == "changed"
 
             second = run(["git", "rev-parse", "dashboard-data"]).stdout.strip()
             remote = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
@@ -168,8 +172,8 @@ def test_tc06_push_branch_reuses_existing_dashboard_branch():
             sync.ROOT = old_root
 
 
-# --- TC-07: payload 변화가 없으면 last_sync만 달라도 push 생략 ---
-def test_tc07_push_branch_skips_unchanged_payload():
+# --- TC-07: payload 변화가 없어도 heartbeat push, 데이터 변경 시각은 유지 ---
+def test_tc07_push_branch_keeps_heartbeat_when_payload_unchanged():
     with tempfile.TemporaryDirectory() as d:
         root = Path(d) / "repo"
         origin = Path(d) / "origin.git"
@@ -195,23 +199,26 @@ def test_tc07_push_branch_skips_unchanged_payload():
             (staging / "dashboard_app.py").write_text("same\n", encoding="utf-8")
             first_hash = sync.payload_hash(staging)
             (staging / "last_sync.json").write_text(
-                f'{{"synced_at":"2026-06-12T00:00:00+00:00","payload_hash":"{first_hash}"}}',
+                f'{{"synced_at":"2026-06-12T00:00:00+00:00",'
+                f'"payload_hash":"{first_hash}",'
+                f'"payload_changed_at":"2026-06-12T00:00:00+00:00"}}',
                 encoding="utf-8",
             )
-            assert sync.push_branch(staging) is True
+            assert sync.push_branch(staging) == "changed"
             first = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
 
             (staging / "last_sync.json").write_text(
                 f'{{"synced_at":"2026-06-12T00:30:00+00:00","payload_hash":"{first_hash}"}}',
                 encoding="utf-8",
             )
-            assert sync.push_branch(staging) is False
+            assert sync.push_branch(staging) == "heartbeat"
             second = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
 
-            assert second == first
-            assert "2026-06-12T00:00:00+00:00" in run(
-                ["git", "show", "origin/dashboard-data:last_sync.json"]
-            ).stdout
+            assert second != first
+            last_sync = run(["git", "show", "origin/dashboard-data:last_sync.json"]).stdout
+            assert '"synced_at": "2026-06-12T00:30:00+00:00"' in last_sync
+            assert '"payload_changed": false' in last_sync
+            assert '"payload_changed_at": "2026-06-12T00:00:00+00:00"' in last_sync
         finally:
             sync.ROOT = old_root
 

@@ -252,6 +252,16 @@ def _read_json(path: Path, default=None):
         return default
 
 
+def _format_kst(value: str | None) -> str | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value).astimezone(
+            timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
+    except ValueError:
+        return value
+
+
 def _read_jsonl(path: Path) -> list[dict]:
     out = []
     if not path.exists():
@@ -583,12 +593,13 @@ st.markdown(
 )
 _sync = _read_json(LAST_SYNC, {})
 if _sync.get("synced_at"):
-    try:
-        _kst = datetime.fromisoformat(_sync["synced_at"]).astimezone(
-            timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
-    except ValueError:
-        _kst = _sync["synced_at"]
-    st.caption(f"🔄 데이터 기준 시각: **{_kst} (한국시간)** — 매매 서버가 30분마다 자동 동기화")
+    _server_kst = _format_kst(_sync.get("synced_at"))
+    _data_kst = _format_kst(_sync.get("payload_changed_at")) or _server_kst
+    _changed_flag = "변경 있음" if _sync.get("payload_changed") else "변경 없음"
+    st.caption(
+        f"🔄 서버 최종 동기화: **{_server_kst} (한국시간)** · "
+        f"데이터 최종 변경: **{_data_kst} (한국시간)** · {_changed_flag}"
+    )
 else:
     st.caption("🔄 동기화 기록 없음 — 로컬 데이터 기준")
 st.markdown(

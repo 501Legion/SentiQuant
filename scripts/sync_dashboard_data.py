@@ -116,19 +116,22 @@ def curate(src: Path, staging: Path) -> list[str]:
     except Exception:
         sha = ""
     current_payload_hash = payload_hash(staging)
+    synced_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     (staging / "last_sync.json").write_text(json.dumps({
-        "synced_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "synced_at": synced_at,
         "source_commit": sha,
         "payload_hash": current_payload_hash,
         "payload_file_count": len(_payload_files(staging)),
+        "payload_changed": True,
+        "payload_changed_at": synced_at,
     }), encoding="utf-8")
     included.append("last_sync.json")
     return included
 
 
-def push_branch(staging: Path) -> bool:
+def push_branch(staging: Path) -> str:
     """staging 내용을 orphan dashboard-data 브랜치 단일커밋으로 force-push (D3).
-    git worktree로 메인 작업트리 오염 없이 수행. 실제 push 여부를 반환한다.
+    git worktree로 메인 작업트리 오염 없이 수행. 변경 상태("changed"|"heartbeat")를 반환한다.
     (서버 전용 — 원격 인증 필요)"""
     wt = ROOT / ".dashboard-worktree"
     subprocess.run(["git", "worktree", "remove", "--force", str(wt)], cwd=ROOT,
@@ -151,11 +154,26 @@ def push_branch(staging: Path) -> bool:
         subprocess.run(["git", "worktree", "add", "--force", "--orphan",
                         "-b", BRANCH, str(wt)], cwd=ROOT, check=True)
     try:
-        previous_payload_hash = _read_json(wt / "last_sync.json").get("payload_hash")
-        current_payload_hash = _read_json(staging / "last_sync.json").get("payload_hash")
+        previous_meta = _read_json(wt / "last_sync.json")
+        current_meta = _read_json(staging / "last_sync.json")
+        previous_payload_hash = previous_meta.get("payload_hash")
+        current_payload_hash = current_meta.get("payload_hash")
         if previous_payload_hash and previous_payload_hash == current_payload_hash:
-            print("[sync] dashboard payload 변경 없음 - push 생략")
-            return False
+            current_meta["payload_changed"] = False
+            current_meta["payload_changed_at"] = (
+                previous_meta.get("payload_changed_at")
+                or previous_meta.get("synced_at")
+                or current_meta.get("synced_at")
+            )
+            sync_status = "heartbeat"
+        else:
+            current_meta["payload_changed"] = True
+            current_meta["payload_changed_at"] = current_meta.get("synced_at")
+            sync_status = "changed"
+        (staging / "last_sync.json").write_text(
+            json.dumps(current_meta, ensure_ascii=False),
+            encoding="utf-8",
+        )
         # 워크트리 내용 비우고 staging 복사
         for p in wt.iterdir():
             if p.name == ".git":
@@ -177,7 +195,7 @@ def push_branch(staging: Path) -> bool:
             subprocess.run(["git", "commit", "-q", "-m", commit_message],
                            cwd=wt, check=True)
         subprocess.run(["git", "push", "--force", "origin", BRANCH], cwd=wt, check=True)
-        return True
+        return sync_status
     finally:
         subprocess.run(["git", "worktree", "remove", "--force", str(wt)], cwd=ROOT,
                        capture_output=True)
@@ -198,10 +216,11 @@ def main(argv) -> int:
         if "--no-push" in argv:
             print("[sync] --no-push: push 생략")
             return 0
-        if push_branch(staging):
+        sync_status = push_branch(staging)
+        if sync_status == "changed":
             print(f"[sync] dashboard-data 브랜치 force-push 완료")
         else:
-            print("[sync] dashboard-data 브랜치 변경 없음")
+            print("[sync] dashboard-data heartbeat force-push 완료")
         return 0
     finally:
         shutil.rmtree(staging, ignore_errors=True)
