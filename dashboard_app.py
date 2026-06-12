@@ -619,6 +619,28 @@ def _parse_observation_candidates(md: str) -> list[dict]:
     return rows
 
 
+def _daily_no_order_message(funnel: dict) -> str:
+    if not funnel:
+        return ""
+    if funnel.get("매수", 0) or funnel.get("매도", 0):
+        return ""
+    input_n = funnel.get("입력", 0)
+    if input_n <= 0:
+        return "이 날은 검토할 종목이 없어 새 주문 판단을 만들지 않았습니다."
+    reasons = [
+        ("여론 방향성이 충분히 뚜렷하지 않음", funnel.get("중립 제외", 0)),
+        ("매매 합의 기준 미충족", funnel.get("컨센서스 미달", 0)),
+        ("최종 위험/비용 기준에서 보류", funnel.get("게이트 차단", 0)),
+    ]
+    top_reason, top_count = max(reasons, key=lambda item: item[1])
+    if top_count > 0:
+        return (
+            f"이 날은 {input_n}개 종목을 검토했지만 매수/매도 주문은 없었습니다. "
+            f"가장 큰 보류 이유는 '{top_reason}'으로, {top_count}개 종목이 해당했습니다."
+        )
+    return f"이 날은 {input_n}개 종목을 검토했지만 새 주문 후보가 나오지 않았습니다."
+
+
 # ── 헤더 + 마지막 sync 배지 (D6) ─────────────────────────────────────────────
 _logo_uri = _logo_data_uri()
 _logo_html = (
@@ -943,6 +965,9 @@ with tab_funnel:
                 ).properties(height=170),
                 width="stretch")
             st.caption("커뮤니티에서 언급된 모든 종목이 위 단계를 통과해야 실제 주문으로 이어집니다.")
+            no_order_message = _daily_no_order_message(funnel)
+            if no_order_message:
+                st.info(no_order_message)
 
         watch_rows = _parse_observation_candidates(md)
         if watch_rows:
