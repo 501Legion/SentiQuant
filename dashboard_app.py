@@ -409,15 +409,27 @@ def _latest_decision_summary() -> dict:
     buy = sum(1 for d in latest if d.get("final_action") == "BUY")
     sell = sum(1 for d in latest if d.get("final_action") == "SELL")
     hold = len(latest) - buy - sell
+    unique_by_symbol = {}
+    for item in latest:
+        symbol = item.get("symbol") or "-"
+        current = unique_by_symbol.get(symbol)
+        if current is None:
+            unique_by_symbol[symbol] = item
+            continue
+        current_key = (float(current.get("opinion_score") or 0), current.get("created_at") or "")
+        item_key = (float(item.get("opinion_score") or 0), item.get("created_at") or "")
+        if item_key > current_key:
+            unique_by_symbol[symbol] = item
     top = sorted(
-        latest,
-        key=lambda d: float(d.get("opinion_score") or 0),
+        unique_by_symbol.values(),
+        key=lambda d: (float(d.get("opinion_score") or 0), d.get("created_at") or ""),
         reverse=True,
     )[:3]
     symbols = [d.get("symbol", "-") for d in top]
     return {
         "date": latest_date,
         "total": len(latest),
+        "unique_total": len(unique_by_symbol),
         "buy": buy,
         "sell": sell,
         "hold": hold,
@@ -573,11 +585,11 @@ with tab_pf:
             decision = _latest_decision_summary()
             trade = _latest_trade_summary()
             decision_value = (
-                f"{decision['date']} · {decision['total']}개 판단"
+                f"{decision['date']} · {decision['unique_total']}개 종목"
                 if decision else "판단 기록 없음"
             )
             decision_sub = (
-                f"매수 {decision['buy']} / 매도 {decision['sell']} / 보류 {decision['hold']}"
+                f"판단 기록 {decision['total']}건 · 매수 {decision['buy']} / 매도 {decision['sell']} / 보류 {decision['hold']}"
                 if decision else "라이브 판단 동기화 후 표시됩니다."
             )
             watch_symbols = ", ".join(decision.get("symbols") or []) if decision else "-"
