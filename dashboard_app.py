@@ -652,17 +652,31 @@ with tab_pf:
         st.caption("현재가는 커밋된 가격 스냅샷의 최신 종가입니다. 실시간 주문/동기화는 이 화면에서 실행하지 않습니다.")
 
         if not rows:
+            run_summary = _latest_live_run_summary()
             decision = _latest_decision_summary()
             trade = _latest_trade_summary()
-            decision_value = (
-                f"{decision['date']} · {decision['unique_total']}개 종목"
-                if decision else "판단 기록 없음"
+            if run_summary:
+                run_candidates = _run_int(run_summary, "candidate_symbols")
+                if run_candidates == 0:
+                    run_candidates = _run_int(run_summary, "candidates")
+                run_value = f"{run_summary.get('date', '-')} · 후보 {run_candidates}개"
+                run_sub = (
+                    f"입력 {_run_int(run_summary, 'input_symbols')} / "
+                    f"점수화 {_run_int(run_summary, 'scored_symbols')} / "
+                    f"랭킹 {_run_int(run_summary, 'ranked_symbols')} · "
+                    f"매수 {_run_int(run_summary, 'buys')} / 매도 {_run_int(run_summary, 'sells')}"
+                )
+                if run_summary.get("no_snapshot_reason") == "filtered_out_all":
+                    run_sub += " · 표시 후보 없음"
+            else:
+                run_value = "실행 기록 없음"
+                run_sub = "라이브 실행 후 표시됩니다."
+            decision_caption = (
+                f"최근 후보 판단: {decision['date']} · {decision['unique_total']}개 종목 "
+                f"(기록 {decision['total']}건)"
+                if decision else ""
             )
-            decision_sub = (
-                f"판단 기록 {decision['total']}건 · 매수 {decision['buy']} / 매도 {decision['sell']} / 보류 {decision['hold']}"
-                if decision else "라이브 판단 동기화 후 표시됩니다."
-            )
-            watch_symbols = ", ".join(decision.get("symbols") or []) if decision else "-"
+            decision_symbols = ", ".join(decision.get("symbols") or []) if decision else ""
             trade_value = (
                 f"{trade.get('symbol', '-')} {trade.get('action', '-')}"
                 if trade.get("total") else "거래 기록 없음"
@@ -686,9 +700,9 @@ with tab_pf:
                             <div class="empty-state-sub">모의 계좌 기준</div>
                         </div>
                         <div class="empty-state-item">
-                            <div class="empty-state-label">최근 판단</div>
-                            <div class="empty-state-value">{_html(decision_value)}</div>
-                            <div class="empty-state-sub">{_html(decision_sub)}</div>
+                            <div class="empty-state-label">최근 실행</div>
+                            <div class="empty-state-value">{_html(run_value)}</div>
+                            <div class="empty-state-sub">{_html(run_sub)}</div>
                         </div>
                         <div class="empty-state-item">
                             <div class="empty-state-label">최근 거래</div>
@@ -700,8 +714,9 @@ with tab_pf:
                 """,
                 unsafe_allow_html=True,
             )
-            if watch_symbols != "-":
-                st.caption(f"최근 여론 상위 관찰 종목: {watch_symbols}")
+            if decision_caption:
+                suffix = f" · 종목: {decision_symbols}" if decision_symbols else ""
+                st.caption(f"{decision_caption}{suffix}")
             syms = _available_symbols()
             if syms:
                 with st.expander("참고 가격 차트", expanded=False):
