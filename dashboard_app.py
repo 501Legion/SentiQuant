@@ -853,12 +853,12 @@ with tab_opinion:
     run_date = run_summary.get("date")
     if not snaps:
         if run_date:
-            st.info(f"{run_date} 기준 실행은 완료됐지만 표시할 여론 후보가 없습니다.")
+            st.info(f"{run_date} 실행은 완료됐지만 이 날짜의 종목별 표시 스냅샷은 생성되지 않았습니다.")
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("표시 후보", "0개")
-            c2.metric("판단 후보", f"{int(run_summary.get('candidates') or 0)}개")
+            c1.metric("신규 표시 종목", "0개")
+            c2.metric("서버 판단 종목", f"{int(run_summary.get('candidates') or 0)}개")
             c3.metric("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}")
-            c4.metric("스냅샷", "없음")
+            c4.metric("종목별 스냅샷", "미생성")
         else:
             st.warning("여론 스냅샷 데이터가 없습니다 (미동기화).")
     else:
@@ -906,17 +906,19 @@ with tab_opinion:
             } for _, r in top.iterrows()]
             st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
         elif latest:
-            st.info(f"{latest} 기준 실행은 완료됐지만 표시할 여론 후보가 없습니다.")
+            st.info(f"{latest} 실행은 완료됐지만 이 날짜의 종목별 표시 스냅샷은 생성되지 않았습니다.")
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("표시 후보", "0개")
-            c2.metric("판단 후보", f"{int(run_summary.get('candidates') or 0)}개")
+            c1.metric("신규 표시 종목", "0개")
+            c2.metric("서버 판단 종목", f"{int(run_summary.get('candidates') or 0)}개")
             c3.metric("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}")
-            c4.metric("스냅샷", "없음")
+            c4.metric("종목별 스냅샷", "미생성")
             if snapshot_latest and snapshot_latest < latest:
-                st.caption(f"최근 종목별 여론 스냅샷은 {snapshot_latest} 기준입니다.")
+                st.caption(f"아래 차트는 최신 실행일이 아니라 {snapshot_latest}까지의 과거 종목별 스냅샷 기준입니다.")
 
         # 종목별 추이 — 최근 언급 많은 순으로 선택
         st.subheader("📊 종목별 여론 흐름")
+        if snapshot_latest:
+            st.caption(f"종목별 추이는 누적 스냅샷 기준입니다. 최신 종목별 스냅샷: {snapshot_latest}")
         recent_syms = (df[df["date"] >= sorted(df["date"].unique())[-7:][0]]
                        .groupby("symbol")["total_mentions"].sum()
                        .sort_values(ascending=False).index.tolist()) if "date" in df else []
@@ -924,18 +926,18 @@ with tab_opinion:
             sym = st.selectbox("종목 선택 (최근 1주 언급 많은 순)", recent_syms)
             sdf = df[df["symbol"] == sym].sort_values("date").tail(40)
             score_line = alt.Chart(sdf).mark_line(point=True, color="#e4584c").encode(
-                x=alt.X("date:T", title="날짜"),
+                x=alt.X("date:T", title="날짜", axis=alt.Axis(format="%m/%d", labelAngle=0)),
                 y=alt.Y("opinion_score:Q", title="여론 점수", scale=alt.Scale(domain=[0, 100])),
-                tooltip=[alt.Tooltip("date:T", title="날짜"),
+                tooltip=[alt.Tooltip("date:T", title="날짜", format="%Y-%m-%d"),
                          alt.Tooltip("opinion_score:Q", title="여론 점수", format=".1f")])
             base50 = alt.Chart(pd.DataFrame({"y": [50]})).mark_rule(
                 strokeDash=[4, 4], color="#9aa0a6").encode(y="y:Q")
             st.altair_chart((score_line + base50).properties(height=240), width="stretch")
             st.altair_chart(
                 alt.Chart(sdf).mark_bar(color="#6b9bd1").encode(
-                    x=alt.X("date:T", title="날짜"),
+                    x=alt.X("date:T", title="날짜", axis=alt.Axis(format="%m/%d", labelAngle=0)),
                     y=alt.Y("total_mentions:Q", title="언급 수"),
-                    tooltip=[alt.Tooltip("date:T", title="날짜"),
+                    tooltip=[alt.Tooltip("date:T", title="날짜", format="%Y-%m-%d"),
                              alt.Tooltip("total_mentions:Q", title="언급 수")],
                 ).properties(height=140),
                 width="stretch")
@@ -951,17 +953,17 @@ with tab_opinion:
         with col_a:
             st.altair_chart(
                 alt.Chart(g).mark_bar(color="#6b9bd1").encode(
-                    x=alt.X("date:T", title="날짜"),
+                    x=alt.X("date:T", title="날짜", axis=alt.Axis(format="%m/%d", labelAngle=0)),
                     y=alt.Y("매수합의:Q", title="매수 합의 종목 수"),
-                    tooltip=[alt.Tooltip("date:T", title="날짜"), "매수합의", "종목수"],
+                    tooltip=[alt.Tooltip("date:T", title="날짜", format="%Y-%m-%d"), "매수합의", "종목수"],
                 ).properties(height=220, title="일자별 매수 합의 종목 수"),
                 width="stretch")
         with col_b:
             st.altair_chart(
                 alt.Chart(g).mark_line(point=True, color="#e4584c").encode(
-                    x=alt.X("date:T", title="날짜"),
+                    x=alt.X("date:T", title="날짜", axis=alt.Axis(format="%m/%d", labelAngle=0)),
                     y=alt.Y("평균점수:Q", title="평균 여론 점수"),
-                    tooltip=[alt.Tooltip("date:T", title="날짜"),
+                    tooltip=[alt.Tooltip("date:T", title="날짜", format="%Y-%m-%d"),
                              alt.Tooltip("평균점수:Q", format=".1f")],
                 ).properties(height=220, title="일자별 평균 여론 점수"),
                 width="stretch")
