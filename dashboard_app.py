@@ -399,6 +399,10 @@ def _price_chart(hist: pd.DataFrame):
     return (line + points).properties(height=300)
 
 
+def _compact_date_axis(tick_count: int = 6) -> alt.Axis:
+    return alt.Axis(format="%m/%d", tickCount=tick_count, labelAngle=0, labelOverlap=True)
+
+
 def _latest_decision_summary() -> dict:
     decisions = _read_jsonl(LIVE_DECISIONS)
     if not decisions:
@@ -926,7 +930,7 @@ with tab_opinion:
             sym = st.selectbox("종목 선택 (최근 1주 언급 많은 순)", recent_syms)
             sdf = df[df["symbol"] == sym].sort_values("date").tail(40)
             score_line = alt.Chart(sdf).mark_line(point=True, color="#e4584c").encode(
-                x=alt.X("date:T", title="날짜", axis=alt.Axis(format="%m/%d", labelAngle=0)),
+                x=alt.X("date:T", title="날짜", axis=_compact_date_axis()),
                 y=alt.Y("opinion_score:Q", title="여론 점수", scale=alt.Scale(domain=[0, 100])),
                 tooltip=[alt.Tooltip("date:T", title="날짜", format="%Y-%m-%d"),
                          alt.Tooltip("opinion_score:Q", title="여론 점수", format=".1f")])
@@ -935,7 +939,7 @@ with tab_opinion:
             st.altair_chart((score_line + base50).properties(height=240), width="stretch")
             st.altair_chart(
                 alt.Chart(sdf).mark_bar(color="#6b9bd1").encode(
-                    x=alt.X("date:T", title="날짜", axis=alt.Axis(format="%m/%d", labelAngle=0)),
+                    x=alt.X("date:T", title="날짜", axis=_compact_date_axis()),
                     y=alt.Y("total_mentions:Q", title="언급 수"),
                     tooltip=[alt.Tooltip("date:T", title="날짜", format="%Y-%m-%d"),
                              alt.Tooltip("total_mentions:Q", title="언급 수")],
@@ -953,7 +957,7 @@ with tab_opinion:
         with col_a:
             st.altair_chart(
                 alt.Chart(g).mark_bar(color="#6b9bd1").encode(
-                    x=alt.X("date:T", title="날짜", axis=alt.Axis(format="%m/%d", labelAngle=0)),
+                    x=alt.X("date:T", title="날짜", axis=_compact_date_axis(5)),
                     y=alt.Y("매수합의:Q", title="매수 합의 종목 수"),
                     tooltip=[alt.Tooltip("date:T", title="날짜", format="%Y-%m-%d"), "매수합의", "종목수"],
                 ).properties(height=220, title="일자별 매수 합의 종목 수"),
@@ -961,7 +965,7 @@ with tab_opinion:
         with col_b:
             st.altair_chart(
                 alt.Chart(g).mark_line(point=True, color="#e4584c").encode(
-                    x=alt.X("date:T", title="날짜", axis=alt.Axis(format="%m/%d", labelAngle=0)),
+                    x=alt.X("date:T", title="날짜", axis=_compact_date_axis(5)),
                     y=alt.Y("평균점수:Q", title="평균 여론 점수"),
                     tooltip=[alt.Tooltip("date:T", title="날짜", format="%Y-%m-%d"),
                              alt.Tooltip("평균점수:Q", format=".1f")],
