@@ -559,16 +559,44 @@ def _reasons_ko(codes) -> str:
 
 
 def _parse_funnel(md: str) -> dict[str, int]:
-    """일일 보고서의 funnel 표에서 단계별 수치 추출. 실패 시 빈 dict(원문만 표시)."""
+    """일일 보고서 표에서 단계별 수치 추출. 실패 시 빈 dict(원문만 표시)."""
     keys = {"①": "입력", "②": "중립 제외", "③": "컨센서스 미달",
             "④": "게이트 차단", "⑤": "매수", "⑥": "매도"}
+    user_keys = {
+        "검토 종목": "입력",
+        "매매 후보": "후보",
+        "매수": "매수",
+        "매도": "매도",
+        "보류": "보류",
+        "여론 방향성이 충분히 뚜렷하지 않음": "중립 제외",
+        "매매 합의 기준 미충족": "컨센서스 미달",
+        "최종 위험/비용 기준에서 보류": "게이트 차단",
+    }
     out: dict[str, int] = {}
     for line in md.splitlines():
+        stripped = line.strip()
         for mark, name in keys.items():
-            if line.strip().startswith(f"| {mark}"):
+            if stripped.startswith(f"| {mark}"):
                 nums = re.findall(r"\d+", line)
                 if nums:
                     out[name] = int(nums[0])
+        if not stripped.startswith("|"):
+            continue
+        cells = [c.strip() for c in stripped.strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        name = user_keys.get(cells[0])
+        if not name:
+            continue
+        nums = re.findall(r"\d+", cells[1])
+        if nums:
+            out[name] = int(nums[0])
+    if "후보" in out:
+        out.setdefault("매수", 0)
+        out.setdefault("매도", 0)
+        out.setdefault("중립 제외", 0)
+        out.setdefault("컨센서스 미달", 0)
+        out.setdefault("게이트 차단", 0)
     return out if "입력" in out else {}
 
 
