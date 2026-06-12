@@ -23,6 +23,7 @@ SYNC_ALLOWLIST = [
     "data/trades.csv",
     "data/community/live/reports",                  # 디렉터리
     "data/community/live/decisions.jsonl",
+    "data/community/live/run_summaries.jsonl",
     "data/community/daily_opinion_snapshots.jsonl",
     "data/backtest_snapshots/v2/ohlcv",             # 가격 차트용(공개 시세, 비밀 아님)
 ]

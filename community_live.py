@@ -8,7 +8,9 @@
 #   - 에이전트 5모듈(universe/cost/memory/reflection/router) 재사용, agent_gate 순수 helper 호출
 #   - 라이브는 영속 상태(score_history·memory jsonl·portfolio state) 사용
 #   - LLM 보조 라우터 ON + 일일 호출 상한(COMMUNITY_LLM_LIVE_MAX_CALLS) → 초과 시 rule fallback
+import json
 import logging
+import os
 from datetime import date as _date, datetime, timedelta
 
 import config
@@ -37,6 +39,19 @@ logger = logging.getLogger(__name__)
 _LIVE_MODEL = "finbert-wsb"
 _LIVE_RANKING = "sentiment"
 _LIVE_SIZING = "opinion_trend"
+
+
+def append_run_summary(summary: dict, path: str = None) -> None:
+    """라이브 실행 1회 요약을 jsonl에 저장한다. 후보 0개인 날도 대시보드 날짜 갱신에 사용."""
+    path = path or config.COMMUNITY_LIVE_RUN_SUMMARIES_FILE
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        rec = dict(summary)
+        rec["created_at"] = datetime.now().astimezone().isoformat()
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False, default=str) + "\n")
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"run summary append 실패(무시): {e}")
 
 
 # =============================================================================
@@ -344,8 +359,13 @@ def run_live(
                 posts_by_symbol = {}
     if not posts_by_symbol:
         logger.warning("Reddit 게시글 없음 — 빈 결과 반환")
+        summary = {"date": date, "posts_date": posts_date, "candidates": 0,
+                   "buys": 0, "sells": 0, "llm_calls": 0,
+                   "dry_run": dry_run, "placed": 0,
+                   "reflections": {"high": 0, "low": 0}}
+        append_run_summary(summary)
         return {"decisions": [], "orders": [], "decision_log_path": decision_log_path(live=True),
-                "summary": {"date": date, "candidates": 0, "buys": 0, "sells": 0, "llm_calls": 0}}
+                "summary": summary}
 
     # 2. 영속 상태 로드
     history = wsb_state.load_score_history()                 # 영속 score_history
@@ -544,6 +564,7 @@ def run_live(
         "placed": sum(1 for o in orders if o.get("executed")),
         "reflections": refl_counts,
     }
+    append_run_summary(summary)
     logger.info(f"=== run_live 완료 — {summary} ===")
 
     # 10. 일일 결정 보고서 (daily-decision-report §6.2) — read-only, 비침습(D3/NFR-01).

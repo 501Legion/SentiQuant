@@ -99,6 +99,8 @@ def _live_env(*, decisions_path, llm_router_cls=None, strategy="agent"):
     _save(community_live, "WSBSignalEngine"); community_live.WSBSignalEngine = _FakeEngine
     # decision log → tmp
     _save(config, "COMMUNITY_LIVE_DECISIONS_FILE"); config.COMMUNITY_LIVE_DECISIONS_FILE = decisions_path
+    _save(config, "COMMUNITY_LIVE_RUN_SUMMARIES_FILE")
+    config.COMMUNITY_LIVE_RUN_SUMMARIES_FILE = os.path.join(os.path.dirname(decisions_path), "run_summaries.jsonl")
     # decision report → tmp (daily-decision-report: 실 data/community/live/reports 미오염)
     _save(config, "COMMUNITY_LIVE_REPORTS_DIR")
     config.COMMUNITY_LIVE_REPORTS_DIR = os.path.join(os.path.dirname(decisions_path), "reports")
@@ -169,6 +171,20 @@ def test_t3_decision_log_persist(tmp_path=None):
         actions = {r["symbol"]: r["final_action"] for r in recs}
         assert "NVDA" in actions and "AAPL" in actions     # BUY + SKIP 모두 기록
         assert res["decision_log_path"] == path
+
+
+def test_t3b_run_summary_persists_even_without_candidates(tmp_path=None):
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "dec.jsonl")
+        with _live_env(decisions_path=path):
+            res = _run(dry_run=True, broker=MockBroker(tradable=["NVDA", "AAPL"]), posts={})
+        summary_path = os.path.join(d, "run_summaries.jsonl")
+        assert os.path.exists(summary_path)
+        recs = [json.loads(line) for line in open(summary_path, encoding="utf-8") if line.strip()]
+        assert recs[-1]["date"] == _DATE
+        assert recs[-1]["candidates"] == 0
+        assert res["summary"]["candidates"] == 0
 
 
 # --- T4: LLM 일일 상한 초과 → rule fallback (SC-05) -------------------------

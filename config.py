@@ -377,6 +377,7 @@ COMMUNITY_DECISIONS_DIR = "data/community/decisions"          # 기본(라이브
 COMMUNITY_DECISIONS_FILE = "data/community/decisions/decision_logs.jsonl"
 COMMUNITY_BACKTEST_DECISIONS_DIR = "data/community/backtests"  # {run_id}/decisions.jsonl
 COMMUNITY_LIVE_DECISIONS_FILE = "data/community/live/decisions.jsonl"
+COMMUNITY_LIVE_RUN_SUMMARIES_FILE = "data/community/live/run_summaries.jsonl"
 
 # --- Daily Decision Report (daily-decision-report) ---
 COMMUNITY_DECISION_REPORT_ENABLED = True             # run_live 종료 시 보고서 자동 생성

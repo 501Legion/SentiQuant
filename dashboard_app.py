@@ -18,6 +18,7 @@ ROOT = Path(__file__).parent
 DATA = ROOT / "data"
 REPORTS = DATA / "community" / "live" / "reports"
 LIVE_DECISIONS = DATA / "community" / "live" / "decisions.jsonl"
+LIVE_RUN_SUMMARIES = DATA / "community" / "live" / "run_summaries.jsonl"
 SNAPSHOTS = DATA / "community" / "daily_opinion_snapshots.jsonl"
 PORTFOLIO = DATA / "portfolio.json"
 TRADES = DATA / "trades.csv"
@@ -437,6 +438,16 @@ def _latest_decision_summary() -> dict:
     }
 
 
+def _latest_live_run_summary() -> dict:
+    summaries = _read_jsonl(LIVE_RUN_SUMMARIES)
+    if not summaries:
+        return {}
+    valid = [s for s in summaries if s.get("date")]
+    if not valid:
+        return {}
+    return max(valid, key=lambda s: (s.get("date") or "", s.get("created_at") or ""))
+
+
 def _latest_trade_summary() -> dict:
     if not TRADES.exists():
         return {}
@@ -838,11 +849,22 @@ with tab_funnel:
 # ── ④ 여론 추세 ──────────────────────────────────────────────────────────────
 with tab_opinion:
     snaps = _read_jsonl(SNAPSHOTS)
+    run_summary = _latest_live_run_summary()
+    run_date = run_summary.get("date")
     if not snaps:
-        st.warning("여론 스냅샷 데이터가 없습니다 (미동기화).")
+        if run_date:
+            st.info(f"{run_date} 기준 실행은 완료됐지만 표시할 여론 후보가 없습니다.")
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("표시 후보", "0개")
+            c2.metric("판단 후보", f"{int(run_summary.get('candidates') or 0)}개")
+            c3.metric("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}")
+            c4.metric("스냅샷", "없음")
+        else:
+            st.warning("여론 스냅샷 데이터가 없습니다 (미동기화).")
     else:
         df = pd.DataFrame(snaps)
-        latest = df["date"].max() if "date" in df else None
+        snapshot_latest = df["date"].max() if "date" in df else None
+        latest = max([d for d in [snapshot_latest, run_date] if d], default=None)
         today = df[df["date"] == latest].copy() if latest else pd.DataFrame()
 
         if not today.empty:
@@ -883,6 +905,15 @@ with tab_opinion:
                 "주요 키워드": ", ".join((r.get("top_keywords") or [])[:4]) or "-",
             } for _, r in top.iterrows()]
             st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+        elif latest:
+            st.info(f"{latest} 기준 실행은 완료됐지만 표시할 여론 후보가 없습니다.")
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("표시 후보", "0개")
+            c2.metric("판단 후보", f"{int(run_summary.get('candidates') or 0)}개")
+            c3.metric("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}")
+            c4.metric("스냅샷", "없음")
+            if snapshot_latest and snapshot_latest < latest:
+                st.caption(f"최근 종목별 여론 스냅샷은 {snapshot_latest} 기준입니다.")
 
         # 종목별 추이 — 최근 언급 많은 순으로 선택
         st.subheader("📊 종목별 여론 흐름")

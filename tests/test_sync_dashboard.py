@@ -33,6 +33,7 @@ def _build_fake_src(root: Path):
     (root / "data/community/live/reports").mkdir(parents=True)
     (root / "data/community/live/reports/2026-06-08.md").write_text("# report", encoding="utf-8")
     (root / "data/community/live/decisions.jsonl").write_text('{"symbol":"X"}\n', encoding="utf-8")
+    (root / "data/community/live/run_summaries.jsonl").write_text('{"date":"2026-06-08"}\n', encoding="utf-8")
     (root / "data/community/daily_opinion_snapshots.jsonl").write_text('{"date":"2026-06-08"}\n', encoding="utf-8")
     (root / "data/portfolio.json").write_text('{"cash":100000}', encoding="utf-8")
     (root / "data/trades.csv").write_text("date,symbol\n", encoding="utf-8")
@@ -62,6 +63,7 @@ def test_tc01_allowlist_included():
         assert "data/portfolio.json" in incset
         assert "data/trades.csv" in incset
         assert "data/community/live/decisions.jsonl" in incset
+        assert "data/community/live/run_summaries.jsonl" in incset
         assert "data/community/daily_opinion_snapshots.jsonl" in incset
         assert "data/community/live/reports/2026-06-08.md" in incset
         # 코드도 포함
