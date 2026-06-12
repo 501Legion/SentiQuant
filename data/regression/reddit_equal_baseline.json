@@ -2,27 +2,17 @@
   "from": "2026-05-13",
   "to": "2026-06-06",
   "model": "finbert",
-  "final_equity": 101882.7,
-  "total_trades": 5,
+  "final_equity": 104812.49,
+  "total_trades": 4,
   "trades": [
-    {
-      "symbol": "POET",
-      "entry_date": "2026-05-15",
-      "exit_date": "2026-05-18",
-      "entry_price": 18.322,
-      "exit_price": 14.21,
-      "shares": 441,
-      "dollar_pnl": -1849.26,
-      "exit_reason": "stop_loss"
-    },
     {
       "symbol": "ASTS",
       "entry_date": "2026-05-19",
       "exit_date": "2026-05-29",
       "entry_price": 85.38,
       "exit_price": 113.46,
-      "shares": 92,
-      "dollar_pnl": 2537.63,
+      "shares": 117,
+      "dollar_pnl": 3227.2,
       "exit_reason": "gap_down"
     },
     {
@@ -31,8 +21,8 @@
       "exit_date": "2026-05-29",
       "entry_price": 262.05,
       "exit_price": 297.8,
-      "shares": 24,
-      "dollar_pnl": 824.41,
+      "shares": 30,
+      "dollar_pnl": 1030.51,
       "exit_reason": "rsi_overbought"
     },
     {
@@ -41,8 +31,8 @@
       "exit_date": "2026-06-05",
       "entry_price": 222.29,
       "exit_price": 205.1,
-      "shares": 32,
-      "dollar_pnl": -584.27,
+      "shares": 40,
+      "dollar_pnl": -730.34,
       "exit_reason": "stop_loss"
     },
     {
@@ -51,8 +41,8 @@
       "exit_date": "2026-06-05",
       "entry_price": 145.23,
       "exit_price": 173.45,
-      "shares": 39,
-      "dollar_pnl": 1069.51,
+      "shares": 50,
+      "dollar_pnl": 1371.16,
       "exit_reason": "trailing_stop"
     }
   ]

@@ -85,11 +85,20 @@ def parse_llm_decision(text: str) -> "LLMDecisionResult | None":
     interp = data.get("tool_interpretation")
     if not isinstance(interp, dict):
         interp = {}
+
+    # llm-p1 수정: LLM이 숫자 필드에 "tighten" 같은 문자열을 넣어도 파싱 전체가
+    # 실패(→ rule 폴백)하지 않도록 필드별로 안전 변환. 변환 불가 → 기본값.
+    def _num(value, default):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return default
+
     return LLMDecisionResult(
         action=action, confidence=float(conf), size_factor_modifier=float(mod),
-        risk_modifier=float(data.get("risk_modifier", 1.0) or 1.0),
-        stop_loss_pct=data.get("stop_loss_pct"),
-        trailing_stop_pct=data.get("trailing_stop_pct"),
+        risk_modifier=_num(data.get("risk_modifier"), 1.0) or 1.0,
+        stop_loss_pct=_num(data.get("stop_loss_pct"), None),
+        trailing_stop_pct=_num(data.get("trailing_stop_pct"), None),
         reason_codes=list(data.get("reason_codes", []) or []),
         reasoning=str(data.get("reasoning", "")),
         tool_interpretation=interp,

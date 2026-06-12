@@ -182,6 +182,32 @@ class RedditReplayBacktester:
         self.strategy_key = f"{model}_{ranking}_{sizing}"
 
     def run(self) -> "RedditBacktestResult":
+        """replay 백테스팅 실행 — 전역 상태 파일을 run-local로 격리한 뒤 본체 실행.
+
+        determinism-fix 2026-06-13: run_pipeline/check_exit가 쓰는 mention_history·
+        position_scores는 전역 파일이라 ① 백테스트가 라이브 상태를 오염시키고
+        ② 직전 백테스트의 잔여 이력이 velocity 판정을 바꿔 재실행 결과가 달라졌다.
+        run() 동안 빈 임시 파일로 redirect → 결정성 보장 + 라이브 상태 불침.
+        """
+        import os
+        import shutil
+        import tempfile
+
+        saved = {
+            "MENTION_HISTORY_FILE": config.MENTION_HISTORY_FILE,
+            "POSITION_SCORES_FILE": config.POSITION_SCORES_FILE,
+        }
+        tmpdir = tempfile.mkdtemp(prefix="reddit_bt_state_")
+        config.MENTION_HISTORY_FILE = os.path.join(tmpdir, "mention_history.json")
+        config.POSITION_SCORES_FILE = os.path.join(tmpdir, "position_scores.json")
+        try:
+            return self._run_inner()
+        finally:
+            for attr, value in saved.items():
+                setattr(config, attr, value)
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+    def _run_inner(self) -> "RedditBacktestResult":
         """
         replay 백테스팅 실행.
         community-opinion-trend-sizing: 인메모리 opinion_history + OpinionMetrics 주입,
@@ -335,6 +361,7 @@ class RedditReplayBacktester:
                 buy_top_n = self._agent_gate(
                     top_n, scored, day_snaps, univ_map, opinion_metrics,
                     portfolio, position_scores, today_ohlcv, date_str,
+                    posts_by_symbol=posts_by_symbol,
                 )
                 day_decision_ids = {
                     sym: self._decision_ids[(sym, date_str)]
@@ -379,11 +406,13 @@ class RedditReplayBacktester:
         return result
 
     def _agent_gate(self, top_n, scored, day_snaps, univ_map, opinion_metrics,
-                    portfolio, position_scores, today_ohlcv, date_str) -> list:
+                    portfolio, position_scores, today_ohlcv, date_str,
+                    posts_by_symbol=None) -> list:
         """opinion_trend 전용: universe→cost→router 게이팅 → BUY 후보만 반환.
         skip 카운트 + sizer용 universe/cost factor 주입. 결정성 위해 memory는 조회 안 함."""
         gated: list[str] = []
         held = set(portfolio.positions)
+        posts_by_symbol = posts_by_symbol or {}
         for sym in top_n:
             if sym in held:
                 continue
@@ -417,6 +446,9 @@ class RedditReplayBacktester:
             low_refs = self._run_memory.retrieve_low_level_reflections(sym, query)
             high_refs = self._run_memory.retrieve_high_level_reflections(sym, query)
 
+            # llm-p1 ②: 원문 발췌를 LLM 보조 판단에 전달 (라이브 경로와 동일)
+            texts = [f"{p.get('title', '')} {p.get('body_excerpt', '')}"
+                     for p in posts_by_symbol.get(sym, [])]
             decision = self._router.decide(
                 symbol=sym, current_signal=d.get("signal", "NEUTRAL"),
                 daily_opinion_snapshot=snap,
@@ -427,6 +459,7 @@ class RedditReplayBacktester:
                 market_filter_status="NORMAL", universe_decision=univ_dec,
                 cost_filter_decision=cost_dec, current_position=None,
                 cash=portfolio.cash, equity=portfolio.cash, risk_settings={},
+                post_excerpts=texts,
             )
             self._decisions_log[(sym, date_str)] = decision
 

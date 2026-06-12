@@ -174,3 +174,37 @@ def test_position_old_state_file_compat(tmp_path, monkeypatch):
     q = RedditPortfolio("t_key")
     assert q.load_state("2026-06-12")
     assert q.positions["IBM"].stop_loss_pct is None   # 구 파일 호환
+
+
+# --- parse 견고화: 숫자 필드에 문자열이 와도 폴백하지 않음 ---
+
+def test_parse_llm_decision_tolerates_string_numbers():
+    raw = json.dumps({"action": "BUY", "confidence": 0.8,
+                      "size_factor_modifier": 1.0,
+                      "stop_loss_pct": "tighten", "risk_modifier": "low"})
+    res = parse_llm_decision(raw)
+    assert res is not None and res.action == "BUY"
+    assert res.stop_loss_pct is None      # 변환 불가 → 기본값 (전체 폴백 아님)
+    assert res.risk_modifier == 1.0
+
+
+# --- determinism-fix: 백테스터가 전역 상태 파일을 건드리지 않음 ---
+
+def test_backtester_run_isolates_state_files(tmp_path, monkeypatch):
+    from reddit_backtester import RedditReplayBacktester
+
+    mh = tmp_path / "mention_history.json"
+    ps = tmp_path / "position_scores.json"
+    mh.write_text('{"NVDA": [5, 5]}', encoding="utf-8")
+    ps.write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(config, "MENTION_HISTORY_FILE", str(mh))
+    monkeypatch.setattr(config, "POSITION_SCORES_FILE", str(ps))
+    monkeypatch.setattr(config, "REDDIT_DATA_DIR", str(tmp_path / "no_data"))
+
+    r = RedditReplayBacktester(
+        model="finbert", ranking="sentiment", sizing="equal",
+        from_date="2026-01-01", to_date="2026-01-02",
+    ).run()   # 데이터 없음 → 빈 결과, 단 redirect/restore는 수행됨
+    assert r.total_trades == 0
+    assert config.MENTION_HISTORY_FILE == str(mh)          # 원복 확인
+    assert mh.read_text(encoding="utf-8") == '{"NVDA": [5, 5]}'  # 전역 파일 불침
