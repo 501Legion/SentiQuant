@@ -226,9 +226,50 @@ st.markdown(
         line-height: 1.35;
         margin-top: 4px;
     }
+    .funnel-stat-grid {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        margin: 6px 0 18px 0;
+    }
+    .funnel-stat {
+        border-top: 1px solid #2f3744;
+        min-width: 0;
+        padding-top: 10px;
+    }
+    .funnel-stat-label {
+        color: #cbd5e1;
+        font-size: 0.86rem;
+        font-weight: 800;
+        line-height: 1.25;
+        margin-bottom: 8px;
+        white-space: nowrap;
+    }
+    .funnel-stat-value {
+        align-items: baseline;
+        color: #f8fafc;
+        display: flex;
+        gap: 5px;
+        line-height: 1;
+        min-height: 2.15rem;
+        white-space: nowrap;
+    }
+    .funnel-stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+    .funnel-stat-unit {
+        color: #cbd5e1;
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
     @media (max-width: 760px) {
         .empty-state-grid {
             grid-template-columns: 1fr;
+        }
+        .funnel-stat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
     </style>
@@ -336,6 +377,24 @@ def _signed_percent(value) -> str:
 
 def _html(value) -> str:
     return html.escape(str(value), quote=True)
+
+
+def _funnel_stat_grid(stats: list[tuple[str, object, str]]) -> str:
+    items = []
+    for label, value, unit in stats:
+        unit_html = f"<span class=\"funnel-stat-unit\">{_html(unit)}</span>" if unit else ""
+        items.append(
+            f"""
+            <div class="funnel-stat">
+                <div class="funnel-stat-label">{_html(label)}</div>
+                <div class="funnel-stat-value">
+                    <span class="funnel-stat-number">{_html(value)}</span>
+                    {unit_html}
+                </div>
+            </div>
+            """
+        )
+    return f"<div class=\"funnel-stat-grid\">{''.join(items)}</div>"
 
 
 def _profit_class(value) -> str:
@@ -972,12 +1031,16 @@ with tab_funnel:
         funnel = _parse_funnel(md)
         if funnel:
             # 단계별 핵심 지표
-            c1, c2, c3, c4, c5 = st.columns(5)
-            c1.metric("분석 종목", f"{funnel.get('입력', 0)}개")
-            c2.metric("방향 약함", f"{funnel.get('중립 제외', 0)}개 제외")
-            c3.metric("합의 부족", f"{funnel.get('컨센서스 미달', 0)}개 미달")
-            c4.metric("안전장치 보류", f"{funnel.get('게이트 차단', 0)}개 보류")
-            c5.metric("매수 / 매도", f"{funnel.get('매수', 0)} / {funnel.get('매도', 0)}")
+            st.markdown(
+                _funnel_stat_grid([
+                    ("분석 종목", funnel.get("입력", 0), "개"),
+                    ("방향 약함", funnel.get("중립 제외", 0), "개 제외"),
+                    ("합의 부족", funnel.get("컨센서스 미달", 0), "개 미달"),
+                    ("안전장치 보류", funnel.get("게이트 차단", 0), "개 보류"),
+                    ("매수 / 매도", f"{funnel.get('매수', 0)} / {funnel.get('매도', 0)}", ""),
+                ]),
+                unsafe_allow_html=True,
+            )
 
             # 단계별 생존 종목 수 — 어디서 걸러졌는지 한눈에
             survive = [funnel.get("입력", 0)]
