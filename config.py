@@ -30,8 +30,11 @@ REDDIT_SUBREDDITS = [
 ]
 REDDIT_ALLOWED_FLAIRS = ["DD", "Discussion", "Fundamentals", "Daily Discussion", "Earnings"]
 REDDIT_LOOKBACK_HOURS = 24          # 최근 24시간 게시글 수집
-REDDIT_DAILY_THREAD_COMMENTS = 1000  # Daily Discussion Thread 수집 댓글 수 — 품질 필터 통과분 기준 (wsb-daily-comments)
-REDDIT_DAILY_THREAD_REPLACE_MORE = 10  # Daily Thread MoreComments 확장 횟수 — 대형 스레드(WSB 8천+)에서 1000개 확보용
+# 2026-06-13 1000→3000 확대: 방향성 멘션 최소치(3)·표본 수축 필터와 시너지 —
+# 멘션 표본이 클수록 신호 신뢰도↑. 5000은 댓글 품질(upvote 0~1 구간)·수집 시간·
+# OHLCV throttle 병목 실측 후 판단.
+REDDIT_DAILY_THREAD_COMMENTS = 3000  # Daily Discussion Thread 수집 댓글 수 — 품질 필터 통과분 기준
+REDDIT_DAILY_THREAD_REPLACE_MORE = 35  # MoreComments 확장 횟수 — 호출당 ~100개 로드, 3000개 확보용 (10→35)
 
 # --- comment-aware-sentiment: 댓글 개별 감성 집계 (Design Ref: §6) ---
 COMMENT_COLLECT_NORMAL = 100         # 일반 글 댓글 상위 N
