@@ -232,6 +232,15 @@ st.markdown(
         grid-template-columns: repeat(5, minmax(0, 1fr));
         margin: 6px 0 18px 0;
     }
+    .funnel-stat-grid.stat-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .funnel-stat-grid.stat-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .funnel-stat-grid.stat-cols-5 {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
     .funnel-stat {
         border-top: 1px solid #2f3744;
         min-width: 0;
@@ -259,6 +268,9 @@ st.markdown(
         font-weight: 800;
         letter-spacing: 0;
     }
+    .funnel-stat-number.is-long {
+        font-size: 1.7rem;
+    }
     .funnel-stat-unit {
         color: #cbd5e1;
         font-size: 0.95rem;
@@ -268,7 +280,10 @@ st.markdown(
         .empty-state-grid {
             grid-template-columns: 1fr;
         }
-        .funnel-stat-grid {
+        .funnel-stat-grid,
+        .funnel-stat-grid.stat-cols-2,
+        .funnel-stat-grid.stat-cols-4,
+        .funnel-stat-grid.stat-cols-5 {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
@@ -379,20 +394,22 @@ def _html(value) -> str:
     return html.escape(str(value), quote=True)
 
 
-def _funnel_stat_grid(stats: list[tuple[str, object, str]]) -> str:
+def _funnel_stat_grid(stats: list[tuple[str, object, str]], columns: int = 5) -> str:
     items = []
     for label, value, unit in stats:
         unit_html = f"<span class=\"funnel-stat-unit\">{_html(unit)}</span>" if unit else ""
+        number_class = "funnel-stat-number is-long" if len(str(value)) >= 8 else "funnel-stat-number"
         items.append(
             "<div class=\"funnel-stat\">"
             f"<div class=\"funnel-stat-label\">{_html(label)}</div>"
             "<div class=\"funnel-stat-value\">"
-            f"<span class=\"funnel-stat-number\">{_html(value)}</span>"
+            f"<span class=\"{number_class}\">{_html(value)}</span>"
             f"{unit_html}"
             "</div>"
             "</div>"
         )
-    return f"<div class=\"funnel-stat-grid\">{''.join(items)}</div>"
+    safe_columns = columns if columns in {2, 4, 5} else 5
+    return f"<div class=\"funnel-stat-grid stat-cols-{safe_columns}\">{''.join(items)}</div>"
 
 
 def _profit_class(value) -> str:
@@ -564,9 +581,13 @@ def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
 
 
 def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -> None:
-    c1, c2 = st.columns(2)
-    c1.metric("최신 실행일", run_date or "없음")
-    c2.metric("최신 종목별 스냅샷", snapshot_date or "없음")
+    st.markdown(
+        _funnel_stat_grid([
+            ("최신 실행일", run_date or "없음", ""),
+            ("최신 종목별 스냅샷", snapshot_date or "없음", ""),
+        ], columns=2),
+        unsafe_allow_html=True,
+    )
 
     if run_date and snapshot_date and run_date != snapshot_date:
         st.warning(
@@ -1102,11 +1123,15 @@ with tab_opinion:
     if not snaps:
         if run_date:
             _render_missing_snapshot_notice(run_summary, run_date)
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("신규 표시 종목", "0개")
-            c2.metric("서버 판단 종목", f"{int(run_summary.get('candidates') or 0)}개")
-            c3.metric("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}")
-            c4.metric("종목별 스냅샷", "미생성")
+            st.markdown(
+                _funnel_stat_grid([
+                    ("신규 표시 종목", 0, "개"),
+                    ("서버 판단 종목", int(run_summary.get("candidates") or 0), "개"),
+                    ("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}", ""),
+                    ("종목별 스냅샷", "미생성", ""),
+                ], columns=4),
+                unsafe_allow_html=True,
+            )
         else:
             st.warning("여론 스냅샷 데이터가 없습니다 (미동기화).")
     else:
@@ -1153,11 +1178,15 @@ with tab_opinion:
             st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
         elif latest:
             _render_missing_snapshot_notice(run_summary, latest)
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("신규 표시 종목", "0개")
-            c2.metric("서버 판단 종목", f"{int(run_summary.get('candidates') or 0)}개")
-            c3.metric("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}")
-            c4.metric("종목별 스냅샷", "미생성")
+            st.markdown(
+                _funnel_stat_grid([
+                    ("신규 표시 종목", 0, "개"),
+                    ("서버 판단 종목", int(run_summary.get("candidates") or 0), "개"),
+                    ("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}", ""),
+                    ("종목별 스냅샷", "미생성", ""),
+                ], columns=4),
+                unsafe_allow_html=True,
+            )
 
         # 종목별 추이 — 최근 스냅샷 기준 언급 많은 순으로 선택
         st.subheader("📊 종목별 여론 흐름")
