@@ -1017,7 +1017,7 @@ with tab_opinion:
             if snapshot_latest and snapshot_latest < latest:
                 st.caption(f"아래 차트는 최신 실행일이 아니라 {snapshot_latest}까지의 과거 종목별 스냅샷 기준입니다.")
 
-        # 종목별 추이 — 최근 언급 많은 순으로 선택
+        # 종목별 추이 — 최근 스냅샷 기준 언급 많은 순으로 선택
         st.subheader("📊 종목별 여론 흐름")
         if snapshot_latest:
             st.caption(f"종목별 추이는 누적 스냅샷 기준입니다. 최신 종목별 스냅샷: {snapshot_latest}")
@@ -1025,7 +1025,7 @@ with tab_opinion:
                        .groupby("symbol")["total_mentions"].sum()
                        .sort_values(ascending=False).index.tolist()) if "date" in df else []
         if recent_syms:
-            sym = st.selectbox("종목 선택 (최근 1주 언급 많은 순)", recent_syms)
+            sym = st.selectbox("종목 선택 (최근 스냅샷 기준 언급 많은 순)", recent_syms)
             sdf = df[df["symbol"] == sym].sort_values("date").tail(40)
             score_line = alt.Chart(sdf).mark_line(point=True, color="#e4584c").encode(
                 x=alt.X("date:T", title="날짜", axis=_compact_date_axis()),
