@@ -733,7 +733,7 @@ with tab_pf:
                 unsafe_allow_html=True,
             )
 
-        st.caption("가격은 서버가 동기화한 최신 종가 기준입니다. 이 화면에서는 주문을 실행하지 않습니다.")
+        st.caption("서버가 동기화한 종가로 평가한 읽기 전용 화면입니다. 주문은 우분투 서버에서만 처리됩니다.")
 
         if not rows:
             run_summary = _latest_live_run_summary()
@@ -743,20 +743,20 @@ with tab_pf:
                 run_candidates = _run_int(run_summary, "candidate_symbols")
                 if run_candidates == 0:
                     run_candidates = _run_int(run_summary, "candidates")
-                run_value = f"{run_summary.get('date', '-')} · 후보 {run_candidates}개"
+                run_value = f"{run_summary.get('date', '-')} · 검토 {run_candidates}개"
                 run_sub = (
-                    f"입력 {_run_int(run_summary, 'input_symbols')} / "
+                    f"언급 종목 {_run_int(run_summary, 'input_symbols')} / "
                     f"점수화 {_run_int(run_summary, 'scored_symbols')} / "
-                    f"랭킹 {_run_int(run_summary, 'ranked_symbols')} · "
+                    f"상세 검토 {_run_int(run_summary, 'ranked_symbols')} · "
                     f"매수 {_run_int(run_summary, 'buys')} / 매도 {_run_int(run_summary, 'sells')}"
                 )
                 if run_summary.get("no_snapshot_reason") == "filtered_out_all":
-                    run_sub += " · 표시 후보 없음"
+                    run_sub += " · 매매 후보 없음"
             else:
                 run_value = "실행 기록 없음"
                 run_sub = "라이브 실행 후 표시됩니다."
             decision_caption = (
-                f"마지막 후보 기록: {decision['date']} · {decision['unique_total']}개 종목 "
+                f"최근 관찰 후보: {decision['date']} · {decision['unique_total']}개 종목 "
                 f"(기록 {decision['total']}건)"
                 if decision else ""
             )
@@ -775,7 +775,7 @@ with tab_pf:
                     <div class="empty-state-kicker">포트폴리오 상태</div>
                     <div class="empty-state-title">현재 보유 포지션 없음</div>
                     <div class="empty-state-copy">
-                        포트폴리오는 전액 현금 상태입니다. 서버의 판단과 주문 기록은 계속 동기화됩니다.
+                        현재는 보유 종목 없이 현금으로 대기 중입니다. 서버의 판단과 주문 기록은 계속 동기화됩니다.
                     </div>
                     <div class="empty-state-grid">
                         <div class="empty-state-item">
@@ -958,9 +958,9 @@ with tab_funnel:
             # 단계별 핵심 지표
             c1, c2, c3, c4, c5 = st.columns(5)
             c1.metric("분석 종목", f"{funnel.get('입력', 0)}개")
-            c2.metric("중립 제외", f"-{funnel.get('중립 제외', 0)}")
-            c3.metric("컨센서스 미달", f"-{funnel.get('컨센서스 미달', 0)}")
-            c4.metric("게이트 차단", f"-{funnel.get('게이트 차단', 0)}")
+            c2.metric("방향 약함", f"-{funnel.get('중립 제외', 0)}")
+            c3.metric("합의 부족", f"-{funnel.get('컨센서스 미달', 0)}")
+            c4.metric("안전장치 보류", f"-{funnel.get('게이트 차단', 0)}")
             c5.metric("매수 / 매도", f"{funnel.get('매수', 0)} / {funnel.get('매도', 0)}")
 
             # 단계별 생존 종목 수 — 어디서 걸러졌는지 한눈에
@@ -968,7 +968,7 @@ with tab_funnel:
             for k in ("중립 제외", "컨센서스 미달", "게이트 차단"):
                 survive.append(max(survive[-1] - funnel.get(k, 0), 0))
             fdf = pd.DataFrame({
-                "단계": ["① 전체 수집", "② 중립 걸러냄", "③ 여론 합의 확인", "④ 안전장치 통과"],
+                "단계": ["① 언급 종목", "② 방향성 확인", "③ 매매 합의 확인", "④ 안전장치 확인"],
                 "종목 수": survive,
             })
             st.altair_chart(
@@ -979,7 +979,7 @@ with tab_funnel:
                     tooltip=["단계", "종목 수"],
                 ).properties(height=170),
                 width="stretch")
-            st.caption("커뮤니티에서 언급된 모든 종목이 위 단계를 통과해야 실제 주문으로 이어집니다.")
+            st.caption("커뮤니티에서 언급된 종목은 위 조건을 모두 통과해야 주문 후보가 됩니다.")
             no_order_message = _daily_no_order_message(funnel)
             if no_order_message:
                 st.info(no_order_message)
@@ -987,10 +987,10 @@ with tab_funnel:
         watch_rows = _parse_observation_candidates(md)
         if watch_rows:
             st.subheader("관찰 후보")
-            st.caption("매수 후보는 아니지만, 다음 실행에서도 이어서 볼 종목입니다.")
+            st.caption("매수 후보는 아니지만 여론 흐름을 이어서 볼 종목입니다.")
             st.dataframe(pd.DataFrame(watch_rows), width="stretch", hide_index=True)
 
-        # 당일 종목별 판단 내역 (게이트까지 올라온 종목)
+        # 당일 종목별 판단 내역
         day_recs = [d for d in decisions if d.get("date") == pick] if pick else decisions[-20:]
         if day_recs:
             st.subheader("종목별 최종 판단")
@@ -1007,7 +1007,7 @@ with tab_funnel:
                 })
             st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
         elif pick:
-            st.caption("이 날은 게이트까지 도달한 종목이 없습니다.")
+            st.caption("이 날은 종목별 최종 판단 표에 표시할 종목이 없습니다.")
 
         if md:
             with st.expander("📄 상세 보고서 원문"):
@@ -1043,8 +1043,8 @@ with tab_opinion:
             c4.metric("총 언급 수", f"{int(today['total_mentions'].sum()):,}건")
             st.caption(f"{latest} 기준 — 점수는 0~100 (50 중립, 높을수록 매수 여론 우세)")
 
-            # 오늘의 여론 상위 종목
-            st.subheader(f"🔥 오늘의 여론 상위 종목 ({latest})")
+            # 최신 여론 상위 종목
+            st.subheader(f"🔥 최신 여론 상위 종목 ({latest})")
             top = today.sort_values("opinion_score", ascending=False).head(10).copy()
             top["여론 방향"] = top["opinion_trend"].map(TREND_KO).fillna("보합")
             st.altair_chart(
@@ -1085,12 +1085,12 @@ with tab_opinion:
         # 종목별 추이 — 최근 스냅샷 기준 언급 많은 순으로 선택
         st.subheader("📊 종목별 여론 흐름")
         if snapshot_latest:
-            st.caption(f"종목별 추이는 누적 스냅샷 기준입니다. 최신 종목별 스냅샷: {snapshot_latest}")
+            st.caption(f"종목별 흐름은 생성된 스냅샷 기준입니다. 최신 기준일: {snapshot_latest}")
         recent_syms = (df[df["date"] >= sorted(df["date"].unique())[-7:][0]]
                        .groupby("symbol")["total_mentions"].sum()
                        .sort_values(ascending=False).index.tolist()) if "date" in df else []
         if recent_syms:
-            sym = st.selectbox("종목 선택 (최근 스냅샷 기준 언급 많은 순)", recent_syms)
+            sym = st.selectbox("종목 선택 (최근 생성된 스냅샷 기준 언급 많은 순)", recent_syms)
             sdf = df[df["symbol"] == sym].sort_values("date").tail(40)
             score_line = alt.Chart(sdf).mark_line(point=True, color="#e4584c").encode(
                 x=alt.X("date:T", title="날짜", axis=_compact_date_axis()),
@@ -1110,7 +1110,7 @@ with tab_opinion:
                 width="stretch")
 
         # 시장 전체 분위기 추이
-        st.subheader("🌡️ 전체 시장 여론 추이")
+        st.subheader("🌡️ 전체 여론 흐름")
         g = df.groupby("date").agg(
             매수합의=("is_consensus_buy", lambda s: int(pd.Series(s).fillna(False).astype(bool).sum())),
             평균점수=("opinion_score", "mean"),
