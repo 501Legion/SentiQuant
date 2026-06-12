@@ -506,6 +506,22 @@ def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
         )
 
 
+def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -> None:
+    c1, c2 = st.columns(2)
+    c1.metric("최신 실행일", run_date or "없음")
+    c2.metric("최신 종목별 스냅샷", snapshot_date or "없음")
+
+    if run_date and snapshot_date and run_date != snapshot_date:
+        st.warning(
+            f"실행은 {run_date}까지 완료됐지만, 종목별 여론 스냅샷은 {snapshot_date} 기준입니다. "
+            "아래 종목별 흐름은 스냅샷 기준일까지만 반영됩니다."
+        )
+    elif run_date and not snapshot_date:
+        st.info(f"{run_date} 실행은 완료됐지만 아직 종목별 여론 스냅샷이 생성되지 않았습니다.")
+    elif run_date and snapshot_date:
+        st.caption(f"실행일과 종목별 스냅샷 기준일이 모두 {run_date}입니다.")
+
+
 def _latest_trade_summary() -> dict:
     if not TRADES.exists():
         return {}
@@ -696,7 +712,7 @@ st.markdown(
 )
 
 tab_pf, tab_trades, tab_funnel, tab_opinion = st.tabs(
-    ["💼 포트폴리오", "📜 매매 이력", "🔎 일일 결정", "🗣️ 여론 추세"])
+    ["💼 포트폴리오", "📜 매매 이력", "🔎 오늘 판단", "🗣️ 여론 흐름"])
 
 # ── ① 포트폴리오 (보유 개요 + 평가) ──────────────────────────────────────────
 with tab_pf:
@@ -958,9 +974,9 @@ with tab_funnel:
             # 단계별 핵심 지표
             c1, c2, c3, c4, c5 = st.columns(5)
             c1.metric("분석 종목", f"{funnel.get('입력', 0)}개")
-            c2.metric("방향 약함", f"-{funnel.get('중립 제외', 0)}")
-            c3.metric("합의 부족", f"-{funnel.get('컨센서스 미달', 0)}")
-            c4.metric("안전장치 보류", f"-{funnel.get('게이트 차단', 0)}")
+            c2.metric("방향 약함", f"{funnel.get('중립 제외', 0)}개 제외")
+            c3.metric("합의 부족", f"{funnel.get('컨센서스 미달', 0)}개 미달")
+            c4.metric("안전장치 보류", f"{funnel.get('게이트 차단', 0)}개 보류")
             c5.metric("매수 / 매도", f"{funnel.get('매수', 0)} / {funnel.get('매도', 0)}")
 
             # 단계별 생존 종목 수 — 어디서 걸러졌는지 한눈에
@@ -1018,6 +1034,10 @@ with tab_opinion:
     snaps = _read_jsonl(SNAPSHOTS)
     run_summary = _latest_live_run_summary()
     run_date = run_summary.get("date")
+    df = pd.DataFrame(snaps) if snaps else pd.DataFrame()
+    snapshot_latest = df["date"].max() if not df.empty and "date" in df else None
+    _render_opinion_freshness(run_date, snapshot_latest)
+
     if not snaps:
         if run_date:
             _render_missing_snapshot_notice(run_summary, run_date)
@@ -1029,8 +1049,6 @@ with tab_opinion:
         else:
             st.warning("여론 스냅샷 데이터가 없습니다 (미동기화).")
     else:
-        df = pd.DataFrame(snaps)
-        snapshot_latest = df["date"].max() if "date" in df else None
         latest = max([d for d in [snapshot_latest, run_date] if d], default=None)
         today = df[df["date"] == latest].copy() if latest else pd.DataFrame()
 
@@ -1079,8 +1097,6 @@ with tab_opinion:
             c2.metric("서버 판단 종목", f"{int(run_summary.get('candidates') or 0)}개")
             c3.metric("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}")
             c4.metric("종목별 스냅샷", "미생성")
-            if snapshot_latest and snapshot_latest < latest:
-                st.caption(f"아래 차트는 최신 실행일이 아니라 {snapshot_latest}까지의 과거 종목별 스냅샷 기준입니다.")
 
         # 종목별 추이 — 최근 스냅샷 기준 언급 많은 순으로 선택
         st.subheader("📊 종목별 여론 흐름")
