@@ -603,7 +603,10 @@ def run_live(
         should_exit, reason = engine.check_exit(
             position={"symbol": sym, "entry_price": portfolio.positions[sym].entry_price,
                       "highest_price": portfolio.positions[sym].highest_price,
-                      "shares": portfolio.positions[sym].shares},
+                      "shares": portfolio.positions[sym].shares,
+                      # llm-p1 ③: 포지션별 손절/트레일링 한도 (None → config 전역값)
+                      "stop_loss_pct": portfolio.positions[sym].stop_loss_pct,
+                      "trailing_stop_pct": portfolio.positions[sym].trailing_stop_pct},
             today_ohlcv=t, scored=scored, ohlcv_cache=df_cache,
             position_scores=position_scores,
             velocity_state=scored.get(sym, {}).get("velocity_state", "NORMAL"),
@@ -647,7 +650,10 @@ def run_live(
         if price <= 0 or intent.shares <= 0:
             continue
         orders.append(executor.execute(intent))
-        portfolio._buy(intent.symbol, price, intent.shares, date)  # 미러 갱신
+        # 미러 갱신 (llm-p1 ③: 라우터가 정한 포지션별 손절/트레일링 한도 저장)
+        portfolio._buy(intent.symbol, price, intent.shares, date,
+                       stop_loss_pct=getattr(intent, "stop_loss_pct", None),
+                       trailing_stop_pct=getattr(intent, "trailing_stop_pct", None))
 
     # 8.5 reflection (FR-09): 청산분 → high-level, forward 확정분 → low-level (decision_id join)
     refl_counts = _build_reflections(memory, ohlcv_full, date, sell_trades, snap_by_key)

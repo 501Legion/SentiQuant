@@ -26,6 +26,9 @@ class Position:
     highest_price: float   # 보유 이후 최고 종가 (Trailing Stop 추적용)
     size_factor: float = 1.0   # community-opinion-trend-sizing: 진입 시 적용된 사이징 factor
     entry_decision_id: str = ""   # community-opinion-agent: 진입 판단 DecisionLog id
+    # llm-p1 ③: 라우터가 정한 포지션별 손절/트레일링 한도 (None → config 전역값)
+    stop_loss_pct: float | None = None
+    trailing_stop_pct: float | None = None
 
 
 class RedditPortfolio:
@@ -219,8 +222,10 @@ class RedditPortfolio:
     # 매수 / 매도
     # ------------------------------------------------------------------
 
-    def _buy(self, symbol: str, price: float, shares: int, date_str: str) -> dict | None:
-        """포지션 기록 + 현금 차감 + 수수료 공제."""
+    def _buy(self, symbol: str, price: float, shares: int, date_str: str,
+             stop_loss_pct: float | None = None,
+             trailing_stop_pct: float | None = None) -> dict | None:
+        """포지션 기록 + 현금 차감 + 수수료 공제. stop 한도는 llm-p1 ③ (None → 전역값)."""
         trade_value = price * shares
         commission = self._calc_commission(trade_value)
         total_cost = trade_value + commission
@@ -238,6 +243,8 @@ class RedditPortfolio:
             entry_price=price,
             shares=shares,
             highest_price=price,
+            stop_loss_pct=stop_loss_pct,
+            trailing_stop_pct=trailing_stop_pct,
         )
 
         record = {
@@ -322,6 +329,8 @@ class RedditPortfolio:
                 "entry_price": round(pos.entry_price, 4),
                 "shares": pos.shares,
                 "highest_price": round(pos.highest_price, 4),
+                "stop_loss_pct": pos.stop_loss_pct,
+                "trailing_stop_pct": pos.trailing_stop_pct,
             }
 
         state = {
@@ -360,6 +369,8 @@ class RedditPortfolio:
                 entry_price=pos_data["entry_price"],
                 shares=pos_data["shares"],
                 highest_price=pos_data["highest_price"],
+                stop_loss_pct=pos_data.get("stop_loss_pct"),
+                trailing_stop_pct=pos_data.get("trailing_stop_pct"),
             )
         logger.info(
             f"포트폴리오 로드: {file_path}"

@@ -106,6 +106,20 @@ def _get(obj, key, default=None):
     return getattr(obj, key, default)
 
 
+def _clamp_stop(value, lo: float, hi: float) -> float | None:
+    """LLM이 제안한 손절/트레일링 %를 안전 범위로 정규화.
+    양수로 와도 음수로 해석(7 → -7), lo ≤ v ≤ hi 클램프, 숫자 아니면 None."""
+    if value is None:
+        return None
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        return None
+    if v > 0:
+        v = -v
+    return max(lo, min(hi, v))
+
+
 def _empty_interpretation() -> dict:
     return {k: "" for k in (
         "opinion_signal", "consensus_signal", "noise_signal", "memory_signal",
@@ -140,7 +154,8 @@ class DecisionRouter:
                retrieved_high_level_reflections=None, rsi=None, atr=None,
                market_filter_status=None, universe_decision=None,
                cost_filter_decision=None, current_position=None,
-               cash=0.0, equity=0.0, risk_settings=None) -> DecisionResult:
+               cash=0.0, equity=0.0, risk_settings=None,
+               post_excerpts=None) -> DecisionResult:
         ctx = dict(
             symbol=symbol, current_signal=(current_signal or "").upper(),
             snap=daily_opinion_snapshot,
@@ -151,6 +166,9 @@ class DecisionRouter:
             universe=universe_decision, cost=cost_filter_decision,
             position=current_position, cash=cash, equity=equity,
             risk=risk_settings or {},
+            # llm-p1 ②: 원문 발췌 — rule이 못 보는 비정형 정보(반어법/펌핑/이벤트 맥락)를
+            # LLM에게만 제공. rule-based 경로는 이 값을 사용하지 않는다.
+            excerpts=list(post_excerpts or []),
         )
         result = self._rule_based(ctx)
         rule_action = result.action          # DecisionLog용 1차 판단 보존
@@ -359,14 +377,18 @@ class DecisionRouter:
             base.warnings = list(base.warnings) + ["llm_buy_overridden_by_rule_skip"]
             return base
 
+        # llm-p1 ③: LLM 손절/트레일링 보정은 안전 범위로 클램프 (자율매매 아님 —
+        # 진입 자체는 rule이 결정, LLM은 리스크 한도만 타이트하게 조정 가능)
+        llm_stop = _clamp_stop(res.stop_loss_pct, lo=-10.0, hi=-3.0)
+        llm_trail = _clamp_stop(res.trailing_stop_pct, lo=-8.0, hi=-3.0)
         merged = DecisionResult(
             action=res.action,
             confidence=round((base.confidence + res.confidence) / 2, 3),
             size_factor=max(0.0, min(config.COMMUNITY_SIZE_FACTOR_MAX,
                                      base.size_factor * res.size_factor_modifier)),
             risk_modifier=res.risk_modifier or 1.0,
-            stop_loss_pct=res.stop_loss_pct if res.stop_loss_pct is not None else base.stop_loss_pct,
-            trailing_stop_pct=res.trailing_stop_pct if res.trailing_stop_pct is not None else base.trailing_stop_pct,
+            stop_loss_pct=llm_stop if llm_stop is not None else base.stop_loss_pct,
+            trailing_stop_pct=llm_trail if llm_trail is not None else base.trailing_stop_pct,
             reason_codes=list(base.reason_codes) + list(res.reason_codes) + ["llm_assisted"],
             reasoning=f"{base.reasoning} | LLM: {res.reasoning}",
             tool_interpretation=(res.tool_interpretation or base.tool_interpretation),
@@ -397,16 +419,39 @@ class LLMRouter:
             logger.warning(f"LLMRouter query 실패 → rule-based fallback: {e}")
             return None
 
-    @staticmethod
-    def build_prompt(ctx) -> str:
+    # llm-p1 ②: 프롬프트에 넣는 발췌 상한 — 토큰/비용 가드
+    _EXCERPT_MAX_COUNT = 5
+    _EXCERPT_MAX_CHARS = 200
+
+    @classmethod
+    def build_prompt(cls, ctx) -> str:
         snap = ctx.get("snap")
         univ = ctx.get("universe")
         cost = ctx.get("cost")
+
+        # llm-p1 ②: 원문 발췌 블록 — FinBERT 집계가 놓치는 반어법/펌핑/이벤트 맥락 판단용
+        excerpt_block = ""
+        excerpts = [t.strip() for t in (ctx.get("excerpts") or []) if t and t.strip()]
+        if excerpts:
+            lines = [
+                f"- {t[:cls._EXCERPT_MAX_CHARS]}"
+                for t in excerpts[:cls._EXCERPT_MAX_COUNT]
+            ]
+            excerpt_block = (
+                "Top community post excerpts (raw, may contain sarcasm or hype):\n"
+                + "\n".join(lines) + "\n"
+                "Use these to detect sarcasm, pump-and-dump hype, or event context "
+                "(earnings, lawsuits) that the aggregate scores above may have missed. "
+                "If the raw text contradicts the aggregate bullishness, downsize or hold.\n"
+            )
+
         return (
             "You are a trading decision ROUTER, not an autonomous trader. "
             "Interpret the rule-based tools and choose one action among "
             "BUY/HOLD/SELL/REDUCE/SKIP/EXIT. You may approve, downsize, hold, or "
             "reject the rule candidate but MUST NOT invent new buys. "
+            "You may also tighten risk limits via stop_loss_pct (-3 to -10) and "
+            "trailing_stop_pct (-3 to -8) when conviction is low. "
             "Respond with STRICT JSON only.\n"
             f"symbol={ctx.get('symbol')} signal={ctx.get('current_signal')}\n"
             f"opinion_score={_get(snap,'opinion_score')} consensus={_get(snap,'consensus_ratio')}"
@@ -415,8 +460,9 @@ class LLMRouter:
             f"universe_allowed={_get(univ,'allowed')} tier={_get(univ,'universe_tier')}"
             f" cost_allowed={_get(cost,'allowed')}\n"
             f"rsi={ctx.get('rsi')} cash={ctx.get('cash')}\n"
+            + excerpt_block +
             'JSON schema: {"action","confidence","size_factor_modifier","risk_modifier",'
-            '"reason_codes","reasoning"}'
+            '"stop_loss_pct","trailing_stop_pct","reason_codes","reasoning"}'
         )
 
     @staticmethod

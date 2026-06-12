@@ -23,6 +23,10 @@ class OrderIntent:
     decision_id: str
     reason: str = ""
     snapshot_summary: str = ""
+    # llm-p1 ③: 라우터(LLM 보정 포함)가 정한 포지션별 손절/트레일링 한도.
+    # None이면 기존 config 전역값(STOP_LOSS_PCT/TRAILING_STOP_PCT) 사용.
+    stop_loss_pct: float | None = None
+    trailing_stop_pct: float | None = None
 
 
 def _recent_volatility_pct(ohlcv, lookback: int = 14) -> float | None:
@@ -112,7 +116,7 @@ def evaluate_candidate(
     low_refs = memory.retrieve_low_level_reflections(symbol, query)
     high_refs = memory.retrieve_high_level_reflections(symbol, query)
 
-    # 5. router
+    # 5. router (llm-p1 ②: 원문 발췌를 LLM 보조 판단에 전달 — rule 경로엔 영향 없음)
     decision = router.decide(
         symbol=symbol, current_signal=scored_entry.get("signal", "NEUTRAL"),
         daily_opinion_snapshot=snap,
@@ -124,6 +128,7 @@ def evaluate_candidate(
         current_position=current_position,
         cash=(cash if cash is not None else account_equity),
         equity=account_equity, risk_settings={},
+        post_excerpts=texts,
     )
 
     # 6. OrderIntent
@@ -151,5 +156,7 @@ def evaluate_candidate(
         size_factor=round(decision.size_factor, 4), decision_id=decision_id,
         reason=(decision.reasoning or "")[:200],
         snapshot_summary=getattr(snap, "summary", ""),
+        stop_loss_pct=getattr(decision, "stop_loss_pct", None),
+        trailing_stop_pct=getattr(decision, "trailing_stop_pct", None),
     )
     return decision, intent, snap

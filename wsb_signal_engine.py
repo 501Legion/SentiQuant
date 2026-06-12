@@ -669,19 +669,23 @@ class WSBSignalEngine:
                 )
                 return True, "gap_down"
 
-        # 4. Stop-Loss: pnl <= -7.0%
-        if pnl_pct <= config.STOP_LOSS_PCT:
+        # llm-p1 ③: 라우터(LLM 보정)가 정한 포지션별 한도 우선, 없으면 config 전역값
+        stop_pct = position.get("stop_loss_pct") or config.STOP_LOSS_PCT
+        trail_pct = position.get("trailing_stop_pct") or config.TRAILING_STOP_PCT
+
+        # 4. Stop-Loss: pnl <= stop_pct (기본 -7.0%)
+        if pnl_pct <= stop_pct:
             logger.info(
                 f"[{symbol}] Stop-Loss 발동: pnl={pnl_pct:.2f}%"
-                f" <= {config.STOP_LOSS_PCT}%"
+                f" <= {stop_pct}%"
             )
             return True, "stop_loss"
 
-        # 5. Trailing Stop: 최고점 대비 -5% AND 현재 수익 > 0%
-        if drawdown <= config.TRAILING_STOP_PCT and pnl_pct > 0:
+        # 5. Trailing Stop: 최고점 대비 trail_pct(기본 -5%) AND 현재 수익 > 0%
+        if drawdown <= trail_pct and pnl_pct > 0:
             logger.info(
                 f"[{symbol}] Trailing Stop: drawdown={drawdown:.2f}%"
-                f" <= {config.TRAILING_STOP_PCT}%, pnl={pnl_pct:.2f}%"
+                f" <= {trail_pct}%, pnl={pnl_pct:.2f}%"
             )
             return True, "trailing_stop"
 
