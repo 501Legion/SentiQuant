@@ -126,9 +126,10 @@ def curate(src: Path, staging: Path) -> list[str]:
     return included
 
 
-def push_branch(staging: Path) -> None:
+def push_branch(staging: Path) -> bool:
     """staging 내용을 orphan dashboard-data 브랜치 단일커밋으로 force-push (D3).
-    git worktree로 메인 작업트리 오염 없이 수행. (서버 전용 — 원격 인증 필요)"""
+    git worktree로 메인 작업트리 오염 없이 수행. 실제 push 여부를 반환한다.
+    (서버 전용 — 원격 인증 필요)"""
     wt = ROOT / ".dashboard-worktree"
     subprocess.run(["git", "worktree", "remove", "--force", str(wt)], cwd=ROOT,
                    capture_output=True)
@@ -154,7 +155,7 @@ def push_branch(staging: Path) -> None:
         current_payload_hash = _read_json(staging / "last_sync.json").get("payload_hash")
         if previous_payload_hash and previous_payload_hash == current_payload_hash:
             print("[sync] dashboard payload 변경 없음 - push 생략")
-            return
+            return False
         # 워크트리 내용 비우고 staging 복사
         for p in wt.iterdir():
             if p.name == ".git":
@@ -176,6 +177,7 @@ def push_branch(staging: Path) -> None:
             subprocess.run(["git", "commit", "-q", "-m", commit_message],
                            cwd=wt, check=True)
         subprocess.run(["git", "push", "--force", "origin", BRANCH], cwd=wt, check=True)
+        return True
     finally:
         subprocess.run(["git", "worktree", "remove", "--force", str(wt)], cwd=ROOT,
                        capture_output=True)
@@ -196,8 +198,10 @@ def main(argv) -> int:
         if "--no-push" in argv:
             print("[sync] --no-push: push 생략")
             return 0
-        push_branch(staging)
-        print(f"[sync] dashboard-data 브랜치 force-push 완료")
+        if push_branch(staging):
+            print(f"[sync] dashboard-data 브랜치 force-push 완료")
+        else:
+            print("[sync] dashboard-data 브랜치 변경 없음")
         return 0
     finally:
         shutil.rmtree(staging, ignore_errors=True)

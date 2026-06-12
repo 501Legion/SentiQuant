@@ -150,14 +150,14 @@ def test_tc06_push_branch_reuses_existing_dashboard_branch():
         try:
             sync.ROOT = root
             (staging / "dashboard_app.py").write_text("first\n", encoding="utf-8")
-            sync.push_branch(staging)
+            assert sync.push_branch(staging) is True
 
             first = run(["git", "rev-parse", "dashboard-data"]).stdout.strip()
             assert run(["git", "branch", "--list", "dashboard-data"]).stdout.strip()
             assert run(["git", "ls-tree", "-r", "--name-only", "dashboard-data"]).stdout.strip() == "dashboard_app.py"
 
             (staging / "dashboard_app.py").write_text("second\n", encoding="utf-8")
-            sync.push_branch(staging)
+            assert sync.push_branch(staging) is True
 
             second = run(["git", "rev-parse", "dashboard-data"]).stdout.strip()
             remote = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
@@ -198,14 +198,14 @@ def test_tc07_push_branch_skips_unchanged_payload():
                 f'{{"synced_at":"2026-06-12T00:00:00+00:00","payload_hash":"{first_hash}"}}',
                 encoding="utf-8",
             )
-            sync.push_branch(staging)
+            assert sync.push_branch(staging) is True
             first = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
 
             (staging / "last_sync.json").write_text(
                 f'{{"synced_at":"2026-06-12T00:30:00+00:00","payload_hash":"{first_hash}"}}',
                 encoding="utf-8",
             )
-            sync.push_branch(staging)
+            assert sync.push_branch(staging) is False
             second = run(["git", "rev-parse", "origin/dashboard-data"]).stdout.strip()
 
             assert second == first
