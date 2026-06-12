@@ -4,6 +4,7 @@
 #            절대 import 금지. streamlit·pandas·altair·표준 라이브러리만.
 # Plan SC: SC-01(heavy import 0), SC-05(실주문 호출 0)
 import base64
+import html
 import json
 import re
 from datetime import datetime, timedelta, timezone
@@ -171,6 +172,64 @@ st.markdown(
         line-height: 1.4;
         margin: 4px 0 0;
     }
+    .empty-state {
+        background: #111820;
+        border: 1px solid #2f3744;
+        border-radius: 8px;
+        margin: 8px 0 18px 0;
+        padding: 18px;
+    }
+    .empty-state-kicker {
+        color: #94a3b8;
+        font-size: 0.76rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
+    .empty-state-title {
+        color: #f8fafc;
+        font-size: 1.3rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 6px;
+    }
+    .empty-state-copy {
+        color: #9ca3af;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        margin-bottom: 16px;
+    }
+    .empty-state-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .empty-state-item {
+        border-top: 1px solid #2f3744;
+        padding-top: 10px;
+    }
+    .empty-state-label {
+        color: #94a3b8;
+        font-size: 0.74rem;
+        margin-bottom: 4px;
+    }
+    .empty-state-value {
+        color: #f8fafc;
+        font-size: 1.02rem;
+        font-weight: 800;
+        line-height: 1.25;
+    }
+    .empty-state-sub {
+        color: #6b7280;
+        font-size: 0.74rem;
+        line-height: 1.35;
+        margin-top: 4px;
+    }
+    @media (max-width: 760px) {
+        .empty-state-grid {
+            grid-template-columns: 1fr;
+        }
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -264,6 +323,10 @@ def _signed_percent(value) -> str:
     return f"{pct:+.2f}%"
 
 
+def _html(value) -> str:
+    return html.escape(str(value), quote=True)
+
+
 def _profit_class(value) -> str:
     try:
         amount = float(value)
@@ -333,6 +396,55 @@ def _price_chart(hist: pd.DataFrame):
         ],
     )
     return (line + points).properties(height=300)
+
+
+def _latest_decision_summary() -> dict:
+    decisions = _read_jsonl(LIVE_DECISIONS)
+    if not decisions:
+        return {}
+    latest_date = max((d.get("date") or "") for d in decisions)
+    latest = [d for d in decisions if d.get("date") == latest_date]
+    if not latest:
+        return {}
+    buy = sum(1 for d in latest if d.get("final_action") == "BUY")
+    sell = sum(1 for d in latest if d.get("final_action") == "SELL")
+    hold = len(latest) - buy - sell
+    top = sorted(
+        latest,
+        key=lambda d: float(d.get("opinion_score") or 0),
+        reverse=True,
+    )[:3]
+    symbols = [d.get("symbol", "-") for d in top]
+    return {
+        "date": latest_date,
+        "total": len(latest),
+        "buy": buy,
+        "sell": sell,
+        "hold": hold,
+        "symbols": symbols,
+    }
+
+
+def _latest_trade_summary() -> dict:
+    if not TRADES.exists():
+        return {}
+    try:
+        df = pd.read_csv(TRADES)
+    except Exception:
+        return {}
+    if df.empty:
+        return {"total": 0}
+    if "date" in df.columns:
+        df = df.copy()
+        df["_date"] = pd.to_datetime(df["date"], errors="coerce")
+        df = df.sort_values("_date", na_position="first")
+    last = df.iloc[-1]
+    return {
+        "total": len(df),
+        "date": str(last.get("date", "-"))[:10],
+        "symbol": last.get("symbol", "-"),
+        "action": last.get("action", "-"),
+    }
 
 
 # ── 한글 라벨 매핑 (대시보드 표시 전용 — 데이터는 원문 유지) ─────────────────
@@ -458,14 +570,63 @@ with tab_pf:
         st.caption("현재가는 커밋된 가격 스냅샷의 최신 종가입니다. 실시간 주문/동기화는 이 화면에서 실행하지 않습니다.")
 
         if not rows:
-            st.write("현재 보유 포지션 없음.")
+            decision = _latest_decision_summary()
+            trade = _latest_trade_summary()
+            decision_value = (
+                f"{decision['date']} · {decision['total']}개 판단"
+                if decision else "판단 기록 없음"
+            )
+            decision_sub = (
+                f"매수 {decision['buy']} / 매도 {decision['sell']} / 보류 {decision['hold']}"
+                if decision else "라이브 판단 동기화 후 표시됩니다."
+            )
+            watch_symbols = ", ".join(decision.get("symbols") or []) if decision else "-"
+            trade_value = (
+                f"{trade.get('symbol', '-')} {trade.get('action', '-')}"
+                if trade.get("total") else "거래 기록 없음"
+            )
+            trade_sub = (
+                f"{trade.get('date', '-')} · 누적 {trade.get('total', 0)}건"
+                if trade.get("total") else "아직 청산/진입 이력이 없습니다."
+            )
+            st.markdown(
+                f"""
+                <div class="empty-state">
+                    <div class="empty-state-kicker">포트폴리오 상태</div>
+                    <div class="empty-state-title">현재 보유 포지션 없음</div>
+                    <div class="empty-state-copy">
+                        포트폴리오는 전액 현금 상태입니다. 서버의 판단과 주문 기록은 계속 동기화됩니다.
+                    </div>
+                    <div class="empty-state-grid">
+                        <div class="empty-state-item">
+                            <div class="empty-state-label">가용 현금</div>
+                            <div class="empty-state-value">{_money(cash, 0)}</div>
+                            <div class="empty-state-sub">모의 계좌 기준</div>
+                        </div>
+                        <div class="empty-state-item">
+                            <div class="empty-state-label">최근 판단</div>
+                            <div class="empty-state-value">{_html(decision_value)}</div>
+                            <div class="empty-state-sub">{_html(decision_sub)}</div>
+                        </div>
+                        <div class="empty-state-item">
+                            <div class="empty-state-label">최근 거래</div>
+                            <div class="empty-state-value">{_html(trade_value)}</div>
+                            <div class="empty-state-sub">{_html(trade_sub)}</div>
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if watch_symbols != "-":
+                st.caption(f"최근 여론 상위 관찰 종목: {watch_symbols}")
             syms = _available_symbols()
             if syms:
-                st.subheader("📈 가격 차트")
-                sel = st.selectbox("종목 선택", syms)
-                hist = _load_ohlcv(sel)
-                if not hist.empty:
-                    st.altair_chart(_price_chart(hist), width="stretch")
+                with st.expander("참고 가격 차트", expanded=False):
+                    sel = st.selectbox("종목 선택", syms)
+                    hist = _load_ohlcv(sel)
+                    if not hist.empty:
+                        st.altair_chart(_price_chart(hist), width="stretch")
             else:
                 st.info("가격 스냅샷(data/backtest_snapshots) 없음")
         else:
