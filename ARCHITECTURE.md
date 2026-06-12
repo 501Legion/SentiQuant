@@ -93,7 +93,7 @@ kis_broker.py
 |------|------|
 | `portfolio.py` | 뉴스 모델 포지션 관리 + `sync_from_kis()` KIS 잔고 동기화 |
 | `trader.py` | 주문 실행 — `Broker` Protocol(`kis_broker`)에 `place_order` 위임 (`--dry-run` 지원) |
-| `scheduler.py` | 크론탭 연동 스케줄러 + 신호 계산 전 KIS 매매가능 종목 갱신 |
+| `scheduler.py` | APScheduler 스케줄러 — 수집 잡 08:45 ET(timing-fix), 주문 잡 09:35 ET, alive heartbeat |
 
 ---
 
@@ -152,14 +152,21 @@ reddit_collector.collect_wsb_posts()
     → Daily Thread 댓글 (_fetch_daily_thread)
     → Polygon 티커 검증 (캐시 활용)
     ↓
-wsb_signal_engine.run_pipeline()  [V3 — wsb-signal-v3]
+wsb_signal_engine.run_pipeline()  [V3 — wsb-signal-v3 + funnel-fix 2026-06-13]
     → _score_posts()          bullish/bearish/neutral 카운트
-    → _apply_neutral_filter() neutral/total > 0.70 → NEUTRAL 강제 (노이즈 제거)
+                              + score 표본 수축: score* = 50+(raw-50)·n/(n+K), n=bull+bear, K=8
+                              (극소표본 노이즈가 랭킹 최상위를 차지하던 문제 차단)
+    → _apply_neutral_filter() 방향성 멘션(bull+bear) < 3 → NEUTRAL 강제
+                              또는 neutral/total > 0.95(극단 노이즈) → NEUTRAL 강제
+                              (구 0.70/0.75 중립 킬스위치 폐지 — FinBERT 중립 편향이
+                               토론량 많은 종목을 역차별. 중립비율은 사이징 damper로 강등)
     → _apply_velocity()       7일 멘션 이력 → velocity_state
                               HIGH_MOMENTUM(×2↑) / NORMAL / DECLINING(×0.5↓)
                               NEW_SPIKE(첫등장 ≥20언급) / NEW_IGNORE(<20언급)
     → _determine_signal_v3()  Velocity 보정 매트릭스 → STRONG_BUY/BUY/NEUTRAL
-                              NORMAL: STRONG_BUY>70, BUY>55
+                              RSI ≥ 70(과매수)만 회피 — 구 "BUY는 RSI 30~50,
+                              STRONG_BUY는 RSI<30" 역추세 창 폐지 (모멘텀 신호와 모순)
+                              NORMAL: STRONG_BUY>68, BUY>52
                               HIGH_MOMENTUM: 임계값 -5 완화
                               DECLINING: 임계값 +5 강화
     → _filter_consensus()     bullish/bearish ≥ 1.5배
@@ -268,9 +275,12 @@ python main.py --run-now --source kis   # KIS 잔고 동기화 후 신호 생성
 
 | 상수 | 기본값 | 설명 |
 |------|--------|------|
-| `WSB_STRONG_BUY_SCORE` | 70.0 | NORMAL STRONG_BUY 기준 |
-| `WSB_BUY_SCORE` | 55.0 | NORMAL BUY 기준 (구 50→55 강화) |
-| `WSB_NEUTRAL_RATIO_MAX` | 0.70 | 중립 비율 상한 (초과 시 NEUTRAL 강제) |
+| `WSB_STRONG_BUY_SCORE` | 68.0 | NORMAL STRONG_BUY 기준 |
+| `WSB_BUY_SCORE` | 52.0 | NORMAL BUY 기준 |
+| `WSB_NEUTRAL_RATIO_MAX` | 0.95 | 극단 노이즈 컷 (funnel-fix: 0.75→0.95, 킬스위치→극단 전용) |
+| `WSB_MIN_DIRECTIONAL_MENTIONS` | 3 | bull+bear 미만 → NEUTRAL 강제 (funnel-fix 신규) |
+| `WSB_SCORE_SHRINKAGE_K` | 8 | score 표본 수축 prior 멘션 수 (funnel-fix 신규) |
+| `WSB_RSI_BUY_MAX` | 70.0 | 매수 허용 RSI 상한 — 과매수만 회피 (funnel-fix 신규) |
 | `WSB_VELOCITY_LOOKBACK_DAYS` | 7 | Velocity 계산 이력 일수 |
 | `WSB_VELOCITY_HIGH_THRESHOLD` | 2.0 | HIGH_MOMENTUM 판정 배수 |
 | `WSB_VELOCITY_LOW_THRESHOLD` | 0.5 | DECLINING 판정 배수 |
@@ -289,8 +299,8 @@ python main.py --run-now --source kis   # KIS 잔고 동기화 후 신호 생성
 | `COMMUNITY_ENABLE_COST_AWARE_FILTER` | `True` | OFF → 무조건 allowed (회귀 0) |
 | `COMMUNITY_MIN_PRICE_USD` / `MIN_AVG_DOLLAR_VOLUME` | 5.0 / 20M | penny·저유동 차단 |
 | `COMMUNITY_NON_INDEX_SIZE_MULTIPLIER` | 0.5 | 인덱스 외 종목 사이즈 배수 |
-| `COMMUNITY_MIN_EDGE_TO_COST_MULTIPLIER` | 2.0 | edge < cost×2 → SKIP |
-| `COMMUNITY_CONSENSUS_MIN_RATIO` / `NEUTRAL_RATIO_MAX` | 1.5 / 0.70 | 합의/노이즈 게이팅 |
+| `COMMUNITY_MIN_EDGE_TO_COST_MULTIPLIER` | 1.5 | edge < cost×1.5 → SKIP (funnel-fix: 2.0→1.5) |
+| `COMMUNITY_CONSENSUS_MIN_RATIO` / `NEUTRAL_RATIO_MAX` | 1.5 / 0.90 | 합의/노이즈 게이팅 (funnel-fix: 0.75→0.90) |
 | `COMMUNITY_FLAIR_WEIGHT_*` | DD 1.5 … low 0.0 | 글 품질 가중 |
 | `COMMUNITY_TICKER_AMBIGUITY_BLACKLIST` | ALL/IT/NOW… | `$` 없으면 제외 |
 | `COMMUNITY_SIZE_FACTOR_MIN/MAX` | 0.0 / 1.3 | 사이징 clamp (= `WSB_OPINION_*` alias) |
@@ -332,6 +342,8 @@ python main.py --run-now --source kis   # KIS 잔고 동기화 후 신호 생성
 | `kis-paper-trading` | 2026-05-16 | KIS OpenAPI 모의투자 연동 (`kis_broker.py`·`signal_provider.py` 신규) + SIGNAL_ENGINE 추상화 + 매매가능 종목 필터 | `docs/01-plan/`·`docs/02-design/`·`docs/03-analysis/`·`docs/04-report/` (미아카이브) |
 | `community-opinion-trend-sizing` | 2026-05-29 | OpinionTrendSizer(7-factor) + opinion_reversal 청산 + ranking sentiment + score_history | `docs/0*/features/community-opinion-trend-sizing.*` (미아카이브) |
 | `community-opinion-agent` | 2026-05-30 | universe/cost 필터 + source quality/ticker ambiguity + DailyOpinionSnapshot + community memory/reflection + DecisionRouter(rule+LLM OFF) + gross/net·skip metric. 신규 5모듈. **equal 회귀 0**, Match Rate 98% | `docs/0*/features/community-opinion-agent.*` (미아카이브) |
+| `funnel-fix` | 2026-06-13 | 라이브 매수 0건 깔때기 정상화: score 표본수축(K=8) + 방향성 멘션 최소치(3, 중립 킬스위치 폐지) + RSI 30~50 역추세 창 폐지(과매수만 회피) + 중립 게이트 0.90 완화·sizer damper 전환 + edge/cost 1.5배 완화 + 백테스트 metrics.json 영속화. ⚠ 신호 자체가 변경(의도) — equal regression baseline `--update` 필요 | — |
+| `timing-fix` | 2026-06-13 | Reddit 수집 잡 16:30 ET → 08:45 ET 이동 — 수집→주문 지연 17시간 → 50분 (당일 아침 여론으로 당일 시가 매매). 주문 잡 09:35 ET 유지. + stale-config 사고 해결(Daily Thread 댓글 0개 수집, 서비스 재시작으로 복구) | — |
 
 ---
 

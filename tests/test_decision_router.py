@@ -76,7 +76,7 @@ def test_t2_new_spike_downsize():
 
 # --- T3: neutral_ratio 높음 → SKIP ---
 def test_t3_high_neutral_skip():
-    d = _decide(snap=_snap(neutral_ratio=0.80))
+    d = _decide(snap=_snap(neutral_ratio=0.94))
     assert d.action == "SKIP"
     assert "high_noise" in d.reason_codes
 

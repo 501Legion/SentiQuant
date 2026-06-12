@@ -45,12 +45,14 @@ def is_trading_day(dt: datetime = None) -> bool:
 
 def signal_calculation_job() -> None:
     """
-    매일 16:30 ET 실행.
+    매일 SIGNAL_JOB_HOUR:MINUTE ET 실행 (timing-fix: 08:45 ET — 장 시작 직전 수집).
     1. NYSE 휴장일 체크
-    2. 모든 종목에 대해 신호 계산
-    3. signals.json 저장
+    2. agent: Reddit 수집 / news: 모든 종목 신호 계산
+    3. signals.json 저장 (news 경로)
     """
-    logger.info("=== 신호 계산 잡 시작 (16:30 ET) ===")
+    logger.info(
+        f"=== 신호 계산 잡 시작 ({config.SIGNAL_JOB_HOUR:02d}:{config.SIGNAL_JOB_MINUTE:02d} ET) ==="
+    )
 
     if not is_trading_day():
         logger.info("오늘은 NYSE 휴장일 — 신호 계산 잡 스킵")
@@ -103,7 +105,9 @@ def order_processing_job(dry_run: bool = False) -> None:
     7. 리포트 출력
     """
     label = "DRY-RUN" if dry_run else "LIVE"
-    logger.info(f"=== 주문 처리 잡 시작 (09:35 ET, {label}) ===")
+    logger.info(
+        f"=== 주문 처리 잡 시작 ({config.ORDER_JOB_HOUR:02d}:{config.ORDER_JOB_MINUTE:02d} ET, {label}) ==="
+    )
 
     if not is_trading_day():
         logger.info("오늘은 NYSE 휴장일 — 주문 처리 잡 스킵")
@@ -199,7 +203,7 @@ def start_scheduler() -> None:
     """
     scheduler = BlockingScheduler(timezone=config.TIMEZONE)
 
-    # 16:30 ET — 신호 계산
+    # SIGNAL_JOB (08:45 ET, timing-fix) — Reddit 수집/신호 준비
     scheduler.add_job(
         signal_calculation_job,
         CronTrigger(

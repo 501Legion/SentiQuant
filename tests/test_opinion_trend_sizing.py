@@ -65,7 +65,7 @@ def test_t2_low_score_excluded():
 
 # --- T3: neutral_ratio > 0.70 → 진입 제외 --------------------------------
 def test_t3_high_neutral_excluded():
-    assert _shares(neutral_ratio=0.75) == 0
+    assert _shares(neutral_ratio=0.94) == 0
 
 
 # --- T4: consensus_ratio < 1.5 → 진입 제외 -------------------------------
@@ -131,7 +131,7 @@ def _exit(opinion, scored_bearish=1, entry_score=80.0, entry_bear=1):
 
 
 def test_t10_opinion_reversal_detected():
-    assert _exit(_om(neutral_ratio=0.80)) == (True, "neutral_spike")
+    assert _exit(_om(neutral_ratio=0.94)) == (True, "neutral_spike")
     assert _exit(_om(consensus_ratio=0.90)) == (True, "consensus_break")
     assert _exit(_om(opinion_score=40.0)) == (True, "sentiment_reversal")  # 40 < 80×0.65=52
     assert _exit(_om()) == (False, "")                                     # 정상 → 유지

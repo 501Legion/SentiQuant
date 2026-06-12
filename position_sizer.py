@@ -135,9 +135,10 @@ class CommunityOpinionTrendSizer(PositionSizer):
                  neutral_ratio, velocity_state, atr, prev_close
 
     진입 게이팅(0 반환):
-        opinion_score < WSB_OPINION_SCORE_LOW(60)
-        or neutral_ratio > WSB_OPINION_NEUTRAL_ENTRY_MAX(0.70)
+        opinion_score < WSB_OPINION_SCORE_LOW(57)
+        or neutral_ratio > WSB_OPINION_NEUTRAL_ENTRY_MAX(0.90 — 극단 노이즈만 차단)
         or consensus_ratio < WSB_OPINION_CONSENSUS_MIN_RATIO(1.5)
+    중립비율 0.5~0.9 구간은 차단 대신 _neutral_factor damper로 사이즈만 축소 (funnel-fix).
 
     base = total_cash × EQUAL_POSITION_PCT × clamp(Π factors, MIN, MAX) / open_price
     """
@@ -259,9 +260,15 @@ class CommunityOpinionTrendSizer(PositionSizer):
 
     @staticmethod
     def _neutral_factor(neutral_ratio: float) -> float:
-        # 게이팅으로 neutral_ratio <= 0.70 보장됨
+        # funnel-fix: 중립비율은 킬스위치가 아니라 연속 damper — FinBERT 중립 편향으로
+        # 토론량 많은 종목의 중립비율이 구조적으로 높아, 차단 대신 사이즈를 줄인다.
+        # (게이팅 상한은 WSB_OPINION_NEUTRAL_ENTRY_MAX=0.90)
+        if neutral_ratio > 0.85:
+            return 0.6
+        if neutral_ratio > 0.70:
+            return 0.8
         if neutral_ratio > 0.50:
-            return 0.7
+            return 0.9
         return 1.0
 
     @staticmethod

@@ -232,10 +232,10 @@ class WSBSignalEngine:
     Reddit 게시글 → Top N 종목 선정 전체 파이프라인 (V3).
 
     단계:
-      1. _score_posts(): 종목별 감성 점수 + bullish/bearish/neutral count
-      2. _apply_neutral_filter(): neutral/total > 0.7 → NEUTRAL 강제
+      1. _score_posts(): 종목별 감성 점수(표본 수축 적용) + bullish/bearish/neutral count
+      2. _apply_neutral_filter(): 방향성 멘션 < 3 또는 극단 노이즈(>0.95) → NEUTRAL 강제
       3. _apply_velocity(): Mention Velocity 계산 → velocity_state
-      4. _determine_signal_v3(): 매수 신호 결정 (Velocity 보정 매트릭스)
+      4. _determine_signal_v3(): 매수 신호 결정 (Velocity 보정 매트릭스, RSI<70만 허용)
       5. _filter_consensus(): bullish/bearish >= 1.5 필터
       6. _rank(): mentions 또는 ratio 기준 정렬 → TOP_N 선정
     """
@@ -324,6 +324,7 @@ class WSBSignalEngine:
                 "ratio": data["ratio"],
                 "mentions": data["mentions"],
                 "score": data["score"],
+                "score_raw": data.get("score_raw", data["score"]),
                 "velocity": velocity,
                 "velocity_state": velocity_state,
                 "neutral_ratio": neutral_ratio,
@@ -386,13 +387,19 @@ class WSBSignalEngine:
             total = bullish + bearish
             ratio = bullish / total if total > 0 else 0.0
 
+            # funnel-fix: 표본 크기 수축 — 방향성 멘션 n이 적을수록 score를 50으로 당긴다.
+            # 글 1개짜리 score 90이 글 50개짜리를 이기는 극소표본 노이즈 랭킹을 차단.
+            k = config.WSB_SCORE_SHRINKAGE_K
+            shrunk = round(50.0 + (score - 50.0) * total / (total + k), 2) if k > 0 else score
+
             result[symbol] = {
                 "bullish": bullish,
                 "bearish": bearish,
                 "neutral": neutral,
                 "ratio": round(ratio, 4),
                 "mentions": len(posts),
-                "score": score,
+                "score": shrunk,
+                "score_raw": score,
                 "labeled_posts": labeled_posts,
             }
             logger.debug(
@@ -406,23 +413,34 @@ class WSBSignalEngine:
         scored: dict[str, dict],
     ) -> dict[str, str]:
         """
-        종목별 neutral/total 비율이 WSB_NEUTRAL_RATIO_MAX 초과 시 NEUTRAL 강제.
-        # Plan SC-02: neutral/total > 0.7 → NEUTRAL
-        # Design Ref: §wsb-signal-v3 §3.2
+        방향성 의견(bull+bear)이 WSB_MIN_DIRECTIONAL_MENTIONS 미만이거나
+        중립비율이 극단(WSB_NEUTRAL_RATIO_MAX=0.95) 초과인 종목을 NEUTRAL 강제.
+
+        # funnel-fix 2026-06-13: 기존 "neutral/total > 0.75 → 킬" 방식은 FinBERT 중립
+        # 편향 탓에 토론량 많은 종목일수록 탈락시키는 역차별이었다. 방향 판정은
+        # 방향성 의견 수로 하고, 중립비율은 사이징 damper(position_sizer)로 강등.
 
         Returns:
             {symbol: "NEUTRAL"} — 필터 적용된 종목만 포함. 통과 종목은 제외.
         """
         neutral_overrides: dict[str, str] = {}
         for symbol, data in scored.items():
-            total = data["bullish"] + data["bearish"] + data["neutral"]
+            directional = data["bullish"] + data["bearish"]
+            total = directional + data["neutral"]
             if total == 0:
                 continue
             neutral_ratio = data["neutral"] / total
-            if neutral_ratio > config.WSB_NEUTRAL_RATIO_MAX:
+            if directional < config.WSB_MIN_DIRECTIONAL_MENTIONS:
                 neutral_overrides[symbol] = "NEUTRAL"
                 logger.info(
-                    f"[중립 필터] {symbol}: 중립비율={neutral_ratio:.0%} → NEUTRAL"
+                    f"[방향성 필터] {symbol}: 방향성 멘션={directional}"
+                    f" < {config.WSB_MIN_DIRECTIONAL_MENTIONS} → NEUTRAL"
+                )
+            elif neutral_ratio > config.WSB_NEUTRAL_RATIO_MAX:
+                neutral_overrides[symbol] = "NEUTRAL"
+                logger.info(
+                    f"[중립 필터] {symbol}: 중립비율={neutral_ratio:.0%}"
+                    f" > {config.WSB_NEUTRAL_RATIO_MAX:.0%} (극단 노이즈) → NEUTRAL"
                 )
         return neutral_overrides
 
@@ -498,9 +516,14 @@ class WSBSignalEngine:
             velocity_state, thresholds["NORMAL"]
         )
 
-        if score > sb_threshold and rsi < config.RSI_OVERSOLD:        # rsi < 30
+        # funnel-fix 2026-06-13: 기존 "BUY는 RSI 30~50, STRONG_BUY는 RSI<30" 창은
+        # 군중 강세 종목(대개 RSI>50)과 모순되는 역추세 게이트였다.
+        # 감성 모멘텀 전략답게 과매수(RSI≥70)만 회피하고 신호 등급은 score로 구분.
+        if rsi >= config.WSB_RSI_BUY_MAX:
+            return "NEUTRAL"
+        if score > sb_threshold:
             return "STRONG_BUY"
-        if score > buy_threshold and config.RSI_OVERSOLD <= rsi < 50:  # 30 ≤ rsi < 50
+        if score > buy_threshold:
             return "BUY"
         return "NEUTRAL"
 

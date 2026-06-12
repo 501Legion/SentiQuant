@@ -76,7 +76,7 @@ def test_t6_weak_consensus_excluded():
 
 # --- T7: neutral_ratio 높음(>0.70) → 진입 제외 ---
 def test_t7_high_neutral_excluded():
-    assert _shares(neutral_ratio=0.75) == 0
+    assert _shares(neutral_ratio=0.94) == 0
 
 
 # --- T8: NEW_SPIKE 단독(persistence 부족) → 축소 ---

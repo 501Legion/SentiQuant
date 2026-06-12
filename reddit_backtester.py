@@ -372,7 +372,11 @@ class RedditReplayBacktester:
         # community-opinion-agent §3.4 — 백테스트 종료 후 reflection 생성·저장
         self._build_reflections(portfolio)
 
-        return self._build_result(portfolio, equity_curve, invested_days, processed_days)
+        result = self._build_result(portfolio, equity_curve, invested_days, processed_days)
+        # funnel-fix 2026-06-13: 성과 지표를 run 디렉토리에 영속화 — 임계값 튜닝의
+        # 전후 비교가 가능하도록 decisions.jsonl 옆에 metrics.json 저장.
+        self._persist_metrics(result)
+        return result
 
     def _agent_gate(self, top_n, scored, day_snaps, univ_map, opinion_metrics,
                     portfolio, position_scores, today_ohlcv, date_str) -> list:
@@ -663,6 +667,27 @@ class RedditReplayBacktester:
             f"/{self._skip_ambiguity}/{self._skip_liquidity}"
         )
         return result
+
+    def _persist_metrics(self, result: "RedditBacktestResult") -> None:
+        """run 디렉토리({run_id}/metrics.json)에 성과 지표 저장. 실패해도 결과 반환엔 영향 0."""
+        import json
+        import os
+        from dataclasses import asdict
+
+        try:
+            run_dir = os.path.dirname(self._decision_log_path)
+            os.makedirs(run_dir, exist_ok=True)
+            payload = asdict(result)
+            payload["run_id"] = self.run_id
+            payload["from_date"] = self.from_date
+            payload["to_date"] = self.to_date
+            payload["created_at"] = datetime.now().astimezone().isoformat()
+            path = os.path.join(run_dir, "metrics.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=2, default=str)
+            logger.info(f"[RedditBacktest] metrics.json 저장 — {path}")
+        except Exception as e:  # noqa: BLE001 — 지표 저장 실패 ≠ 백테스트 실패
+            logger.warning(f"metrics.json 저장 실패(무시): {e}")
 
     @staticmethod
     def _max_drawdown(equities: list) -> float:
