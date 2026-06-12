@@ -600,6 +600,25 @@ def _parse_funnel(md: str) -> dict[str, int]:
     return out if "입력" in out else {}
 
 
+def _parse_observation_candidates(md: str) -> list[dict]:
+    rows: list[dict] = []
+    in_section = False
+    for line in md.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("## "):
+            in_section = stripped == "## 관찰 후보"
+            continue
+        if not in_section or not stripped.startswith("|"):
+            continue
+        cells = [c.strip() for c in stripped.strip("|").split("|")]
+        if len(cells) < 3 or cells[0] in {"종목", "------"}:
+            continue
+        if set(cells[0]) == {"-"}:
+            continue
+        rows.append({"종목": cells[0], "관찰 이유": cells[1], "참고": cells[2]})
+    return rows
+
+
 # ── 헤더 + 마지막 sync 배지 (D6) ─────────────────────────────────────────────
 _logo_uri = _logo_data_uri()
 _logo_html = (
@@ -924,6 +943,12 @@ with tab_funnel:
                 ).properties(height=170),
                 width="stretch")
             st.caption("커뮤니티에서 언급된 모든 종목이 위 단계를 통과해야 실제 주문으로 이어집니다.")
+
+        watch_rows = _parse_observation_candidates(md)
+        if watch_rows:
+            st.subheader("관찰 후보")
+            st.caption("매수 후보는 아니지만, 다음 실행에서도 이어서 볼 종목입니다.")
+            st.dataframe(pd.DataFrame(watch_rows), width="stretch", hide_index=True)
 
         # 당일 종목별 판단 내역 (게이트까지 올라온 종목)
         day_recs = [d for d in decisions if d.get("date") == pick] if pick else decisions[-20:]

@@ -158,6 +158,24 @@ def _hold_reason_sentence(funnel: dict) -> str:
     return f"검토한 {input_n}개 종목 중 최종 주문 후보 {candidate_n}개가 확인되었습니다."
 
 
+def _observation_candidates(funnel: dict, limit: int = 5) -> list[dict]:
+    """주문 후보는 아니지만 다음 실행에서 이어서 볼 종목을 추린다."""
+    rows = []
+    for g in funnel["gate_dropped"]:
+        rows.append({
+            "symbol": g["symbol"],
+            "reason": "최종 기준에서 보류",
+            "detail": ", ".join(g["reason_codes"]) or g.get("final_action") or "-",
+        })
+    for c in funnel["consensus_dropped"]:
+        rows.append({
+            "symbol": c["symbol"],
+            "reason": "매매 합의 기준 미충족",
+            "detail": f"상승 {c['bullish']} / 하락 {c['bearish']}",
+        })
+    return rows[:limit]
+
+
 def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
     """funnel → 한국어 Markdown 보고서 본문 (Design §6.1 / D7). 순수 함수."""
     date = ctx.date
@@ -165,6 +183,7 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
     consensus_n = len(funnel["consensus_dropped"])
     gate_n = len(funnel["gate_dropped"])
     hold_n = neutral_n + consensus_n + gate_n
+    observation = _observation_candidates(funnel)
     L = [
         f"# 오늘의 매매 판단 — {date}",
         "",
@@ -183,6 +202,20 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
         f"| 보류 | {hold_n}개 |",
         "",
     ]
+
+    L += ["## 관찰 후보", ""]
+    if observation:
+        L += [
+            "매수 후보는 아니지만, 다음 실행에서도 이어서 볼 종목입니다.",
+            "",
+            "| 종목 | 관찰 이유 | 참고 |",
+            "|------|----------|------|",
+        ]
+        for row in observation:
+            L.append(f"| {row['symbol']} | {row['reason']} | {row['detail']} |")
+    else:
+        L.append("_관찰 후보 없음._")
+    L.append("")
 
     # ⑤ 매수
     L += ["## 매수", ""]

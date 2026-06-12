@@ -94,6 +94,10 @@ def test_tc04_gate_dropped_reasons():
     assert g["symbol"] == "CCC"
     assert g["final_action"] == "SKIP"
     assert "universe_blocked" in g["reason_codes"]
+    md = dr._format_markdown(_ctx(), f)
+    assert "## 관찰 후보" in md
+    assert "| CCC | 최종 기준에서 보류 | universe_blocked |" in md
+    assert "| BBB | 매매 합의 기준 미충족 | 상승 1 / 하락 1 |" in md
 
 
 # --- TC-05: 비침습 — 보고서 실패가 흐름을 막지 않음(community_live 격리 패턴) ---
