@@ -806,11 +806,15 @@ with tab_pf:
         priced_count = sum(1 for r in rows if r["last"] is not None)
         equity = cash + holdings_val
 
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("현금(모의)", f"${cash:,.0f}")
-        c2.metric("보유 평가액", f"${holdings_val:,.0f}")
-        c3.metric("총 자산", f"${equity:,.0f}")
-        c4.metric("보유 종목 수", len(positions))
+        st.markdown(
+            _funnel_stat_grid([
+                ("현금(모의)", f"${cash:,.0f}", ""),
+                ("보유 평가액", f"${holdings_val:,.0f}", ""),
+                ("총 자산", f"${equity:,.0f}", ""),
+                ("보유 종목 수", len(positions), "개"),
+            ], columns=4),
+            unsafe_allow_html=True,
+        )
 
         col_nav, col_total_info = st.columns([3, 1])
         with col_nav:
