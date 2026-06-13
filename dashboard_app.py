@@ -1109,7 +1109,7 @@ with tab_trades:
                 ]),
                 unsafe_allow_html=True,
             )
-            st.caption("최근 거래가 위에 오도록 정렬했습니다. 시간은 한국시간 기준입니다.")
+            st.caption("최근 거래부터 표시하며, 시간은 한국시간 기준입니다.")
             st.dataframe(_trade_table(df), width="stretch", hide_index=True)
 
 # ── ③ 일일 결정 ──────────────────────────────────────────────────────────────
