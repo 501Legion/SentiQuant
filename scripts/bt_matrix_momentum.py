@@ -104,7 +104,7 @@ def _trades(r):
         out.append((
             getattr(t, "symbol", "?"),
             getattr(t, "entry_date", ""),
-            getattr(t, "net_return_pct", getattr(t, "return_pct", 0.0)),
+            getattr(t, "pnl_pct", 0.0),  # RedditTradeRecord.pnl_pct (per-trade 순수익률)
         ))
     return out
 
@@ -116,7 +116,7 @@ def _summ(tag, r):
     sndk = [(s, ed, ret) for s, ed, ret in tr if s == "SNDK"]
     _w(f"\n===== {tag} =====")
     _w(f"  net_return = {r.net_return_pct:+.2f}%  gross={r.gross_return_pct:+.2f}%")
-    _w(f"  trades={r.total_trades}  win_rate={r.win_rate:.0%}  PF={r.profit_factor:.2f}"
+    _w(f"  trades={r.total_trades}  win_rate={r.win_rate:.0f}%  PF={r.profit_factor:.2f}"
        f"  MDD={r.max_drawdown:.1f}%")
     _w(f"  decisions: buy {r.buy_decisions_logged}/hold {r.hold_decisions_logged}"
        f"/skip {r.skip_decisions_logged}  llm_assisted={r.llm_decisions_logged}")
@@ -150,10 +150,10 @@ def main() -> int:
         results[tag] = (r, syms, top)
 
     _w("\n================ 매트릭스 요약 ================")
-    _w(f"  {'arm':<34}{'net%':>8}{'trades':>8}{'win':>6}{'MDD%':>8}{'top%':>8}  SNDK")
+    _w(f"  {'arm':<34}{'net%':>8}{'trades':>8}{'win%':>6}{'MDD%':>8}{'top%':>8}  SNDK")
     for tag, (r, syms, top) in results.items():
         _w(f"  {tag:<34}{r.net_return_pct:>+7.2f}{r.total_trades:>8}"
-           f"{r.win_rate:>5.0%}{r.max_drawdown:>+7.1f}{top:>+7.1f}  "
+           f"{r.win_rate:>5.0f}{r.max_drawdown:>+7.1f}{top:>+7.1f}  "
            f"{'✓' if 'SNDK' in syms else '·'}")
 
     _w("\n  해석 가이드:")
