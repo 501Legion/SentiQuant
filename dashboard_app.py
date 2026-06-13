@@ -394,7 +394,7 @@ def _html(value) -> str:
     return html.escape(str(value), quote=True)
 
 
-def _funnel_stat_grid(stats: list[tuple[str, object, str]], columns: int = 5) -> str:
+def _stat_grid(stats: list[tuple[str, object, str]], columns: int = 5) -> str:
     items = []
     for label, value, unit in stats:
         unit_html = f"<span class=\"funnel-stat-unit\">{_html(unit)}</span>" if unit else ""
@@ -582,7 +582,7 @@ def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
 
 def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -> None:
     st.markdown(
-        _funnel_stat_grid([
+        _stat_grid([
             ("최신 실행일", run_date or "없음", ""),
             ("최신 종목별 스냅샷", snapshot_date or "없음", ""),
         ], columns=2),
@@ -863,7 +863,7 @@ with tab_pf:
         equity = cash + holdings_val
 
         st.markdown(
-            _funnel_stat_grid([
+            _stat_grid([
                 ("현금(모의)", f"${cash:,.0f}", ""),
                 ("보유 평가액", f"${holdings_val:,.0f}", ""),
                 ("총 자산", f"${equity:,.0f}", ""),
@@ -1100,7 +1100,7 @@ with tab_trades:
             win_rate = f"{(closed > 0).mean() * 100:.0f}%" if len(closed) else "-"
 
             st.markdown(
-                _funnel_stat_grid([
+                _stat_grid([
                     ("총 거래", len(df), "건"),
                     ("매수", buy_count, "건"),
                     ("매도", sell_count, "건"),
@@ -1109,7 +1109,7 @@ with tab_trades:
                 ]),
                 unsafe_allow_html=True,
             )
-            st.caption("최근 거래부터 표시하며, 시간은 한국시간 기준입니다.")
+            st.caption("최근 거래부터 표시합니다. 시간은 한국시간 기준이며, 수익 거래 비율은 실현 손익이 있는 거래 기준입니다.")
             st.dataframe(_trade_table(df), width="stretch", hide_index=True)
 
 # ── ③ 일일 결정 ──────────────────────────────────────────────────────────────
@@ -1126,7 +1126,7 @@ with tab_funnel:
         if funnel:
             # 단계별 핵심 지표
             st.markdown(
-                _funnel_stat_grid([
+                _stat_grid([
                     ("분석 종목", funnel.get("입력", 0), "개"),
                     ("방향 약함", funnel.get("중립 제외", 0), "개 제외"),
                     ("합의 부족", funnel.get("컨센서스 미달", 0), "개 미달"),
@@ -1199,7 +1199,7 @@ with tab_opinion:
         if run_date:
             _render_missing_snapshot_notice(run_summary, run_date)
             st.markdown(
-                _funnel_stat_grid([
+                _stat_grid([
                     ("신규 표시 종목", 0, "개"),
                     ("서버 판단 종목", int(run_summary.get("candidates") or 0), "개"),
                     ("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}", ""),
@@ -1216,7 +1216,7 @@ with tab_opinion:
         if not today.empty:
             # 최신일 요약
             st.markdown(
-                _funnel_stat_grid([
+                _stat_grid([
                     ("분석 종목", len(today), "개"),
                     ("매수 합의 후보", int(today["is_consensus_buy"].fillna(False).astype(bool).sum()), "개"),
                     ("평균 여론 점수", f"{today['opinion_score'].mean():.1f}", "점"),
@@ -1258,7 +1258,7 @@ with tab_opinion:
         elif latest:
             _render_missing_snapshot_notice(run_summary, latest)
             st.markdown(
-                _funnel_stat_grid([
+                _stat_grid([
                     ("신규 표시 종목", 0, "개"),
                     ("서버 판단 종목", int(run_summary.get("candidates") or 0), "개"),
                     ("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}", ""),
