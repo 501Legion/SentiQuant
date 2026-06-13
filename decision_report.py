@@ -176,6 +176,51 @@ def _observation_candidates(funnel: dict, limit: int = 5) -> list[dict]:
     return rows[:limit]
 
 
+def _candidate_details(ctx: ReportContext, funnel: dict) -> list[dict]:
+    """컨센서스를 통과해 라우터까지 도달한 후보(게이트보류·매수·매도)의 판단 근거를
+    decision_records에서 추려 반환한다. 사람이 매수/보류 사유를 그대로 검토할 수 있게 함."""
+    rec_by_sym = {r.get("symbol"): r for r in (ctx.decision_records or [])}
+    order = ([b["symbol"] for b in funnel["buys"]]
+             + [s["symbol"] for s in funnel["sells"]]
+             + [g["symbol"] for g in funnel["gate_dropped"]])
+    rows = []
+    for sym in dict.fromkeys(order):
+        r = rec_by_sym.get(sym)
+        if not r:
+            continue
+        rows.append(r)
+    return rows
+
+
+def _fmt_candidate_block(r: dict) -> list[str]:
+    """단일 후보 record → Markdown 블록 (헤더 + 지표줄 + 판단 근거)."""
+    sym = r.get("symbol", "?")
+    final = r.get("final_action") or r.get("action") or "-"
+    rule = r.get("rule_action")
+    llm = r.get("llm_action")
+    if rule and llm:
+        route = f"rule {rule} → llm {llm}"
+    elif rule:
+        route = f"rule {rule}"
+    else:
+        route = r.get("router_mode", "")
+    metrics = (
+        f"여론점수 {_fmt_num(r.get('opinion_score'), 1)} · "
+        f"합의 {_fmt_num(r.get('consensus_ratio'))} · "
+        f"중립 {_fmt_pct(r.get('neutral_ratio'))} · "
+        f"속도 {r.get('velocity_state') or '-'} · "
+        f"추세 {r.get('opinion_trend') or '-'} · "
+        f"지속 {r.get('persistence_days', 0)}d"
+    )
+    reasoning = (r.get("reasoning") or "").strip() or "_근거 기록 없음_"
+    return [
+        f"#### {sym} — 최종 {final}  ({route})",
+        f"- {metrics}",
+        f"- 근거: {reasoning}",
+        "",
+    ]
+
+
 def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
     """funnel → 한국어 Markdown 보고서 본문 (Design §6.1 / D7). 순수 함수."""
     date = ctx.date
@@ -195,11 +240,13 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
         "",
         "| 항목 | 결과 |",
         "|------|------|",
+        f"| 수집 게시글 출처일 | {_get(ctx.summary, 'posts_date', date)} |",
         f"| 검토 종목 | {funnel['input_n']}개 |",
         f"| 매매 후보 | {len(funnel['buys']) + len(funnel['sells'])}개 |",
         f"| 매수 | {len(funnel['buys'])}개 |",
         f"| 매도 | {len(funnel['sells'])}개 |",
         f"| 보류 | {hold_n}개 |",
+        f"| LLM 판단 호출 | {_get(ctx.summary, 'llm_calls', 0)}회 |",
         "",
     ]
 
@@ -255,8 +302,17 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
         L.append("_보류된 종목 없음._")
         L.append("")
 
-    # ④ 상세: 최종 기준 보류
-    L += ["## 상세 기록", "", "### 최종 기준에서 보류", ""]
+    # ④ 상세: 후보별 판단 근거 (컨센서스 통과 후 라우터까지 간 종목)
+    L += ["## 상세 기록", "", "### 후보 상세 판단 (근거)", ""]
+    details = _candidate_details(ctx, funnel)
+    if details:
+        L += ["컨센서스를 통과해 최종 판단까지 간 후보의 지표·근거입니다.", ""]
+        for r in details:
+            L += _fmt_candidate_block(r)
+    else:
+        L += ["_라우터까지 도달한 후보 없음._", ""]
+
+    L += ["### 최종 기준에서 보류", ""]
     if funnel["gate_dropped"]:
         L += ["| 종목 | 최종 판단 | 참고 코드 |", "|------|-----------|-----------|"]
         for g in funnel["gate_dropped"]:

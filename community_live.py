@@ -525,6 +525,7 @@ def run_live(
     # 6. 후보 평가 (top_n ∪ 보유) — 모든 판단 영속 로그
     candidates = list(dict.fromkeys(list(top_n) + list(portfolio.positions)))
     decisions: list[dict] = []
+    decision_records: list[dict] = []        # 보고서 근거 보강(reason_codes·판단문) 전달용
     buy_intents: list = []
     sell_intents: list = []
     snap_by_key: dict[tuple, object] = {}      # (sym, date) → snapshot (reflection join용)
@@ -576,6 +577,7 @@ def run_live(
             llm_model=(config.GPT_MODEL if router.llm_router else ""),
         )
         append_decision_log(record, path=log_path)
+        decision_records.append(record)
         decisions.append({"symbol": sym, "action": decision.action,
                           "size_factor": intent.size_factor,
                           "decision_id": intent.decision_id,
@@ -699,6 +701,7 @@ def run_live(
         report_path = build_daily_report(ReportContext(
             date=date, signal_details=signal_details, decisions=decisions,
             orders=orders, snapshots=snap_by_key, summary=summary,
+            decision_records=decision_records,
         ))
     except Exception as e:  # noqa: BLE001 — 보고서 실패 ≠ 매매 실패
         logger.warning(f"decision report 생성 실패(무시): {e}")
