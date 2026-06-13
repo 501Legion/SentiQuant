@@ -1140,11 +1140,15 @@ with tab_opinion:
 
         if not today.empty:
             # 최신일 요약
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("분석 종목", f"{len(today)}개")
-            c2.metric("매수 합의 후보", f"{int(today['is_consensus_buy'].fillna(False).astype(bool).sum())}개")
-            c3.metric("평균 여론 점수", f"{today['opinion_score'].mean():.1f}점")
-            c4.metric("총 언급 수", f"{int(today['total_mentions'].sum()):,}건")
+            st.markdown(
+                _funnel_stat_grid([
+                    ("분석 종목", len(today), "개"),
+                    ("매수 합의 후보", int(today["is_consensus_buy"].fillna(False).astype(bool).sum()), "개"),
+                    ("평균 여론 점수", f"{today['opinion_score'].mean():.1f}", "점"),
+                    ("총 언급 수", f"{int(today['total_mentions'].sum()):,}", "건"),
+                ], columns=4),
+                unsafe_allow_html=True,
+            )
             st.caption(f"{latest} 기준 — 점수는 0~100 (50 중립, 높을수록 매수 여론 우세)")
 
             # 최신 여론 상위 종목
