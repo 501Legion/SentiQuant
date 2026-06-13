@@ -34,7 +34,7 @@ sys.path.insert(0, ROOT)
 import config
 from reddit_backtester import RedditReplayBacktester
 
-FROM, TO = "2026-05-13", "2026-06-11"
+FROM, TO = "2026-05-13", "2026-06-13"
 MODEL, RANKING, SIZING, UNIV = "finbert-wsb", "sentiment", "opinion_trend", "community_liquid"
 OUT = os.path.join(ROOT, "data", "bt_matrix_result.txt")
 

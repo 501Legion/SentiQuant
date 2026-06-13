@@ -24,7 +24,7 @@ import config
 from reddit_collector import RedditCollector
 from backtester import _snapshot_path, _get_ohlcv_snapshot
 
-FROM, TO = "2026-05-13", "2026-06-11"
+FROM, TO = "2026-05-13", "2026-06-13"
 OHLCV_START = (datetime.strptime(FROM, "%Y-%m-%d") - timedelta(days=100)).strftime("%Y-%m-%d")
 PROGRESS = os.path.join(ROOT, "data", "prefetch_progress.txt")
 
