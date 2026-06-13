@@ -1105,7 +1105,7 @@ with tab_trades:
                     ("매수", buy_count, "건"),
                     ("매도", sell_count, "건"),
                     ("실현 손익", _format_signed_money_value(realized), ""),
-                    ("승률", win_rate, ""),
+                    ("수익 거래 비율", win_rate, ""),
                 ]),
                 unsafe_allow_html=True,
             )
