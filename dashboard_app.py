@@ -622,6 +622,62 @@ def _latest_trade_summary() -> dict:
     }
 
 
+def _trade_action(value) -> str:
+    text = str(value or "-").upper()
+    return ACTION_KO.get(text, text)
+
+
+def _trade_date(value) -> str:
+    parsed = pd.to_datetime(value, errors="coerce", utc=True)
+    if pd.isna(parsed):
+        return str(value or "-")[:16]
+    return (parsed + pd.Timedelta(hours=9)).strftime("%Y-%m-%d %H:%M")
+
+
+def _format_signed_pct_value(value) -> str:
+    try:
+        pct = float(value)
+    except (TypeError, ValueError):
+        return "-"
+    if pct == 0:
+        return "0.00%"
+    return f"{pct:+.2f}%"
+
+
+def _format_signed_money_value(value) -> str:
+    try:
+        amount = float(value)
+    except (TypeError, ValueError):
+        return "-"
+    if amount == 0:
+        return "$0.00"
+    return _signed_money(amount)
+
+
+def _trade_table(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        return pd.DataFrame()
+
+    src = df.copy()
+    if "date" in src.columns:
+        src["_sort_date"] = pd.to_datetime(src["date"], errors="coerce", utc=True)
+        src = src.sort_values("_sort_date", na_position="first")
+
+    rows = []
+    for _, row in src.tail(200).iloc[::-1].iterrows():
+        rows.append({
+            "일시": _trade_date(row.get("date")),
+            "종목": row.get("symbol", "-"),
+            "구분": _trade_action(row.get("action")),
+            "가격": _money(row.get("price"), 2),
+            "수량": f"{float(row.get('shares') or 0):,.0f}주",
+            "거래 금액": _money(row.get("amount"), 2),
+            "실현 손익": _format_signed_money_value(row.get("net_profit_usd")),
+            "수익률": _format_signed_pct_value(row.get("net_profit_pct")),
+        })
+    return pd.DataFrame(rows)
+
+
 # ── 한글 라벨 매핑 (대시보드 표시 전용 — 데이터는 원문 유지) ─────────────────
 ACTION_KO = {"BUY": "매수", "SELL": "매도", "SKIP": "보류", "HOLD": "보유 유지"}
 TREND_KO = {"UP": "상승", "DOWN": "하락", "FLAT": "보합"}
@@ -1033,13 +1089,28 @@ with tab_trades:
         st.warning("매매 이력이 아직 동기화되지 않았습니다.")
     else:
         df = pd.read_csv(TRADES)
-        st.metric("총 거래", len(df))
-        if "net_profit_pct" in df.columns and len(df):
-            closed = df[df["net_profit_pct"].notna() & (df["net_profit_pct"] != 0)]
-            if len(closed):
-                win = (closed["net_profit_pct"] > 0).mean() * 100
-                st.metric("승률(청산 기준)", f"{win:.0f}%")
-        st.dataframe(df.tail(200), width="stretch", hide_index=True)
+        if df.empty:
+            st.info("아직 기록된 매매 이력이 없습니다.")
+        else:
+            buy_count = int((df.get("action", pd.Series(dtype=str)).astype(str).str.upper() == "BUY").sum())
+            sell_count = int((df.get("action", pd.Series(dtype=str)).astype(str).str.upper() == "SELL").sum())
+            realized = float(pd.to_numeric(df.get("net_profit_usd", pd.Series(dtype=float)), errors="coerce").fillna(0).sum())
+            closed = pd.to_numeric(df.get("net_profit_pct", pd.Series(dtype=float)), errors="coerce")
+            closed = closed[closed.notna() & (closed != 0)]
+            win_rate = f"{(closed > 0).mean() * 100:.0f}%" if len(closed) else "-"
+
+            st.markdown(
+                _funnel_stat_grid([
+                    ("총 거래", len(df), "건"),
+                    ("매수", buy_count, "건"),
+                    ("매도", sell_count, "건"),
+                    ("실현 손익", _format_signed_money_value(realized), ""),
+                    ("승률", win_rate, ""),
+                ]),
+                unsafe_allow_html=True,
+            )
+            st.caption("최근 거래가 위에 오도록 정렬했습니다. 시간은 한국시간 기준입니다.")
+            st.dataframe(_trade_table(df), width="stretch", hide_index=True)
 
 # ── ③ 일일 결정 ──────────────────────────────────────────────────────────────
 with tab_funnel:
