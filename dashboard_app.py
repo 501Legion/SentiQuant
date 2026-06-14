@@ -170,6 +170,7 @@ st.markdown(
     .stock-card-link:focus .stock-card-panel {
         background: #1b2434;
         border-color: #3b82f6;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
         transform: translateY(-1px);
     }
     .stock-card-link:focus {
@@ -244,6 +245,7 @@ st.markdown(
         border: 1px solid #2f3744;
         border-radius: 8px;
         padding: 18px;
+        transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
     .position-panel-label {
         color: #94a3b8;
@@ -267,6 +269,7 @@ st.markdown(
         border-radius: 8px;
         margin: 8px 0 18px 0;
         padding: 18px;
+        transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
     .empty-state-kicker {
         color: #94a3b8;
@@ -413,6 +416,7 @@ st.markdown(
         border: 1px solid #2f3744;
         border-radius: 8px;
         padding: 12px 14px;
+        transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
     .decision-row-head {
         align-items: baseline;
@@ -442,6 +446,7 @@ st.markdown(
         border: 1px solid #2f3744;
         border-radius: 8px;
         padding: 10px 12px;
+        transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
     .watch-row-head {
         align-items: baseline;
@@ -493,6 +498,17 @@ st.markdown(
         font-size: 0.82rem;
         line-height: 1.4;
         margin-top: 8px;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .position-panel:hover,
+        .empty-state:hover,
+        .decision-row:hover,
+        .watch-row:hover {
+            background: #131c25;
+            border-color: #3a4656;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+            transform: translateY(-1px);
+        }
     }
     @media (max-width: 760px) {
         .empty-state-grid {
