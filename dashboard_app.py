@@ -321,6 +321,33 @@ st.markdown(
         line-height: 1.35;
         margin-top: 4px;
     }
+    .credit-footer {
+        color: #64748b;
+        font-size: 0.76rem;
+        line-height: 1.45;
+        margin: 42px 0 16px 0;
+    }
+    .credit-footer summary {
+        cursor: pointer;
+        display: inline-flex;
+        list-style: none;
+        user-select: none;
+    }
+    .credit-footer summary::-webkit-details-marker {
+        display: none;
+    }
+    .credit-footer summary:hover,
+    .credit-footer[open] summary {
+        color: #60a5fa;
+    }
+    .credit-footer-panel {
+        color: #94a3b8;
+        margin-top: 8px;
+    }
+    .credit-footer-team {
+        color: #cbd5e1;
+        font-weight: 800;
+    }
     .funnel-stat-grid {
         display: grid;
         gap: 18px;
@@ -1779,3 +1806,16 @@ with tab_opinion:
                 ).properties(height=220, title="일자별 평균 여론 점수"),
                 width="stretch")
         st.caption(f"누적 여론 스냅샷 {len(df):,}건 · 최근 40일 표시")
+
+st.markdown(
+    """
+    <details class="credit-footer">
+        <summary>signal notes</summary>
+        <div class="credit-footer-panel">
+            <div class="credit-footer-team">Built by Team Angel's Share</div>
+            <div>강연준 · 안재빈 · 최수연 · 김서원</div>
+        </div>
+    </details>
+    """,
+    unsafe_allow_html=True,
+)
