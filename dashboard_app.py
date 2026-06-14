@@ -1196,12 +1196,14 @@ components.html(
         }}
         .brand-name {{
             color: #f8fafc;
+            display: block;
             font-size: 2.05rem;
             font-weight: 800;
             line-height: 1.05;
         }}
         .brand-subtitle {{
             color: #94a3b8;
+            display: block;
             font-size: 0.92rem;
             margin-top: 3px;
         }}
