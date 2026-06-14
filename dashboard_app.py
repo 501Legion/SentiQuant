@@ -1214,7 +1214,7 @@ with tab_pf:
                 unsafe_allow_html=True,
             )
 
-        st.caption("서버가 동기화한 종가로 평가한 읽기 전용 화면입니다. 주문은 우분투 서버에서만 처리됩니다.")
+        st.caption("서버가 동기화한 종가 기준으로 평가한 화면입니다.")
 
         if not rows:
             run_summary = _latest_live_run_summary()
