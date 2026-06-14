@@ -775,6 +775,21 @@ def _decision_cards(rows: list[dict]) -> str:
     return f"<div class=\"decision-list\">{''.join(cards)}</div>"
 
 
+def _watch_candidate_cards(rows: list[dict]) -> str:
+    cards = []
+    for row in rows:
+        cards.append(
+            "<div class=\"decision-row\">"
+            "<div class=\"decision-row-head\">"
+            f"<span class=\"decision-symbol\">{_html(row.get('종목', '-'))}</span>"
+            f"<span class=\"decision-meta\">{_html(row.get('관찰 이유', '-'))}</span>"
+            "</div>"
+            f"<div class=\"decision-reasons\">{_html(row.get('참고', '-'))}</div>"
+            "</div>"
+        )
+    return f"<div class=\"decision-list\">{''.join(cards)}</div>"
+
+
 def _parse_funnel(md: str) -> dict[str, int]:
     """일일 보고서 표에서 단계별 수치 추출. 실패 시 빈 dict(원문만 표시)."""
     keys = {"①": "입력", "②": "중립 제외", "③": "컨센서스 미달",
@@ -1228,7 +1243,7 @@ with tab_funnel:
         if watch_rows:
             st.subheader("관찰 후보")
             st.caption("매수 후보는 아니지만 여론 흐름을 이어서 볼 종목입니다.")
-            st.dataframe(pd.DataFrame(watch_rows), width="stretch", hide_index=True)
+            st.markdown(_watch_candidate_cards(watch_rows), unsafe_allow_html=True)
 
         # 당일 종목별 판단 내역
         day_recs = [d for d in decisions if d.get("date") == pick] if pick else decisions[-20:]
