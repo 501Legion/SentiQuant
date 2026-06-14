@@ -82,6 +82,39 @@ st.markdown(
         color: #bfdbfe;
         font-weight: 800;
     }
+    .notice-card {
+        background: #111820;
+        border: 1px solid #2f3744;
+        border-left: 3px solid #3b82f6;
+        border-radius: 8px;
+        margin: 10px 0 16px 0;
+        padding: 13px 15px;
+    }
+    .notice-card.notice-info {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.24);
+        border-left-color: #3b82f6;
+    }
+    .notice-card.notice-warn {
+        background: rgba(245, 158, 11, 0.08);
+        border-color: rgba(245, 158, 11, 0.32);
+        border-left-color: #f59e0b;
+    }
+    .notice-title {
+        color: #bfdbfe;
+        font-size: 0.78rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+    .notice-warn .notice-title {
+        color: #fcd34d;
+    }
+    .notice-message {
+        color: #cbd5e1;
+        font-size: 0.92rem;
+        font-weight: 650;
+        line-height: 1.5;
+    }
     div[data-baseweb="tab-list"] {
         border-bottom: 1px solid #242b36;
         gap: 8px;
@@ -484,6 +517,16 @@ def _html(value) -> str:
     return html.escape(str(value), quote=True)
 
 
+def _notice_card(title: str, message: str, tone: str = "info") -> str:
+    tone = tone if tone in {"info", "warn"} else "info"
+    return f"""
+    <div class="notice-card notice-{tone}">
+        <div class="notice-title">{_html(title)}</div>
+        <div class="notice-message">{_html(message)}</div>
+    </div>
+    """
+
+
 def _stat_grid(stats: list[tuple[str, object, str]], columns: int = 5) -> str:
     items = []
     for label, value, unit in stats:
@@ -677,9 +720,9 @@ def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
     reason = summary.get("no_snapshot_reason") or ""
     message = _missing_snapshot_message(summary, date_label)
     if reason in {"snapshot_write_failed", "partial_snapshot_write_failure"}:
-        st.warning(message)
+        st.markdown(_notice_card("스냅샷 저장 확인 필요", message, "warn"), unsafe_allow_html=True)
     else:
-        st.info(message)
+        st.markdown(_notice_card("스냅샷 미생성", message), unsafe_allow_html=True)
 
     if any(k in summary for k in ("input_symbols", "scored_symbols", "ranked_symbols", "snapshot_count")):
         st.caption(
@@ -701,12 +744,17 @@ def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -
     )
 
     if run_date and snapshot_date and run_date != snapshot_date:
-        st.warning(
+        st.markdown(_notice_card(
+            "기준일 차이",
             f"실행은 {run_date}까지 완료됐지만, 종목별 여론 스냅샷은 {snapshot_date} 기준입니다. "
-            "아래 종목별 흐름은 스냅샷 기준일까지만 반영됩니다."
-        )
+            "아래 종목별 흐름은 스냅샷 기준일까지만 반영됩니다.",
+            "warn",
+        ), unsafe_allow_html=True)
     elif run_date and not snapshot_date:
-        st.info(f"{run_date} 실행은 완료됐지만 아직 종목별 여론 스냅샷이 생성되지 않았습니다.")
+        st.markdown(_notice_card(
+            "스냅샷 대기",
+            f"{run_date} 실행은 완료됐지만 아직 종목별 여론 스냅샷이 생성되지 않았습니다.",
+        ), unsafe_allow_html=True)
     elif run_date and snapshot_date:
         st.caption(f"실행일과 종목별 스냅샷 기준일이 모두 {run_date}입니다.")
 
@@ -1313,7 +1361,10 @@ with tab_funnel:
             st.caption("커뮤니티에서 언급된 종목은 위 조건을 모두 통과해야 주문 후보가 됩니다.")
             no_order_message = _daily_no_order_message(funnel)
             if no_order_message:
-                st.info(no_order_message)
+                st.markdown(
+                    _notice_card("주문 없음", no_order_message),
+                    unsafe_allow_html=True,
+                )
 
         watch_rows = _parse_observation_candidates(md)
         if watch_rows:
