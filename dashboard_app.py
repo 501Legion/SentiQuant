@@ -288,6 +288,13 @@ st.markdown(
         line-height: 1.45;
         margin-bottom: 16px;
     }
+    .empty-state-whisper {
+        color: #60a5fa;
+        font-size: 0.78rem;
+        font-weight: 700;
+        line-height: 1.4;
+        margin: -8px 0 16px 0;
+    }
     .empty-state-grid {
         display: grid;
         gap: 10px;
@@ -1364,6 +1371,7 @@ with tab_pf:
                     <div class="empty-state-copy">
                         현재는 보유 종목 없이 현금으로 대기 중입니다. 서버의 판단과 주문 기록은 계속 동기화됩니다.
                     </div>
+                    <div class="empty-state-whisper">현금도 포지션입니다.</div>
                     <div class="empty-state-grid">
                         <div class="empty-state-item">
                             <div class="empty-state-label">최근 관찰 후보</div>
