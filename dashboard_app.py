@@ -1254,10 +1254,13 @@ components.html(
             left: 54px;
             line-height: 1.25;
             opacity: 0;
+            overflow: hidden;
             position: absolute;
+            text-overflow: ellipsis;
             top: 62px;
             transform: translateY(-2px);
             transition: opacity 180ms ease, transform 180ms ease;
+            white-space: nowrap;
         }}
         .quiet-signal.is-visible {{
             opacity: 1;
@@ -1280,6 +1283,8 @@ components.html(
         const brand = document.getElementById("brandEgg");
         const signal = document.getElementById("quietSignal");
         const storageKey = "sentiquant.quietSignalSeen";
+        const quietMessage = "시장의 소음을 관찰하는 중입니다...";
+        const teamMessage = "팀명인 엔젤스쉐어는 대시보드를 만든 안재빈이 가장 좋아하는 향수 중 하나입니다.";
         let taps = 0;
         let timer = null;
         const parentDocument = (() => {{
@@ -1304,10 +1309,17 @@ components.html(
         }} catch (error) {{}}
         brand.addEventListener("click", () => {{
             taps += 1;
-            if (taps >= 5) {{
+            if (taps >= 10) {{
+                signal.textContent = teamMessage;
                 markSignalSeen();
                 signal.classList.add("is-visible");
                 taps = 0;
+                clearTimeout(timer);
+                timer = setTimeout(() => signal.classList.remove("is-visible"), 5200);
+            }} else if (taps === 5) {{
+                signal.textContent = quietMessage;
+                markSignalSeen();
+                signal.classList.add("is-visible");
                 clearTimeout(timer);
                 timer = setTimeout(() => signal.classList.remove("is-visible"), 4200);
             }}
