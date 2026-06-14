@@ -323,9 +323,13 @@ st.markdown(
     }
     .credit-footer {
         color: #64748b;
+        display: none;
         font-size: 0.76rem;
         line-height: 1.45;
         margin: 42px 0 16px 0;
+    }
+    body.sq-egg-seen .credit-footer {
+        display: block;
     }
     .credit-footer summary {
         cursor: pointer;
@@ -1275,11 +1279,33 @@ components.html(
     <script>
         const brand = document.getElementById("brandEgg");
         const signal = document.getElementById("quietSignal");
+        const storageKey = "sentiquant.quietSignalSeen";
         let taps = 0;
         let timer = null;
+        const parentDocument = (() => {{
+            try {{
+                return window.parent && window.parent.document;
+            }} catch (error) {{
+                return null;
+            }}
+        }})();
+        const markSignalSeen = () => {{
+            try {{
+                window.localStorage.setItem(storageKey, "1");
+            }} catch (error) {{}}
+            if (parentDocument && parentDocument.body) {{
+                parentDocument.body.classList.add("sq-egg-seen");
+            }}
+        }};
+        try {{
+            if (window.localStorage.getItem(storageKey) === "1" && parentDocument && parentDocument.body) {{
+                parentDocument.body.classList.add("sq-egg-seen");
+            }}
+        }} catch (error) {{}}
         brand.addEventListener("click", () => {{
             taps += 1;
             if (taps >= 5) {{
+                markSignalSeen();
                 signal.classList.add("is-visible");
                 taps = 0;
                 clearTimeout(timer);
