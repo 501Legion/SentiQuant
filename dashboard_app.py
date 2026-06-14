@@ -325,11 +325,13 @@ st.markdown(
         margin-top: 4px;
     }
     .credit-footer {
+        box-sizing: border-box;
         color: #64748b;
         display: none;
         font-size: 0.76rem;
         line-height: 1.45;
         margin: 42px 0 16px 0;
+        min-height: 92px;
     }
     body.sq-egg-seen .credit-footer {
         display: block;
