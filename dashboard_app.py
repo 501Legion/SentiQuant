@@ -351,11 +351,21 @@ st.markdown(
     }
     .credit-footer-panel {
         color: #94a3b8;
+        font-size: 0.76rem;
+        line-height: 1.48;
         margin-top: 8px;
     }
     .credit-footer-team {
         color: #cbd5e1;
         font-weight: 800;
+    }
+    .credit-footer-members {
+        color: #94a3b8;
+    }
+    .credit-footer-note {
+        color: #7c8798;
+        font-size: 0.72rem;
+        margin-top: 9px;
     }
     .funnel-stat-grid {
         display: grid;
@@ -1869,8 +1879,8 @@ st.markdown(
         <summary>Behind The Signal</summary>
         <div class="credit-footer-panel">
             <div class="credit-footer-team">Built by Team Angel's Share</div>
-            <div>강연준 · 안재빈 · 최수연 · 김서원</div>
-            <div>로고인 핑구는 안재빈의 취향이 100% 반영되었습니다.</div>
+            <div class="credit-footer-members">강연준 · 안재빈 · 최수연 · 김서원</div>
+            <div class="credit-footer-note">로고인 핑구는 안재빈의 취향이 100% 반영되었습니다.</div>
         </div>
     </details>
     """,
