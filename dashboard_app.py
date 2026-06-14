@@ -1573,7 +1573,7 @@ with tab_opinion:
                 ], columns=4),
                 unsafe_allow_html=True,
             )
-            st.caption(f"{latest} 기준 — 점수는 0~100 (50 중립, 높을수록 매수 여론 우세)")
+            st.caption("점수는 0~100 기준입니다. 50은 중립, 높을수록 매수 여론이 우세하다는 뜻입니다.")
 
             # 최신 여론 상위 종목
             st.subheader(f"🔥 최신 여론 상위 종목 ({latest})")
