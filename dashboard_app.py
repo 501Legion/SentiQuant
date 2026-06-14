@@ -1035,7 +1035,9 @@ def _parse_funnel(md: str) -> dict[str, int]:
         "보류": "보류",
         "여론 방향성이 충분히 뚜렷하지 않음": "중립 제외",
         "매매 합의 기준 미충족": "컨센서스 미달",
+        "매수 의견 합의 부족": "컨센서스 미달",
         "최종 위험/비용 기준에서 보류": "게이트 차단",
+        "위험/비용 기준에서 보류": "게이트 차단",
     }
     out: dict[str, int] = {}
     for line in md.splitlines():
@@ -1109,8 +1111,8 @@ def _daily_no_order_message(funnel: dict) -> str:
         return "이 날은 검토할 종목이 없어 새 주문 판단을 만들지 않았습니다."
     reasons = [
         ("여론 방향성이 충분히 뚜렷하지 않음", funnel.get("중립 제외", 0)),
-        ("매매 합의 기준 미충족", funnel.get("컨센서스 미달", 0)),
-        ("최종 위험/비용 기준에서 보류", funnel.get("게이트 차단", 0)),
+        ("매수 의견 합의 부족", funnel.get("컨센서스 미달", 0)),
+        ("위험/비용 기준에서 보류", funnel.get("게이트 차단", 0)),
     ]
     top_reason, top_count = max(reasons, key=lambda item: item[1])
     if top_count > 0:

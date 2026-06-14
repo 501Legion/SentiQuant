@@ -13,6 +13,21 @@ logger = logging.getLogger(__name__)
 # 매수/매도로 분류되는 액션 집합
 _SELL_ACTIONS = {"SELL", "EXIT", "REDUCE"}
 
+ACTION_LABELS = {
+    "BUY": "매수",
+    "SELL": "매도",
+    "EXIT": "매도",
+    "REDUCE": "비중 축소",
+    "SKIP": "보류",
+    "HOLD": "관망",
+}
+
+REASON_CODE_LABELS = {
+    "universe_blocked": "투자 대상 조건 미충족",
+    "cost_blocked": "비용/위험 기준 미충족",
+    "EDGE_BELOW_COST_THRESHOLD": "비용 대비 기대수익 부족",
+}
+
 
 def _get(obj, key, default=None):
     """dict/객체 공용 안전 getter (decision_log._get와 동일 패턴)."""
@@ -21,6 +36,16 @@ def _get(obj, key, default=None):
     if isinstance(obj, dict):
         return obj.get(key, default)
     return getattr(obj, key, default)
+
+
+def _fmt_action(value) -> str:
+    text = str(value or "-").upper()
+    return ACTION_LABELS.get(text, str(value or "-"))
+
+
+def _fmt_reason_codes(codes) -> str:
+    labels = [REASON_CODE_LABELS.get(c, str(c).replace("_", " ")) for c in (codes or [])]
+    return ", ".join(labels) if labels else "-"
 
 
 @dataclass
@@ -55,7 +80,10 @@ def _derive_funnel(ctx: ReportContext) -> dict:
         elif not d.get("passed_consensus"):
             consensus_dropped.append({
                 "symbol": sym, "bullish": d.get("bullish", 0), "bearish": d.get("bearish", 0),
-                "reason": f"bull {d.get('bullish', 0)}/bear {d.get('bearish', 0)} < 컨센서스 기준",
+                "reason": (
+                    f"상승 {d.get('bullish', 0)} / 하락 {d.get('bearish', 0)}로 "
+                    "매수 우세 기준 미달"
+                ),
             })
         elif sym not in bought and sym not in sold:
             # 컨센서스는 통과했으나 universe/cost/router 게이트에서 탈락 (SKIP/HOLD)
@@ -164,13 +192,17 @@ def _observation_candidates(funnel: dict, limit: int = 5) -> list[dict]:
     for g in funnel["gate_dropped"]:
         rows.append({
             "symbol": g["symbol"],
-            "reason": "최종 기준에서 보류",
-            "detail": ", ".join(g["reason_codes"]) or g.get("final_action") or "-",
+            "reason": f"최종 판단: {_fmt_action(g.get('final_action'))}",
+            "detail": (
+                _fmt_reason_codes(g.get("reason_codes"))
+                if g.get("reason_codes")
+                else _fmt_action(g.get("final_action"))
+            ),
         })
     for c in funnel["consensus_dropped"]:
         rows.append({
             "symbol": c["symbol"],
-            "reason": "매매 합의 기준 미충족",
+            "reason": "매수 의견 합의 부족",
             "detail": f"상승 {c['bullish']} / 하락 {c['bearish']}",
         })
     return rows[:limit]
@@ -195,13 +227,13 @@ def _candidate_details(ctx: ReportContext, funnel: dict) -> list[dict]:
 def _fmt_candidate_block(r: dict) -> list[str]:
     """단일 후보 record → Markdown 블록 (헤더 + 지표줄 + 판단 근거)."""
     sym = r.get("symbol", "?")
-    final = r.get("final_action") or r.get("action") or "-"
+    final = _fmt_action(r.get("final_action") or r.get("action") or "-")
     rule = r.get("rule_action")
     llm = r.get("llm_action")
     if rule and llm:
-        route = f"rule {rule} → llm {llm}"
+        route = f"룰 {_fmt_action(rule)} → LLM {_fmt_action(llm)}"
     elif rule:
-        route = f"rule {rule}"
+        route = f"룰 {_fmt_action(rule)}"
     else:
         route = r.get("router_mode", "")
     metrics = (
@@ -214,7 +246,7 @@ def _fmt_candidate_block(r: dict) -> list[str]:
     )
     reasoning = (r.get("reasoning") or "").strip() or "_근거 기록 없음_"
     return [
-        f"#### {sym} — 최종 {final}  ({route})",
+        f"#### {sym} — 최종 판단: {final}  ({route})",
         f"- {metrics}",
         f"- 근거: {reasoning}",
         "",
@@ -294,8 +326,8 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
             "| 이유 | 종목 수 |",
             "|------|--------|",
             f"| 여론 방향성이 충분히 뚜렷하지 않음 | {neutral_n}개 |",
-            f"| 매매 합의 기준 미충족 | {consensus_n}개 |",
-            f"| 최종 위험/비용 기준에서 보류 | {gate_n}개 |",
+            f"| 매수 의견 합의 부족 | {consensus_n}개 |",
+            f"| 위험/비용 기준에서 보류 | {gate_n}개 |",
             "",
         ]
     else:
@@ -312,17 +344,20 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
     else:
         L += ["_라우터까지 도달한 후보 없음._", ""]
 
-    L += ["### 최종 기준에서 보류", ""]
+    L += ["### 최종 판단: 보류/관망", ""]
     if funnel["gate_dropped"]:
-        L += ["| 종목 | 최종 판단 | 참고 코드 |", "|------|-----------|-----------|"]
+        L += ["| 종목 | 최종 판단 | 참고 |", "|------|-----------|------|"]
         for g in funnel["gate_dropped"]:
-            L.append(f"| {g['symbol']} | {g['final_action']} | {', '.join(g['reason_codes']) or '-'} |")
+            L.append(
+                f"| {g['symbol']} | {_fmt_action(g['final_action'])} | "
+                f"{_fmt_reason_codes(g['reason_codes'])} |"
+            )
     else:
         L.append("_없음._")
     L.append("")
 
     # ③ 컨센서스 탈락
-    L += ["### 매매 합의 기준 미충족", ""]
+    L += ["### 매수 의견 합의 부족", ""]
     if funnel["consensus_dropped"]:
         L += ["| 종목 | 상승 | 하락 | 사유 |", "|------|------|------|------|"]
         for c in funnel["consensus_dropped"]:
