@@ -514,11 +514,31 @@ def _position_table(rows: list[dict]) -> pd.DataFrame:
     ])
 
 
-def _price_chart(hist: pd.DataFrame):
+PRICE_RANGE_DAYS = {
+    "1개월": 21,
+    "3개월": 63,
+    "6개월": 126,
+    "1년": 252,
+    "전체": None,
+}
+
+
+def _price_range_control(key: str, default: str = "3개월") -> str:
+    return st.radio(
+        "기간",
+        list(PRICE_RANGE_DAYS.keys()),
+        index=list(PRICE_RANGE_DAYS.keys()).index(default),
+        horizontal=True,
+        key=key,
+    )
+
+
+def _price_chart(hist: pd.DataFrame, range_label: str = "3개월", enable_zoom: bool = True):
     data = hist.copy()
     data["Price"] = pd.to_numeric(data["close"], errors="coerce")
     data = data.dropna(subset=["date", "Price"]).sort_values("date")
-    visible = data.tail(min(63, len(data)))
+    window = PRICE_RANGE_DAYS.get(range_label)
+    visible = data.tail(min(window, len(data))) if window else data
     line = alt.Chart(visible).mark_line(color="#3b82f6").encode(
         x=alt.X("date:T", title=None),
         y=alt.Y("Price:Q", title="가격", scale=alt.Scale(zero=False)),
@@ -535,7 +555,8 @@ def _price_chart(hist: pd.DataFrame):
             alt.Tooltip("Price:Q", title="종가", format=",.2f"),
         ],
     )
-    return (line + points).properties(height=300)
+    chart = (line + points).properties(height=300)
+    return chart.interactive() if enable_zoom else chart
 
 
 def _compact_date_axis(tick_count: int = 6) -> alt.Axis:
@@ -1060,9 +1081,10 @@ with tab_pf:
             if syms:
                 with st.expander("참고 가격 차트", expanded=False):
                     sel = st.selectbox("종목 선택", syms)
+                    range_label = _price_range_control("reference_price_range")
                     hist = _load_ohlcv(sel)
                     if not hist.empty:
-                        st.altair_chart(_price_chart(hist), width="stretch")
+                        st.altair_chart(_price_chart(hist, range_label), width="stretch")
             else:
                 st.info("가격 데이터가 아직 동기화되지 않았습니다.")
         else:
@@ -1131,7 +1153,9 @@ with tab_pf:
                 if hist.empty:
                     st.warning(f"{selected['symbol']} 가격 스냅샷 없음")
                 else:
-                    st.altair_chart(_price_chart(hist), width="stretch")
+                    range_label = _price_range_control(
+                        f"position_price_range_{selected['symbol']}")
+                    st.altair_chart(_price_chart(hist, range_label), width="stretch")
 
                 m_col1, m_col2, m_col3 = st.columns(3)
                 with m_col1:
