@@ -276,6 +276,42 @@ st.markdown(
         font-size: 0.95rem;
         font-weight: 700;
     }
+    .decision-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 8px 0 16px 0;
+    }
+    .decision-row {
+        background: #111820;
+        border: 1px solid #2f3744;
+        border-radius: 8px;
+        padding: 12px 14px;
+    }
+    .decision-row-head {
+        align-items: baseline;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        margin-bottom: 8px;
+    }
+    .decision-symbol {
+        color: #f8fafc;
+        font-size: 1.05rem;
+        font-weight: 800;
+    }
+    .decision-meta {
+        color: #cbd5e1;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+    .decision-reasons {
+        color: #d1d5db;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+        word-break: keep-all;
+    }
     @media (max-width: 760px) {
         .empty-state-grid {
             grid-template-columns: 1fr;
@@ -719,6 +755,24 @@ def _reasons_ko(codes) -> str:
     if not codes:
         return "-"
     return ", ".join(REASON_KO.get(c, c) for c in codes)
+
+
+def _decision_cards(rows: list[dict]) -> str:
+    cards = []
+    for row in rows:
+        cards.append(
+            "<div class=\"decision-row\">"
+            "<div class=\"decision-row-head\">"
+            f"<span class=\"decision-symbol\">{_html(row.get('종목', '-'))}</span>"
+            f"<span class=\"decision-meta\">신호 {_html(row.get('신호', '-'))}</span>"
+            f"<span class=\"decision-meta\">최종 판단 {_html(row.get('최종 판단', '-'))}</span>"
+            f"<span class=\"decision-meta\">여론 점수 {_html(row.get('여론 점수', '-'))}</span>"
+            f"<span class=\"decision-meta\">확신도 {_html(row.get('확신도', '-'))}</span>"
+            "</div>"
+            f"<div class=\"decision-reasons\">{_html(row.get('판단 사유', '-'))}</div>"
+            "</div>"
+        )
+    return f"<div class=\"decision-list\">{''.join(cards)}</div>"
 
 
 def _parse_funnel(md: str) -> dict[str, int]:
@@ -1191,7 +1245,7 @@ with tab_funnel:
                     "여론 점수": (tool.get("opinion_signal") or "").replace("score ", "") or "-",
                     "확신도": f"{d.get('confidence', 0) * 100:.0f}%" if d.get("confidence") is not None else "-",
                 })
-            st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+            st.markdown(_decision_cards(rows), unsafe_allow_html=True)
         elif pick:
             st.caption("이 날은 종목별 최종 판단 표에 표시할 종목이 없습니다.")
 
