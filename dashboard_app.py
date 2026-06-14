@@ -13,6 +13,7 @@ from pathlib import Path
 import altair as alt
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 ROOT = Path(__file__).parent
 DATA = ROOT / "data"
@@ -1140,17 +1141,116 @@ _logo_html = (
     if _logo_uri
     else '<div class="brand-mark">SQ</div>'
 )
-st.markdown(
+components.html(
     f"""
-    <div class="brand-bar">
-        {_logo_html}
-        <div>
-            <div class="brand-name">SentiQuant</div>
-            <div class="brand-subtitle">Sentiment 분석 기반의 투자 지원</div>
-        </div>
+    <!doctype html>
+    <html lang="ko">
+    <head>
+    <meta charset="utf-8">
+    <style>
+        html, body {{
+            background: transparent;
+            margin: 0;
+            overflow: hidden;
+        }}
+        .brand-shell {{
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            padding: 4px 0 0 0;
+        }}
+        .brand-bar {{
+            align-items: center;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            display: inline-flex;
+            gap: 12px;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }}
+        .brand-bar:focus-visible {{
+            border-radius: 10px;
+            outline: 2px solid #3b82f6;
+            outline-offset: 4px;
+        }}
+        .brand-mark {{
+            align-items: center;
+            background: #2563eb;
+            border-radius: 9px;
+            color: #ffffff;
+            display: inline-flex;
+            font-size: 1.05rem;
+            font-weight: 800;
+            height: 42px;
+            justify-content: center;
+            width: 42px;
+        }}
+        .brand-logo {{
+            border-radius: 9px;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+            display: block;
+            height: 42px;
+            object-fit: cover !important;
+            width: 42px;
+        }}
+        .brand-name {{
+            color: #f8fafc;
+            font-size: 2.05rem;
+            font-weight: 800;
+            line-height: 1.05;
+        }}
+        .brand-subtitle {{
+            color: #94a3b8;
+            font-size: 0.92rem;
+            margin-top: 3px;
+        }}
+        .quiet-signal {{
+            color: #60a5fa;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-left: 54px;
+            margin-top: 8px;
+            opacity: 0;
+            transform: translateY(-2px);
+            transition: opacity 180ms ease, transform 180ms ease;
+        }}
+        .quiet-signal.is-visible {{
+            opacity: 1;
+            transform: translateY(0);
+        }}
+    </style>
+    </head>
+    <body>
+    <div class="brand-shell">
+        <button class="brand-bar" id="brandEgg" type="button" aria-label="SentiQuant">
+            {_logo_html}
+            <span>
+                <span class="brand-name">SentiQuant</span>
+                <span class="brand-subtitle">Sentiment 분석 기반의 투자 지원</span>
+            </span>
+        </button>
+        <div class="quiet-signal" id="quietSignal" aria-live="polite">시장의 소음을 관찰하는 중입니다...</div>
     </div>
+    <script>
+        const brand = document.getElementById("brandEgg");
+        const signal = document.getElementById("quietSignal");
+        let taps = 0;
+        let timer = null;
+        brand.addEventListener("click", () => {{
+            taps += 1;
+            if (taps >= 5) {{
+                signal.classList.add("is-visible");
+                taps = 0;
+                clearTimeout(timer);
+                timer = setTimeout(() => signal.classList.remove("is-visible"), 4200);
+            }}
+        }});
+    </script>
+    </body>
+    </html>
     """,
-    unsafe_allow_html=True,
+    height=78,
 )
 _sync = _read_json(LAST_SYNC, {})
 if _sync.get("synced_at"):
