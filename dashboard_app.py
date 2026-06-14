@@ -811,8 +811,6 @@ def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -
             "스냅샷 대기",
             f"{run_date} 실행은 완료됐지만 아직 종목별 여론 스냅샷이 생성되지 않았습니다.",
         ), unsafe_allow_html=True)
-    elif run_date and snapshot_date:
-        st.caption(f"실행일과 종목별 스냅샷 기준일이 모두 {run_date}입니다.")
 
 
 def _latest_trade_summary() -> dict:
@@ -1618,8 +1616,6 @@ with tab_opinion:
 
         # 종목별 추이 — 최근 스냅샷 기준 언급 많은 순으로 선택
         st.subheader("📊 종목별 여론 흐름")
-        if snapshot_latest:
-            st.caption(f"종목별 흐름은 생성된 스냅샷 기준입니다. 최신 기준일: {snapshot_latest}")
         recent_syms = (df[df["date"] >= sorted(df["date"].unique())[-7:][0]]
                        .groupby("symbol")["total_mentions"].sum()
                        .sort_values(ascending=False).index.tolist()) if "date" in df else []
