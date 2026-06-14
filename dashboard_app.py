@@ -990,13 +990,14 @@ def _decision_cards(rows: list[dict]) -> str:
 def _watch_candidate_cards(rows: list[dict]) -> str:
     cards = []
     for row in rows:
+        note = _trade_action(row.get("참고", "-"))
         cards.append(
             "<div class=\"watch-row\">"
             "<div class=\"watch-row-head\">"
             f"<span class=\"decision-symbol\">{_html(row.get('종목', '-'))}</span>"
             f"<span class=\"watch-reason\">{_html(row.get('관찰 이유', '-'))}</span>"
             "</div>"
-            f"<div class=\"watch-note\">{_html(row.get('참고', '-'))}</div>"
+            f"<div class=\"watch-note\">{_html(note)}</div>"
             "</div>"
         )
     return f"<div class=\"watch-list\">{''.join(cards)}</div>"
