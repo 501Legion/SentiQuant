@@ -411,6 +411,19 @@ st.markdown(
         color: #f8fafc;
         font-weight: 800;
     }
+    .trade-action {
+        color: #86efac;
+        font-weight: 800;
+    }
+    .trade-profit {
+        font-weight: 800;
+    }
+    .trade-card-foot {
+        color: #94a3b8;
+        font-size: 0.82rem;
+        line-height: 1.4;
+        margin-top: 8px;
+    }
     @media (max-width: 760px) {
         .empty-state-grid {
             grid-template-columns: 1fr;
@@ -847,6 +860,39 @@ def _trade_table(df: pd.DataFrame) -> pd.DataFrame:
             "수익률": _format_signed_pct_value(row.get("net_profit_pct")),
         })
     return pd.DataFrame(rows)
+
+
+def _trade_cards(rows: pd.DataFrame) -> str:
+    cards = []
+    for _, row in rows.iterrows():
+        action = row.get("구분", "-")
+        profit = row.get("실현 손익", "-")
+        profit_cls = "profit-flat"
+        try:
+            profit_number = float(str(profit).replace("$", "").replace(",", ""))
+        except ValueError:
+            profit_number = 0
+        if profit_number > 0:
+            profit_cls = "profit-pos"
+        elif profit_number < 0:
+            profit_cls = "profit-neg"
+        cards.append(
+            "<div class=\"decision-row\">"
+            "<div class=\"decision-row-head\">"
+            f"<span class=\"decision-symbol\">{_html(row.get('종목', '-'))}</span>"
+            f"<span class=\"decision-meta trade-action\">{_html(action)}</span>"
+            f"<span class=\"decision-meta\">일시: {_html(row.get('일시', '-'))}</span>"
+            f"<span class=\"decision-meta\">가격: {_html(row.get('가격', '-'))}</span>"
+            f"<span class=\"decision-meta\">수량: {_html(row.get('수량', '-'))}</span>"
+            f"<span class=\"decision-meta\">거래 금액: {_html(row.get('거래 금액', '-'))}</span>"
+            "</div>"
+            "<div class=\"trade-card-foot\">"
+            f"실현 손익: <span class=\"trade-profit {profit_cls}\">{_html(profit)}</span>"
+            f" · 수익률: {_html(row.get('수익률', '-'))}"
+            "</div>"
+            "</div>"
+        )
+    return f"<div class=\"decision-list\">{''.join(cards)}</div>"
 
 
 # ── 한글 라벨 매핑 (대시보드 표시 전용 — 데이터는 원문 유지) ─────────────────
@@ -1348,7 +1394,23 @@ with tab_trades:
                 unsafe_allow_html=True,
             )
             st.caption("최근 거래부터 표시합니다. 시간은 한국시간 기준이며, 수익 거래 비율은 실현 손익이 있는 거래 기준입니다.")
-            st.dataframe(_trade_table(df), width="stretch", hide_index=True)
+            trade_rows = _trade_table(df)
+            page_size = 10
+            page_count = max((len(trade_rows) + page_size - 1) // page_size, 1)
+            if page_count > 1:
+                page_label = st.radio(
+                    "페이지",
+                    [str(i) for i in range(1, page_count + 1)],
+                    horizontal=True,
+                    key="trade_history_page",
+                )
+                page = int(page_label)
+            else:
+                page = 1
+            start = (page - 1) * page_size
+            end = start + page_size
+            st.markdown(_trade_cards(trade_rows.iloc[start:end]), unsafe_allow_html=True)
+            st.caption(f"{start + 1}–{min(end, len(trade_rows))} / {len(trade_rows)}건 표시")
 
 # ── ③ 일일 결정 ──────────────────────────────────────────────────────────────
 with tab_funnel:
