@@ -82,6 +82,41 @@ st.markdown(
         color: #bfdbfe;
         font-weight: 800;
     }
+    div[data-baseweb="tab-list"] {
+        border-bottom: 1px solid #242b36;
+        gap: 8px;
+        margin-top: 4px;
+        padding: 0 0 9px 0;
+    }
+    button[data-baseweb="tab"] {
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        color: #94a3b8;
+        height: auto;
+        padding: 8px 13px;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    button[data-baseweb="tab"] p {
+        font-size: 0.88rem;
+        font-weight: 800;
+        line-height: 1.15;
+        margin: 0;
+    }
+    button[data-baseweb="tab"]:hover {
+        background: rgba(148, 163, 184, 0.08);
+        border-color: rgba(148, 163, 184, 0.22);
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: rgba(34, 197, 94, 0.12);
+        border-color: rgba(34, 197, 94, 0.45);
+    }
+    button[data-baseweb="tab"][aria-selected="true"] * {
+        color: #86efac !important;
+    }
+    div[data-baseweb="tab-highlight"] {
+        display: none;
+    }
     .stock-card-panel {
         background: #171b22;
         border: 1px solid #2f3744;
@@ -968,7 +1003,7 @@ st.markdown(
 )
 
 tab_pf, tab_trades, tab_funnel, tab_opinion = st.tabs(
-    ["💼 포트폴리오", "📜 매매 이력", "🔎 일일 판단", "🗣️ 여론 흐름"])
+    ["💼 자산 현황", "📜 거래 기록", "🔎 일일 판단", "🗣️ 여론 흐름"])
 
 # ── ① 포트폴리오 (보유 개요 + 평가) ──────────────────────────────────────────
 with tab_pf:
