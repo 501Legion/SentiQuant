@@ -679,7 +679,7 @@ def _trade_table(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ── 한글 라벨 매핑 (대시보드 표시 전용 — 데이터는 원문 유지) ─────────────────
-ACTION_KO = {"BUY": "매수", "SELL": "매도", "SKIP": "보류", "HOLD": "보유 유지"}
+ACTION_KO = {"BUY": "매수", "SELL": "매도", "SKIP": "보류", "HOLD": "관망"}
 TREND_KO = {"UP": "상승", "DOWN": "하락", "FLAT": "보합"}
 VELOCITY_KO = {"SPIKE": "급증", "NORMAL": "보통", "FADING": "감소"}
 REASON_KO = {
