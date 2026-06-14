@@ -399,6 +399,18 @@ st.markdown(
         overflow-wrap: anywhere;
         word-break: keep-all;
     }
+    .opinion-keywords {
+        color: #94a3b8;
+        font-size: 0.82rem;
+        line-height: 1.4;
+        margin-top: 8px;
+        overflow-wrap: anywhere;
+        word-break: keep-all;
+    }
+    .opinion-score {
+        color: #f8fafc;
+        font-weight: 800;
+    }
     @media (max-width: 760px) {
         .empty-state-grid {
             grid-template-columns: 1fr;
@@ -908,6 +920,26 @@ def _watch_candidate_cards(rows: list[dict]) -> str:
             f"<span class=\"decision-meta\">{_html(row.get('관찰 이유', '-'))}</span>"
             "</div>"
             f"<div class=\"decision-reasons\">{_html(row.get('참고', '-'))}</div>"
+            "</div>"
+        )
+    return f"<div class=\"decision-list\">{''.join(cards)}</div>"
+
+
+def _opinion_snapshot_cards(rows: list[dict]) -> str:
+    cards = []
+    for row in rows:
+        keywords = row.get("주요 키워드") or "-"
+        cards.append(
+            "<div class=\"decision-row\">"
+            "<div class=\"decision-row-head\">"
+            f"<span class=\"decision-symbol\">{_html(row.get('종목', '-'))}</span>"
+            f"<span class=\"decision-meta opinion-score\">여론 점수: {_html(row.get('여론 점수', '-'))}</span>"
+            f"<span class=\"decision-meta\">추세: {_html(row.get('추세', '-'))}</span>"
+            f"<span class=\"decision-meta\">언급: {_html(row.get('언급', '-'))}건</span>"
+            f"<span class=\"decision-meta\">긍정/부정: {_html(row.get('긍정/부정', '-'))}</span>"
+            f"<span class=\"decision-meta\">언급량: {_html(row.get('언급량 변화', '-'))}</span>"
+            "</div>"
+            f"<div class=\"opinion-keywords\">주요 키워드: {_html(keywords)}</div>"
             "</div>"
         )
     return f"<div class=\"decision-list\">{''.join(cards)}</div>"
@@ -1463,7 +1495,7 @@ with tab_opinion:
                 "언급량 변화": VELOCITY_KO.get(r.get("velocity_state"), "보통"),
                 "주요 키워드": ", ".join((r.get("top_keywords") or [])[:4]) or "-",
             } for _, r in top.iterrows()]
-            st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+            st.markdown(_opinion_snapshot_cards(rows), unsafe_allow_html=True)
         elif latest:
             _render_missing_snapshot_notice(run_summary, latest)
             st.markdown(
