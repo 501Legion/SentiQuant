@@ -1087,9 +1087,21 @@ def _parse_observation_candidates(md: str) -> list[dict]:
 
 
 def _compact_report_markdown(md: str) -> str:
-    """보고서 원문 내용을 유지하되 대시보드 안에서는 제목 크기를 낮춘다."""
+    """보고서 원문 내용을 유지하되 대시보드 안에서는 제목 크기와 용어를 다듬는다."""
     out = []
     for line in md.splitlines():
+        line = line.replace("최종 위험/비용 기준에서 보류", "위험/비용 기준에서 보류")
+        line = line.replace("매매 합의 기준 미충족", "매수 의견 합의 부족")
+        line = line.replace("참고 코드", "참고")
+        line = line.replace("최종 기준에서 보류", "최종 판단: 보류/관망")
+        line = re.sub(r"\bSKIP\b", "보류", line)
+        line = re.sub(r"\bHOLD\b", "관망", line)
+        line = re.sub(
+            r"bull (\d+)/bear (\d+) < 컨센서스 기준",
+            r"상승 \1 / 하락 \2로 매수 우세 기준 미달",
+            line,
+        )
+        line = re.sub(r"bull (\d+)/bear (\d+)", r"상승 \1 / 하락 \2", line)
         if line.startswith("### "):
             out.append("##### " + line[4:])
         elif line.startswith("## "):
