@@ -86,9 +86,28 @@ st.markdown(
         background: #171b22;
         border: 1px solid #2f3744;
         border-radius: 6px;
+        cursor: pointer;
         min-height: 112px;
         padding: 12px;
         position: relative;
+        transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+    .stock-card-link {
+        color: inherit !important;
+        display: block;
+        text-decoration: none !important;
+    }
+    .stock-card-link:hover .stock-card-panel,
+    .stock-card-link:focus .stock-card-panel {
+        background: #1b2434;
+        border-color: #3b82f6;
+        transform: translateY(-1px);
+    }
+    .stock-card-link:focus {
+        outline: none;
+    }
+    .stock-card-link:focus-visible .stock-card-panel {
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.28);
     }
     .stock-card-panel.selected {
         background: #172033;
@@ -1048,6 +1067,11 @@ with tab_pf:
                 st.info("가격 데이터가 아직 동기화되지 않았습니다.")
         else:
             symbols = [r["symbol"] for r in rows]
+            query_symbol = st.query_params.get("holding")
+            if isinstance(query_symbol, list):
+                query_symbol = query_symbol[0] if query_symbol else None
+            if query_symbol in symbols:
+                st.session_state["dashboard_selected_symbol"] = query_symbol
             current = st.session_state.get("dashboard_selected_symbol")
             if current not in symbols:
                 st.session_state["dashboard_selected_symbol"] = symbols[0]
@@ -1059,23 +1083,24 @@ with tab_pf:
                 profit_cls = _profit_class(row["profit"])
                 selected_cls = " selected" if row["symbol"] == current else ""
                 with card_cols[idx % len(card_cols)]:
+                    card_href = f"?holding={_html(row['symbol'])}"
                     st.markdown(
                         f"""
-                        <div class="stock-card-panel{selected_cls}">
-                            <div class="stock-card-symbol">{row['symbol']}.US</div>
-                            <div class="stock-card-name">{row['symbol']}</div>
-                            <div class="stock-card-profit {profit_cls}">{profit_text}</div>
-                            <div class="stock-card-shares">보유 {row['shares']:,.0f}주</div>
-                        </div>
+                        <a class="stock-card-link" href="{card_href}" target="_self"
+                           aria-label="{_html(row['symbol'])} 포지션 보기">
+                            <div class="stock-card-panel{selected_cls}">
+                                <div class="stock-card-symbol">{row['symbol']}.US</div>
+                                <div class="stock-card-name">{row['symbol']}</div>
+                                <div class="stock-card-profit {profit_cls}">{profit_text}</div>
+                                <div class="stock-card-shares">보유 {row['shares']:,.0f}주</div>
+                            </div>
+                        </a>
                         """,
                         unsafe_allow_html=True,
                     )
-                    if st.button("선택", key=f"dashboard_pick_{row['symbol']}", width="stretch"):
-                        st.session_state["dashboard_selected_symbol"] = row["symbol"]
-                        st.rerun()
 
             st.divider()
-            selected = next(r for r in rows if r["symbol"] == st.session_state["dashboard_selected_symbol"])
+            selected = next(r for r in rows if r["symbol"] == current)
             hist = _load_ohlcv(selected["symbol"])
             price_label = "최근 종가" if selected["last"] is not None else "매입 단가"
             delta_html = (
