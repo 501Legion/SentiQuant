@@ -392,6 +392,37 @@ st.markdown(
         font-size: 0.82rem;
         font-weight: 700;
     }
+    .watch-list {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        margin: 8px 0 16px 0;
+    }
+    .watch-row {
+        background: #111820;
+        border: 1px solid #2f3744;
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+    .watch-row-head {
+        align-items: baseline;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        margin-bottom: 4px;
+    }
+    .watch-reason {
+        color: #cbd5e1;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+    .watch-note {
+        color: #d1d5db;
+        font-size: 0.84rem;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+        word-break: keep-all;
+    }
     .decision-reasons {
         color: #d1d5db;
         font-size: 0.9rem;
@@ -960,15 +991,15 @@ def _watch_candidate_cards(rows: list[dict]) -> str:
     cards = []
     for row in rows:
         cards.append(
-            "<div class=\"decision-row\">"
-            "<div class=\"decision-row-head\">"
+            "<div class=\"watch-row\">"
+            "<div class=\"watch-row-head\">"
             f"<span class=\"decision-symbol\">{_html(row.get('종목', '-'))}</span>"
-            f"<span class=\"decision-meta\">{_html(row.get('관찰 이유', '-'))}</span>"
+            f"<span class=\"watch-reason\">{_html(row.get('관찰 이유', '-'))}</span>"
             "</div>"
-            f"<div class=\"decision-reasons\">{_html(row.get('참고', '-'))}</div>"
+            f"<div class=\"watch-note\">{_html(row.get('참고', '-'))}</div>"
             "</div>"
         )
-    return f"<div class=\"decision-list\">{''.join(cards)}</div>"
+    return f"<div class=\"watch-list\">{''.join(cards)}</div>"
 
 
 def _opinion_snapshot_cards(rows: list[dict]) -> str:
