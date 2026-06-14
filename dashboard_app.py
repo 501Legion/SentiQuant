@@ -1868,6 +1868,7 @@ st.markdown(
         <div class="credit-footer-panel">
             <div class="credit-footer-team">Built by Team Angel's Share</div>
             <div>강연준 · 안재빈 · 최수연 · 김서원</div>
+            <div>로고인 핑구는 안재빈의 취향이 100% 반영되었습니다.</div>
         </div>
     </details>
     """,
