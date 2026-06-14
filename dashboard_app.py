@@ -1031,12 +1031,15 @@ with tab_pf:
             else:
                 run_value = "실행 기록 없음"
                 run_sub = "라이브 실행 후 표시됩니다."
-            decision_caption = (
-                f"최근 관찰 후보: {decision['date']} · {decision['unique_total']}개 종목 "
-                f"(기록 {decision['total']}건)"
-                if decision else ""
-            )
             decision_symbols = ", ".join(decision.get("symbols") or []) if decision else ""
+            decision_value = (
+                f"{decision['unique_total']}개 종목" if decision else "관찰 기록 없음"
+            )
+            decision_sub = (
+                f"{decision['date']} · {decision_symbols}" if decision_symbols else
+                f"{decision['date']} · 기록 {decision['total']}건" if decision else
+                "일일 판단 후 표시됩니다."
+            )
             trade_value = (
                 f"{trade.get('symbol', '-')} {trade.get('action', '-')}"
                 if trade.get("total") else "거래 기록 없음"
@@ -1055,9 +1058,9 @@ with tab_pf:
                     </div>
                     <div class="empty-state-grid">
                         <div class="empty-state-item">
-                            <div class="empty-state-label">가용 현금</div>
-                            <div class="empty-state-value">{_money(cash, 0)}</div>
-                            <div class="empty-state-sub">모의 계좌 기준</div>
+                            <div class="empty-state-label">최근 관찰 후보</div>
+                            <div class="empty-state-value">{_html(decision_value)}</div>
+                            <div class="empty-state-sub">{_html(decision_sub)}</div>
                         </div>
                         <div class="empty-state-item">
                             <div class="empty-state-label">최근 실행</div>
@@ -1074,9 +1077,6 @@ with tab_pf:
                 """,
                 unsafe_allow_html=True,
             )
-            if decision_caption:
-                suffix = f" · 종목: {decision_symbols}" if decision_symbols else ""
-                st.caption(f"{decision_caption}{suffix}")
             syms = _available_symbols()
             if syms:
                 with st.expander("참고 가격 차트", expanded=False):
