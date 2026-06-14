@@ -1132,12 +1132,6 @@ with tab_pf:
                     st.warning(f"{selected['symbol']} 가격 스냅샷 없음")
                 else:
                     st.altair_chart(_price_chart(hist), width="stretch")
-                    visible = hist.tail(min(63, len(hist)))
-                    st.caption(
-                        f"차트 데이터 기준일: {hist['date'].max():%Y-%m-%d}  \n"
-                        f"기본 표시: {visible['date'].min():%Y-%m-%d} ~ {visible['date'].max():%Y-%m-%d}  \n"
-                        f"확대/축소 가능 범위: {hist['date'].min():%Y-%m-%d} ~ {hist['date'].max():%Y-%m-%d}"
-                    )
 
                 m_col1, m_col2, m_col3 = st.columns(3)
                 with m_col1:
@@ -1180,8 +1174,6 @@ with tab_pf:
                         <div class="position-panel-value {_profit_class(selected['profit_pct'])}">{profit_rate}</div>
                         <div class="position-panel-label">미실현 수익</div>
                         <div class="position-panel-value {_profit_class(selected['profit'])}">{profit_money}</div>
-                        <hr style="border-top:1px solid #2f3744;">
-                        <div class="sub-text">읽기 전용 · 주문/동기화 없음</div>
                     </div>
                     """,
                     unsafe_allow_html=True,
