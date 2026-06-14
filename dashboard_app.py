@@ -1848,7 +1848,7 @@ with tab_opinion:
 st.markdown(
     """
     <details class="credit-footer">
-        <summary>signal notes</summary>
+        <summary>Behind The Signal</summary>
         <div class="credit-footer-panel">
             <div class="credit-footer-team">Built by Team Angel's Share</div>
             <div>강연준 · 안재빈 · 최수연 · 김서원</div>
