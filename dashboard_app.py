@@ -1156,7 +1156,7 @@ components.html(
         .brand-shell {{
             color: #f8fafc;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            padding: 4px 0 0 0;
+            padding: 4px 0 10px 0;
         }}
         .brand-bar {{
             align-items: center;
@@ -1211,8 +1211,9 @@ components.html(
             color: #60a5fa;
             font-size: 0.8rem;
             font-weight: 700;
+            line-height: 1.35;
             margin-left: 54px;
-            margin-top: 8px;
+            margin-top: 6px;
             opacity: 0;
             transform: translateY(-2px);
             transition: opacity 180ms ease, transform 180ms ease;
@@ -1252,7 +1253,7 @@ components.html(
     </body>
     </html>
     """,
-    height=78,
+    height=96,
 )
 _sync = _read_json(LAST_SYNC, {})
 if _sync.get("synced_at"):
