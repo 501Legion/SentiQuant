@@ -402,6 +402,13 @@ COMMUNITY_LIVE_RUN_SUMMARIES_FILE = "data/community/live/run_summaries.jsonl"
 COMMUNITY_DECISION_REPORT_ENABLED = True             # run_live 종료 시 보고서 자동 생성
 COMMUNITY_LIVE_REPORTS_DIR = "data/community/live/reports"  # YYYY-MM-DD.md 저장 루트
 
+# 보고서 "오늘의 총평" — 결정론 템플릿(숫자·표) 위에 LLM이 2~4문장 서술만 덧붙임(하이브리드).
+# 숫자는 LLM이 생성하지 않음(환각 차단). 호출 실패/비활성 시 총평 섹션만 생략(보고서 자체는 정상).
+COMMUNITY_REPORT_LLM_COMMENTARY_ENABLED = True       # 켜면 일일 1회 GPT_MODEL 호출(보고서 총평)
+COMMUNITY_REPORT_LLM_MAX_TOKENS = 400                # 총평 응답 토큰 상한
+COMMUNITY_REPORT_LLM_TEMPERATURE = 0.3              # 약간의 자연스러움 허용(숫자는 표가 담보)
+COMMUNITY_REPORT_LLM_LOG_FILE = "data/community/live/report_commentary_log.jsonl"  # 프롬프트+응답 로깅(재현성)
+
 # run_live가 오늘 수집분이 없을 때 최근 수집일 캐시를 쓰는데, 이 일수 초과 시 경고(stale 가시화).
 # 정상 운영(timing-fix): 당일 08:45 ET 수집 → 같은 날 09:35 ET 주문잡 사용 (지연 ~50분).
 COMMUNITY_LIVE_MAX_POSTS_AGE_DAYS = 4
