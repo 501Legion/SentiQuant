@@ -578,6 +578,39 @@ def _read_jsonl(path: Path) -> list[dict]:
     return out
 
 
+def _normalize_opinion_snapshots(rows: list[dict]) -> pd.DataFrame:
+    if not rows:
+        return pd.DataFrame()
+    df = pd.DataFrame(rows)
+    required = {"date", "symbol"}
+    if not required.issubset(df.columns):
+        return df
+    df = df.copy()
+    df["_row_order"] = range(len(df))
+    df["date"] = df["date"].astype(str)
+    df["symbol"] = df["symbol"].astype(str).str.strip()
+    for col in [
+        "opinion_score",
+        "total_mentions",
+        "bullish_count",
+        "bearish_count",
+        "persistence_days",
+    ]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    sort_cols = ["date", "symbol", "_row_order"]
+    if "created_at" in df.columns:
+        sort_cols = ["date", "symbol", "created_at", "_row_order"]
+    df = (
+        df.dropna(subset=["date", "symbol"])
+        .sort_values(sort_cols)
+        .drop_duplicates(["date", "symbol"], keep="last")
+        .drop(columns=["_row_order"])
+        .reset_index(drop=True)
+    )
+    return df
+
+
 def _load_ohlcv(symbol: str) -> pd.DataFrame:
     """커밋된 ohlcv 스냅샷({symbol}_*.csv) 병합. Cloud-안전(Polygon/KIS 호출 없음).
     # Design Ref: A 포팅 — app.py load_ohlcv_snapshot 읽기전용 이식."""
@@ -1755,7 +1788,7 @@ with tab_opinion:
     snaps = _read_jsonl(SNAPSHOTS)
     run_summary = _latest_live_run_summary()
     run_date = run_summary.get("date")
-    df = pd.DataFrame(snaps) if snaps else pd.DataFrame()
+    df = _normalize_opinion_snapshots(snaps)
     snapshot_latest = df["date"].max() if not df.empty and "date" in df else None
     _render_opinion_freshness(run_date, snapshot_latest)
 
