@@ -14,7 +14,7 @@
 
 ```bash
 # 0) GitHub 푸시 인증 (force-push 권한) — PAT 또는 deploy key
-#    예: git remote set-url origin https://<PAT>@github.com/501Legion/auto_stock.git
+#    예: git remote set-url origin https://<PAT>@github.com/501Legion/SentiQuant.git
 
 # 1) 로컬 검증 (push 없이 curate만)
 ./venv/bin/python scripts/sync_dashboard_data.py --no-push   # 비밀 제외 확인
@@ -33,7 +33,7 @@ systemctl list-timers sync-dashboard
 
 1. https://share.streamlit.io 가입 (GitHub 연동)
 2. **New app** →
-   - Repository: `501Legion/auto_stock`
+   - Repository: `501Legion/SentiQuant`
    - **Branch: `dashboard-data`**
    - **Main file: `dashboard_app.py`**
    - Advanced → **Requirements: `requirements-dashboard.txt`** (자동 인식 안 되면 지정)
@@ -57,5 +57,6 @@ systemctl list-timers sync-dashboard
 |------|------|
 | Cloud 빌드 OOM/실패 | requirements-dashboard.txt에 무거운 패키지 섞였는지 확인 |
 | 데이터 안 보임 | dashboard-data 브랜치에 data/ 들어갔는지 `git ls-tree origin/dashboard-data` |
+| Cloud 화면만 옛날 상태(브랜치는 갱신됨) | **GitHub 리포 리네임 후 Cloud 소스 연결 끊김**. share.streamlit.io에서 앱 Repository를 `501Legion/SentiQuant`로 변경 후 Reboot, 안 되면 앱 삭제→New app 재생성 (Secrets 비어있어 부담 없음) |
 | sync push 실패 | 우분투 GitHub 인증(PAT/deploy key) 확인 |
 | 비밀 노출 우려 | `git ls-tree -r origin/dashboard-data`로 .env/token 없는지 점검 |
