@@ -813,6 +813,16 @@ def _latest_live_run_summary() -> dict:
     return max(valid, key=lambda s: (s.get("date") or "", s.get("created_at") or ""))
 
 
+def _live_run_summary_for_date(date_label: str | None) -> dict:
+    if not date_label:
+        return {}
+    summaries = _read_jsonl(LIVE_RUN_SUMMARIES)
+    matches = [s for s in summaries if s.get("date") == date_label]
+    if not matches:
+        return {}
+    return max(matches, key=lambda s: s.get("created_at") or "")
+
+
 def _run_int(summary: dict, key: str) -> int:
     try:
         return int(summary.get(key) or 0)
@@ -1764,11 +1774,25 @@ with tab_opinion:
         else:
             st.warning("여론 스냅샷 데이터가 없습니다 (미동기화).")
     else:
-        latest = max([d for d in [snapshot_latest, run_date] if d], default=None)
-        today = df[df["date"] == latest].copy() if latest else pd.DataFrame()
+        snapshot_dates = sorted(str(d) for d in df["date"].dropna().unique())
+        selected_snapshot_date = st.selectbox(
+            "스냅샷 날짜 선택",
+            list(reversed(snapshot_dates)),
+            key="opinion_snapshot_date",
+        ) if snapshot_dates else None
+        selected_run_summary = _live_run_summary_for_date(selected_snapshot_date)
+        today = (
+            df[df["date"] == selected_snapshot_date].copy()
+            if selected_snapshot_date else pd.DataFrame()
+        )
+        if selected_snapshot_date:
+            st.caption(
+                f"선택한 스냅샷 기준일: {selected_snapshot_date} · "
+                "아래 요약과 종목별 차트는 이 날짜까지의 데이터만 반영합니다."
+            )
 
         if not today.empty:
-            # 최신일 요약
+            # 선택일 요약
             st.markdown(
                 _stat_grid([
                     ("분석 종목", len(today), "개"),
@@ -1780,8 +1804,8 @@ with tab_opinion:
             )
             st.caption("점수는 0~100 기준입니다. 50은 중립, 높을수록 매수 여론이 우세하다는 뜻입니다.")
 
-            # 최신 여론 상위 종목
-            st.subheader(f"🔥 최신 여론 상위 종목 ({latest})")
+            # 선택일 여론 상위 종목
+            st.subheader(f"🔥 선택일 여론 상위 종목 ({selected_snapshot_date})")
             top = today.sort_values("opinion_score", ascending=False).head(10).copy()
             top["여론 방향"] = top["opinion_trend"].map(TREND_KO).fillna("보합")
             st.altair_chart(
@@ -1809,26 +1833,36 @@ with tab_opinion:
                 "주요 키워드": ", ".join((r.get("top_keywords") or [])[:4]) or "-",
             } for _, r in top.iterrows()]
             st.markdown(_opinion_snapshot_cards(rows), unsafe_allow_html=True)
-        elif latest:
-            _render_missing_snapshot_notice(run_summary, latest)
+        elif selected_snapshot_date:
+            _render_missing_snapshot_notice(selected_run_summary or run_summary, selected_snapshot_date)
             st.markdown(
                 _stat_grid([
                     ("신규 표시 종목", 0, "개"),
-                    ("서버 판단 종목", int(run_summary.get("candidates") or 0), "개"),
-                    ("매수 / 매도", f"{int(run_summary.get('buys') or 0)} / {int(run_summary.get('sells') or 0)}", ""),
+                    ("서버 판단 종목", int((selected_run_summary or run_summary).get("candidates") or 0), "개"),
+                    ("매수 / 매도", (
+                        f"{int((selected_run_summary or run_summary).get('buys') or 0)} / "
+                        f"{int((selected_run_summary or run_summary).get('sells') or 0)}"
+                    ), ""),
                     ("종목별 스냅샷", "미생성", ""),
                 ], columns=4),
                 unsafe_allow_html=True,
             )
 
-        # 종목별 추이 — 최근 스냅샷 기준 언급 많은 순으로 선택
+        # 종목별 추이 — 선택한 스냅샷 날짜 기준 최근 1주 언급 많은 순으로 선택
         st.subheader("📊 종목별 여론 흐름")
-        recent_syms = (df[df["date"] >= sorted(df["date"].unique())[-7:][0]]
-                       .groupby("symbol")["total_mentions"].sum()
-                       .sort_values(ascending=False).index.tolist()) if "date" in df else []
+        if selected_snapshot_date and snapshot_dates:
+            selected_idx = snapshot_dates.index(selected_snapshot_date)
+            window_dates = snapshot_dates[max(0, selected_idx - 6):selected_idx + 1]
+            history_df = df[df["date"] <= selected_snapshot_date].copy()
+            rank_df = df[df["date"].isin(window_dates)].copy()
+        else:
+            history_df = df.copy()
+            rank_df = df.copy()
+        recent_syms = (rank_df.groupby("symbol")["total_mentions"].sum()
+                       .sort_values(ascending=False).index.tolist()) if "date" in rank_df else []
         if recent_syms:
-            sym = st.selectbox("종목 선택 (최근 생성된 스냅샷 기준 언급 많은 순)", recent_syms)
-            sdf = df[df["symbol"] == sym].sort_values("date").tail(40)
+            sym = st.selectbox("종목 선택 (선택일 기준 최근 1주 언급 많은 순)", recent_syms)
+            sdf = history_df[history_df["symbol"] == sym].sort_values("date").tail(40)
             score_line = alt.Chart(sdf).mark_line(point=True, color="#e4584c").encode(
                 x=alt.X("date:T", title="날짜", axis=_compact_date_axis()),
                 y=alt.Y("opinion_score:Q", title="여론 점수", scale=alt.Scale(domain=[0, 100])),
@@ -1848,7 +1882,7 @@ with tab_opinion:
 
         # 시장 전체 분위기 추이
         st.subheader("🌡️ 전체 여론 흐름")
-        g = df.groupby("date").agg(
+        g = history_df.groupby("date").agg(
             매수합의=("is_consensus_buy", lambda s: int(pd.Series(s).fillna(False).astype(bool).sum())),
             평균점수=("opinion_score", "mean"),
             종목수=("symbol", "count"),
@@ -1871,7 +1905,7 @@ with tab_opinion:
                              alt.Tooltip("평균점수:Q", format=".1f")],
                 ).properties(height=220, title="일자별 평균 여론 점수"),
                 width="stretch")
-        st.caption(f"누적 여론 스냅샷 {len(df):,}건 · 최근 40일 표시")
+        st.caption(f"누적 여론 스냅샷 {len(df):,}건 · 선택일 기준 최대 40일 표시")
 
 st.markdown(
     """
