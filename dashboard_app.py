@@ -2,30 +2,39 @@
 # Streamlit Community Cloud 배포용. 커밋된 data만 읽어 렌더한다.
 # 불가침 원칙: KIS·FinBERT·실주문·무거운 모듈(torch/transformers/community_live/backtester)
 #            절대 import 금지. streamlit·pandas·altair·표준 라이브러리만.
-# Plan SC: SC-01(heavy import 0), SC-05(실주문 호출 0)
-import base64
-import html
-import json
-import re
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
-
 import altair as alt
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
-ROOT = Path(__file__).parent
-DATA = ROOT / "data"
-REPORTS = DATA / "community" / "live" / "reports"
-LIVE_DECISIONS = DATA / "community" / "live" / "decisions.jsonl"
-LIVE_RUN_SUMMARIES = DATA / "community" / "live" / "run_summaries.jsonl"
-SNAPSHOTS = DATA / "community" / "daily_opinion_snapshots.jsonl"
-PORTFOLIO = DATA / "portfolio.json"
-TRADES = DATA / "trades.csv"
-OHLCV_DIR = DATA / "backtest_snapshots" / "v2" / "ohlcv"   # 커밋된 가격 스냅샷(읽기전용)
-LAST_SYNC = ROOT / "last_sync.json"
-LOGO = ROOT / "assets" / "sentiquant-logo.jpeg"
+from dashboard_utils import (
+    LAST_SYNC,
+    LIVE_DECISIONS,
+    LIVE_RUN_SUMMARIES,
+    PORTFOLIO,
+    REPORTS,
+    SNAPSHOTS,
+    TRADES,
+    TREND_KO,
+    VELOCITY_KO,
+    _available_symbols,
+    _compact_report_markdown,
+    _format_kst,
+    _html,
+    _latest_close,
+    _load_ohlcv,
+    _logo_data_uri,
+    _money,
+    _normalize_opinion_snapshots,
+    _parse_funnel,
+    _parse_observation_candidates,
+    _read_json,
+    _read_jsonl,
+    _reasons_ko,
+    _signed_money,
+    _signed_percent,
+    _translate_code,
+)
 
 st.set_page_config(page_title="SentiQuant Dashboard", page_icon="📈", layout="wide")
 
@@ -116,6 +125,15 @@ st.markdown(
         font-weight: 650;
         line-height: 1.5;
     }
+    .notice-detail {
+        border-top: 1px solid rgba(148, 163, 184, 0.18);
+        color: #9ca3af;
+        font-size: 0.78rem;
+        font-weight: 600;
+        line-height: 1.45;
+        margin-top: 8px;
+        padding-top: 8px;
+    }
     div[data-baseweb="tab-list"] {
         border-bottom: 1px solid #242b36;
         gap: 8px;
@@ -161,12 +179,37 @@ st.markdown(
         position: relative;
         transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
     }
+    .stock-card-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        max-height: 270px;
+        overflow-y: auto;
+        padding: 2px 6px 8px 2px;
+    }
+    .stock-card-grid::-webkit-scrollbar {
+        width: 8px;
+    }
+    .stock-card-grid::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 999px;
+    }
+    .stock-card-grid::-webkit-scrollbar-track {
+        background: transparent;
+    }
     .stock-card-link {
         color: inherit !important;
         display: block;
         text-decoration: none !important;
     }
-    .stock-card-link:hover .stock-card-panel,
+    @media (hover: hover) and (pointer: fine) {
+        .stock-card-panel:hover {
+            background: #1b2434;
+            border-color: #3b82f6;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+            transform: translateY(-1px);
+        }
+    }
     .stock-card-link:focus .stock-card-panel {
         background: #1b2434;
         border-color: #3b82f6;
@@ -502,6 +545,12 @@ st.markdown(
         color: #86efac;
         font-weight: 800;
     }
+    .trade-buy {
+        color: #86efac;
+    }
+    .trade-sell {
+        color: #f87171;
+    }
     .trade-profit {
         font-weight: 800;
     }
@@ -539,113 +588,14 @@ st.markdown(
 )
 
 
-def _logo_data_uri() -> str | None:
-    try:
-        encoded = base64.b64encode(LOGO.read_bytes()).decode("ascii")
-    except OSError:
-        return None
-    return f"data:image/jpeg;base64,{encoded}"
-
-
-def _read_json(path: Path, default=None):
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return default
-
-
-def _format_kst(value: str | None) -> str | None:
-    if not value:
-        return None
-    try:
-        return datetime.fromisoformat(value).astimezone(
-            timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
-    except ValueError:
-        return value
-
-
-def _read_jsonl(path: Path) -> list[dict]:
-    out = []
-    if not path.exists():
-        return out
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if line:
-            try:
-                out.append(json.loads(line))
-            except Exception:
-                pass
-    return out
-
-
-def _load_ohlcv(symbol: str) -> pd.DataFrame:
-    """커밋된 ohlcv 스냅샷({symbol}_*.csv) 병합. Cloud-안전(Polygon/KIS 호출 없음).
-    # Design Ref: A 포팅 — app.py load_ohlcv_snapshot 읽기전용 이식."""
-    if not OHLCV_DIR.exists():
-        return pd.DataFrame()
-    frames = []
-    for p in sorted(OHLCV_DIR.glob(f"{symbol}_*.csv")):
-        try:
-            df = pd.read_csv(p)
-        except Exception:
-            continue
-        if {"date", "close"}.issubset(df.columns):
-            frames.append(df)
-    if not frames:
-        return pd.DataFrame()
-    c = pd.concat(frames, ignore_index=True)
-    c["date"] = pd.to_datetime(c["date"], errors="coerce")
-    c = c.dropna(subset=["date"]).sort_values("date").drop_duplicates("date", keep="last")
-    return c.reset_index(drop=True)
-
-
-def _available_symbols() -> list[str]:
-    if not OHLCV_DIR.exists():
-        return []
-    return sorted({p.name.split("_")[0] for p in OHLCV_DIR.glob("*.csv")})
-
-
-def _latest_close(symbol: str) -> float | None:
-    df = _load_ohlcv(symbol)
-    if df.empty:
-        return None
-    return float(df["close"].iloc[-1])
-
-
-def _money(value, digits: int = 0) -> str:
-    try:
-        return f"${float(value):,.{digits}f}"
-    except (TypeError, ValueError):
-        return "-"
-
-
-def _signed_money(value) -> str:
-    try:
-        amount = float(value)
-    except (TypeError, ValueError):
-        return "-"
-    sign = "+" if amount >= 0 else "-"
-    return f"{sign}${abs(amount):,.2f}"
-
-
-def _signed_percent(value) -> str:
-    try:
-        pct = float(value)
-    except (TypeError, ValueError):
-        return "-"
-    return f"{pct:+.2f}%"
-
-
-def _html(value) -> str:
-    return html.escape(str(value), quote=True)
-
-
-def _notice_card(title: str, message: str, tone: str = "info") -> str:
+def _notice_card(title: str, message: str, tone: str = "info", detail: str = "") -> str:
     tone = tone if tone in {"info", "warn"} else "info"
+    detail_html = f"<div class=\"notice-detail\">{_html(detail)}</div>" if detail else ""
     return f"""
     <div class="notice-card notice-{tone}">
         <div class="notice-title">{_html(title)}</div>
         <div class="notice-message">{_html(message)}</div>
+        {detail_html}
     </div>
     """
 
@@ -683,7 +633,18 @@ def _profit_class(value) -> str:
 def _position_values(symbol: str, raw: dict) -> dict:
     shares = float(raw.get("shares") or raw.get("quantity") or 0)
     entry = float(raw.get("entry_price") or raw.get("avg_price") or raw.get("average_price") or 0)
-    last = _latest_close(symbol)
+    # 1순위: 서버가 KIS 동기화 시 캐시한 실계좌 현재가(current_price). Source of Truth.
+    # 2순위(폴백): 커밋된 OHLCV 스냅샷 종가 — 며칠 낡을 수 있어 손익이 왜곡될 수 있음.
+    live = raw.get("current_price")
+    live = float(live) if live not in (None, 0, "") else None
+    if live is not None:
+        last = live
+        price_source = "live"
+        price_asof = raw.get("price_asof")
+    else:
+        last = _latest_close(symbol)
+        price_source = "snapshot" if last is not None else None
+        price_asof = None
     price = last if last is not None else entry
     value = price * shares
     profit = (price - entry) * shares if last is not None and entry else None
@@ -697,7 +658,28 @@ def _position_values(symbol: str, raw: dict) -> dict:
         "value": value,
         "profit": profit,
         "profit_pct": profit_pct,
+        "price_source": price_source,
+        "price_asof": price_asof,
     }
+
+
+def _price_basis_caption(rows: list[dict]) -> str:
+    """평가 기준 가격의 출처/신선도를 한 줄로 요약."""
+    if not rows:
+        return "보유 포지션이 없습니다."
+    live = [r for r in rows if r.get("price_source") == "live"]
+    snap = [r for r in rows if r.get("price_source") == "snapshot"]
+    if live and not snap:
+        asof = next((r.get("price_asof") for r in live if r.get("price_asof")), None)
+        asof_kst = _format_kst(asof) if asof else None
+        asof_txt = f" ({asof_kst} KST 동기화)" if asof_kst else ""
+        return f"KIS 실계좌 현재가 기준 평가입니다{asof_txt}."
+    if live and snap:
+        return (
+            f"{len(live)}개는 KIS 실계좌 현재가, "
+            f"{len(snap)}개는 커밋된 스냅샷 종가(낡았을 수 있음) 기준입니다."
+        )
+    return "커밋된 OHLCV 스냅샷 종가 기준입니다 — 며칠 낡았을 수 있어 실계좌 손익과 다를 수 있습니다."
 
 
 def _position_table(rows: list[dict]) -> pd.DataFrame:
@@ -849,6 +831,29 @@ def _missing_snapshot_message(summary: dict, date_label: str) -> str:
     return f"{date_label} 실행은 완료됐지만 {detail}"
 
 
+def _snapshot_gap_reason_message(summary: dict, run_date: str, snapshot_date: str) -> str:
+    if not summary:
+        return ""
+
+    snapshot_status = str(summary.get("snapshot_status") or "").strip().lower()
+    snapshot_count = _run_int(summary, "snapshot_count")
+    reason = str(summary.get("no_snapshot_reason") or "").strip()
+    if snapshot_status not in {"missing", "failed"} and snapshot_count > 0 and not reason:
+        return ""
+
+    if reason == "no_candidate_snapshots":
+        return f"사유: {run_date} 실행에서는 표시 가능한 후보가 없어 새 종목별 스냅샷이 생성되지 않았습니다."
+    if reason == "filtered_out_all":
+        return f"사유: {run_date} 실행에서는 점수화 이후 랭킹/필터를 통과한 표시 후보가 없었습니다."
+    if reason == "no_posts":
+        return f"사유: {run_date} 실행에서 수집된 Reddit 입력이 없었습니다."
+    if reason == "no_scored_symbols":
+        return f"사유: {run_date} 실행에서 입력은 있었지만 점수화된 종목이 없었습니다."
+    if reason in {"snapshot_write_failed", "partial_snapshot_write_failure"}:
+        return f"사유: {run_date} 실행 중 종목별 스냅샷 저장을 확인할 필요가 있습니다."
+    return f"사유: {run_date} 실행에서 새 종목별 스냅샷이 생성되지 않았습니다."
+
+
 def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
     reason = summary.get("no_snapshot_reason") or ""
     message = _missing_snapshot_message(summary, date_label)
@@ -867,7 +872,11 @@ def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
         )
 
 
-def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -> None:
+def _render_opinion_freshness(
+    run_date: str | None,
+    snapshot_date: str | None,
+    run_summary: dict | None = None,
+) -> None:
     st.markdown(
         _stat_grid([
             ("최신 실행일", run_date or "없음", ""),
@@ -877,11 +886,16 @@ def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -
     )
 
     if run_date and snapshot_date and run_date != snapshot_date:
+        message = (
+            f"실행 기준일은 {run_date}, 종목별 스냅샷 기준일은 {snapshot_date}입니다. "
+            f"아래 흐름은 {snapshot_date}까지의 데이터만 반영합니다."
+        )
+        gap_reason = _snapshot_gap_reason_message(run_summary or {}, run_date, snapshot_date)
         st.markdown(_notice_card(
             "기준일 차이",
-            f"실행은 {run_date}까지 완료됐지만, 종목별 여론 스냅샷은 {snapshot_date} 기준입니다. "
-            "아래 종목별 흐름은 스냅샷 기준일까지만 반영됩니다.",
+            message,
             "warn",
+            detail=gap_reason,
         ), unsafe_allow_html=True)
     elif run_date and not snapshot_date:
         st.markdown(_notice_card(
@@ -908,13 +922,12 @@ def _latest_trade_summary() -> dict:
         "total": len(df),
         "date": str(last.get("date", "-"))[:10],
         "symbol": last.get("symbol", "-"),
-        "action": last.get("action", "-"),
+        "action": _trade_action(last.get("action", "-")),
     }
 
 
 def _trade_action(value) -> str:
-    text = str(value or "-").upper()
-    return ACTION_KO.get(text, text)
+    return _translate_code(value)
 
 
 def _trade_date(value) -> str:
@@ -944,18 +957,67 @@ def _format_signed_money_value(value) -> str:
     return _signed_money(amount)
 
 
-def _trade_table(df: pd.DataFrame) -> pd.DataFrame:
+def _trade_action_code(value) -> str:
+    return str(value or "").strip().upper()
+
+
+def _trade_date_key(value) -> str | None:
+    parsed = _parse_trade_datetime(value)
+    if pd.isna(parsed):
+        return None
+    return (parsed + pd.Timedelta(hours=9)).strftime("%Y-%m-%d")
+
+
+def _parse_trade_datetime(value):
+    return pd.to_datetime(value, errors="coerce", utc=True)
+
+
+def _filter_trade_history(
+    df: pd.DataFrame,
+    *,
+    date_filter: str,
+    action_filter: str,
+    newest_first: bool,
+) -> pd.DataFrame:
+    if df.empty:
+        return df.copy()
+
+    src = df.copy()
+    if "date" in src.columns:
+        src["_sort_date"] = src["date"].apply(_parse_trade_datetime)
+        src["_date_key"] = src["date"].apply(_trade_date_key)
+    else:
+        src["_sort_date"] = pd.NaT
+        src["_date_key"] = None
+
+    if date_filter != "전체 기간":
+        src = src[src["_date_key"] == date_filter]
+
+    if action_filter != "전체":
+        target = "BUY" if action_filter == "매수" else "SELL"
+        if "action" not in src.columns:
+            return src.iloc[0:0]
+        src = src[src["action"].apply(_trade_action_code) == target]
+
+    return src.sort_values(
+        "_sort_date",
+        ascending=not newest_first,
+        na_position="last",
+    )
+
+
+def _trade_table(df: pd.DataFrame, *, newest_first: bool = True) -> pd.DataFrame:
     if df.empty:
         return pd.DataFrame()
 
     src = df.copy()
     if "date" in src.columns:
-        src["_sort_date"] = pd.to_datetime(src["date"], errors="coerce", utc=True)
-        src = src.sort_values("_sort_date", na_position="first")
+        src["_sort_date"] = src["date"].apply(_parse_trade_datetime)
+        src = src.sort_values("_sort_date", ascending=not newest_first, na_position="last")
 
     rows = []
-    for _, row in src.tail(200).iloc[::-1].iterrows():
-        rows.append({
+    for _, row in src.head(200).iterrows():
+        display_row = {
             "일시": _trade_date(row.get("date")),
             "종목": row.get("symbol", "-"),
             "구분": _trade_action(row.get("action")),
@@ -964,7 +1026,10 @@ def _trade_table(df: pd.DataFrame) -> pd.DataFrame:
             "거래 금액": _money(row.get("amount"), 2),
             "실현 손익": _format_signed_money_value(row.get("net_profit_usd")),
             "수익률": _format_signed_pct_value(row.get("net_profit_pct")),
-        })
+        }
+        if "signal" in row.index:
+            display_row["판단 근거"] = _translate_code(row.get("signal"))
+        rows.append(display_row)
     return pd.DataFrame(rows)
 
 
@@ -972,6 +1037,7 @@ def _trade_cards(rows: pd.DataFrame) -> str:
     cards = []
     for _, row in rows.iterrows():
         action = row.get("구분", "-")
+        action_cls = "trade-buy" if action == "매수" else "trade-sell" if action == "매도" else ""
         profit = row.get("실현 손익", "-")
         profit_cls = "profit-flat"
         try:
@@ -986,7 +1052,7 @@ def _trade_cards(rows: pd.DataFrame) -> str:
             "<div class=\"decision-row\">"
             "<div class=\"decision-row-head\">"
             f"<span class=\"decision-symbol\">{_html(row.get('종목', '-'))}</span>"
-            f"<span class=\"decision-meta trade-action\">{_html(action)}</span>"
+            f"<span class=\"decision-meta trade-action {action_cls}\">{_html(action)}</span>"
             f"<span class=\"decision-meta\">일시: {_html(row.get('일시', '-'))}</span>"
             f"<span class=\"decision-meta\">가격: {_html(row.get('가격', '-'))}</span>"
             f"<span class=\"decision-meta\">수량: {_html(row.get('수량', '-'))}</span>"
@@ -999,49 +1065,6 @@ def _trade_cards(rows: pd.DataFrame) -> str:
             "</div>"
         )
     return f"<div class=\"decision-list\">{''.join(cards)}</div>"
-
-
-# ── 한글 라벨 매핑 (대시보드 표시 전용 — 데이터는 원문 유지) ─────────────────
-ACTION_KO = {"BUY": "매수", "SELL": "매도", "SKIP": "보류", "HOLD": "관망"}
-TREND_KO = {"UP": "상승", "DOWN": "하락", "FLAT": "보합"}
-VELOCITY_KO = {"SPIKE": "급증", "NORMAL": "보통", "FADING": "감소"}
-REASON_KO = {
-    "universe_blocked": "유동성 유니버스 미포함",
-    "safety_universe_blocked": "안전장치 — 유니버스 차단",
-    "cost_blocked": "거래비용 대비 기대수익 부족",
-    "safety_cost_blocked": "안전장치 — 비용 차단",
-    "insufficient_cash": "현금 부족",
-    "low_opinion_score": "여론 점수 미달",
-    "weak_consensus": "매매 합의 부족",
-    "high_noise": "중립(노이즈) 비율 과다",
-    "neutral_spike": "중립 의견 급증",
-    "consensus_break": "컨센서스 붕괴",
-    "no_rule_signal": "룰 신호 없음",
-    "bullish_trend": "상승 추세",
-    "high_momentum": "강한 모멘텀",
-    "trend_up_with_moderate_momentum": "완만한 상승 모멘텀",
-    "community_hype_detected": "커뮤니티 과열 감지",
-    "possible_pump_risk": "펌프 위험 가능성",
-    "rsi_elevated": "RSI 과열권",
-    "rsi_neutral_to_slightly_weak": "RSI 중립~소폭 약세",
-    "core_universe_allowed": "핵심 유니버스 통과",
-    "bullish_aggregate_but_mixed_social_sentiment": "종합 여론은 긍정이나 반응 혼재",
-    "sarcasm_and_price-prediction_noise": "풍자/가격예측성 잡음",
-    "approve_candidate_but_downsize": "후보 승인, 비중 축소",
-    "history_downsize": "과거 유사 사례 부진 — 비중 축소",
-    "low_persistence_downsize": "신호 지속일 부족 — 비중 축소",
-    "new_spike_downsize": "신규 급등 종목 — 비중 축소",
-    "llm_assisted": "LLM 보조 판단",
-    "llm_fallback_to_rule_based": "LLM 실패 — 룰 기반 대체",
-    "llm_low_confidence_kept_rule": "LLM 저신뢰 — 룰 판단 유지",
-    "llm_buy_overridden_by_rule_skip": "룰 우선 — LLM 매수 기각",
-}
-
-
-def _reasons_ko(codes) -> str:
-    if not codes:
-        return "-"
-    return ", ".join(REASON_KO.get(c, c) for c in codes)
 
 
 def _decision_cards(rows: list[dict]) -> str:
@@ -1065,7 +1088,7 @@ def _decision_cards(rows: list[dict]) -> str:
 def _watch_candidate_cards(rows: list[dict]) -> str:
     cards = []
     for row in rows:
-        note = _trade_action(row.get("참고", "-"))
+        note = _translate_code(row.get("참고", "-"))
         cards.append(
             "<div class=\"watch-row\">"
             "<div class=\"watch-row-head\">"
@@ -1098,116 +1121,137 @@ def _opinion_snapshot_cards(rows: list[dict]) -> str:
     return f"<div class=\"decision-list\">{''.join(cards)}</div>"
 
 
-def _parse_funnel(md: str) -> dict[str, int]:
-    """일일 보고서 표에서 단계별 수치 추출. 실패 시 빈 dict(원문만 표시)."""
-    keys = {"①": "입력", "②": "중립 제외", "③": "컨센서스 미달",
-            "④": "게이트 차단", "⑤": "매수", "⑥": "매도"}
-    user_keys = {
-        "검토 종목": "입력",
-        "매매 후보": "후보",
-        "매수": "매수",
-        "매도": "매도",
-        "보류": "보류",
-        "여론 방향성이 충분히 뚜렷하지 않음": "중립 제외",
-        "매매 합의 기준 미충족": "컨센서스 미달",
-        "매수 의견 합의 부족": "컨센서스 미달",
-        "최종 위험/비용 기준에서 보류": "게이트 차단",
-        "위험/비용 기준에서 보류": "게이트 차단",
-    }
-    out: dict[str, int] = {}
-    for line in md.splitlines():
-        stripped = line.strip()
-        for mark, name in keys.items():
-            if stripped.startswith(f"| {mark}"):
-                nums = re.findall(r"\d+", line)
-                if nums:
-                    out[name] = int(nums[0])
-        if not stripped.startswith("|"):
-            continue
-        cells = [c.strip() for c in stripped.strip("|").split("|")]
-        if len(cells) < 2:
-            continue
-        name = user_keys.get(cells[0])
-        if not name:
-            continue
-        nums = re.findall(r"\d+", cells[1])
-        if nums:
-            out[name] = int(nums[0])
-    if "후보" in out:
-        out.setdefault("매수", 0)
-        out.setdefault("매도", 0)
-        out.setdefault("중립 제외", 0)
-        out.setdefault("컨센서스 미달", 0)
-        out.setdefault("게이트 차단", 0)
-    return out if "입력" in out else {}
-
-
-def _parse_observation_candidates(md: str) -> list[dict]:
-    rows: list[dict] = []
-    in_section = False
-    for line in md.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("## "):
-            in_section = stripped == "## 관찰 후보"
-            continue
-        if not in_section or not stripped.startswith("|"):
-            continue
-        cells = [c.strip() for c in stripped.strip("|").split("|")]
-        if len(cells) < 3 or cells[0] in {"종목", "------"}:
-            continue
-        if set(cells[0]) == {"-"}:
-            continue
-        rows.append({"종목": cells[0], "관찰 이유": cells[1], "참고": cells[2]})
-    return rows
-
-
-def _compact_report_markdown(md: str) -> str:
-    """보고서 원문 내용을 유지하되 대시보드 안에서는 제목 크기와 용어를 다듬는다."""
-    out = []
-    for line in md.splitlines():
-        line = line.replace("최종 위험/비용 기준에서 보류", "위험/비용 기준에서 보류")
-        line = line.replace("매매 합의 기준 미충족", "매수 의견 합의 부족")
-        line = line.replace("참고 코드", "참고")
-        line = line.replace("최종 기준에서 보류", "최종 판단: 보류/관망")
-        line = re.sub(r"\bSKIP\b", "보류", line)
-        line = re.sub(r"\bHOLD\b", "관망", line)
-        line = re.sub(
-            r"bull (\d+)/bear (\d+) < 컨센서스 기준",
-            r"상승 \1 / 하락 \2로 매수 우세 기준 미달",
-            line,
-        )
-        line = re.sub(r"bull (\d+)/bear (\d+)", r"상승 \1 / 하락 \2", line)
-        if line.startswith("### "):
-            out.append("##### " + line[4:])
-        elif line.startswith("## "):
-            out.append("#### " + line[3:])
-        elif line.startswith("# "):
-            out.append("### " + line[2:])
-        else:
-            out.append(line)
-    return "\n".join(out)
-
-
-def _daily_no_order_message(funnel: dict) -> str:
+def _daily_decision_notice(funnel: dict) -> tuple[str, str]:
     if not funnel:
-        return ""
-    if funnel.get("매수", 0) or funnel.get("매도", 0):
-        return ""
+        return "", ""
     input_n = funnel.get("입력", 0)
+    buy_n = funnel.get("매수", 0)
+    sell_n = funnel.get("매도", 0)
+    order_n = buy_n + sell_n
     if input_n <= 0:
-        return "이 날은 검토할 종목이 없어 새 주문 판단을 만들지 않았습니다."
+        return "주문 없음", "이 날은 검토할 종목이 없어 새 주문 판단을 만들지 않았습니다."
     reasons = [
         ("여론 방향성이 충분히 뚜렷하지 않음", funnel.get("중립 제외", 0)),
         ("매수 의견 합의 부족", funnel.get("컨센서스 미달", 0)),
         ("위험/비용 기준에서 보류", funnel.get("게이트 차단", 0)),
     ]
     top_reason, top_count = max(reasons, key=lambda item: item[1])
+    held_n = sum(count for _, count in reasons)
+    if order_n:
+        order_parts = []
+        if buy_n:
+            order_parts.append(f"매수 {buy_n}건")
+        if sell_n:
+            order_parts.append(f"매도 {sell_n}건")
+        order_text = ", ".join(order_parts)
+        if held_n:
+            return (
+                "주문 요약",
+                f"이 날은 {input_n}개 종목을 검토해 {order_text}을 주문 후보로 확정했습니다. "
+                f"주문으로 이어지지 않은 종목 중 가장 큰 보류 이유는 '{top_reason}'으로, {top_count}개 종목이 해당했습니다.",
+            )
+        return (
+            "주문 요약",
+            f"이 날은 {input_n}개 종목을 검토해 {order_text}을 주문 후보로 확정했습니다.",
+        )
     if top_count > 0:
         return (
+            "주문 없음",
             f"이 날은 {input_n}개 종목을 검토했지만 매수/매도 주문은 없었습니다. "
-            f"가장 큰 보류 이유는 '{top_reason}'으로, {top_count}개 종목이 해당했습니다."
+            f"가장 큰 보류 이유는 '{top_reason}'으로, {top_count}개 종목이 해당했습니다.",
         )
-    return f"이 날은 {input_n}개 종목을 검토했지만 새 주문 후보가 나오지 않았습니다."
+    return "주문 없음", f"이 날은 {input_n}개 종목을 검토했지만 새 주문 후보가 나오지 않았습니다."
+
+
+@st.fragment
+def _render_position_detail(selected: dict, rows: list[dict]) -> None:
+    st.divider()
+    hist = _load_ohlcv(selected["symbol"])
+    price_label = "최근 종가" if selected["last"] is not None else "매입 단가"
+    delta_html = (
+        f"<span class='{_profit_class(selected['price'] - selected['entry'])}'>"
+        f"{_signed_money(selected['price'] - selected['entry'])} "
+        f"({_signed_percent(selected['profit_pct'])})</span>"
+        if selected["profit_pct"] is not None else
+        "<span class='sub-text'>가격 미조회 · 손익 계산 대기</span>"
+    )
+
+    col_main, col_side = st.columns([2.2, 0.8])
+    with col_main:
+        c_title, c_price = st.columns([2, 1])
+        with c_title:
+            st.markdown(f"<h1 style='margin-bottom:0;'>{selected['symbol']}</h1>", unsafe_allow_html=True)
+        with c_price:
+            st.markdown(
+                f"""
+                <div style="text-align:right;">
+                    <span class="sub-text">{price_label}</span><br>
+                    <span class="price-large">{_money(selected['price'], 2)}</span><br>
+                    {delta_html}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        if hist.empty:
+            st.warning(f"{selected['symbol']} 가격 스냅샷 없음")
+        else:
+            range_label = _price_range_control(
+                f"position_price_range_{selected['symbol']}")
+            st.altair_chart(_price_chart(hist, range_label), width="stretch")
+
+        m_col1, m_col2, m_col3 = st.columns(3)
+        with m_col1:
+            st.write("시장 가치")
+            st.subheader(_money(selected["value"], 2))
+        with m_col2:
+            st.write("매입 단가")
+            st.subheader(_money(selected["entry"], 2))
+        with m_col3:
+            st.write("미실현 수익")
+            profit_html = (
+                f"<div class='detail-profit-value {_profit_class(selected['profit'])}'>{_signed_money(selected['profit'])}</div>"
+                if selected["profit"] is not None else
+                "<div class='detail-profit-value profit-flat'>가격 미조회</div>"
+            )
+            st.markdown(profit_html, unsafe_allow_html=True)
+
+        st.subheader(f"{selected['symbol']} 최근 거래")
+        if TRADES.exists():
+            trades = pd.read_csv(TRADES)
+            if "symbol" in trades.columns:
+                symbol_trades = trades[trades["symbol"] == selected["symbol"]]
+                if symbol_trades.empty:
+                    st.caption("이 종목의 거래 기록이 아직 없습니다.")
+                else:
+                    st.dataframe(_trade_table(symbol_trades).head(5),
+                                 width="stretch", hide_index=True)
+            else:
+                st.caption("거래 기록 형식을 확인할 수 없습니다.")
+        else:
+            st.caption("거래 기록이 아직 동기화되지 않았습니다.")
+
+    with col_side:
+        profit_rate = _signed_percent(selected["profit_pct"]) if selected["profit_pct"] is not None else "가격 미조회"
+        profit_money = _signed_money(selected["profit"]) if selected["profit"] is not None else "가격 미조회"
+        st.markdown(
+            f"""
+            <div class="position-panel">
+                <div class="position-panel-label">보유 수량</div>
+                <div class="position-panel-value">{selected['shares']:,.0f} 주</div>
+                <div class="position-panel-label">시장 가치</div>
+                <div class="position-panel-value">{_money(selected['value'], 2)}</div>
+                <div class="position-panel-label">수익률</div>
+                <div class="position-panel-value {_profit_class(selected['profit_pct'])}">{profit_rate}</div>
+                <div class="position-panel-label">미실현 수익</div>
+                <div class="position-panel-value {_profit_class(selected['profit'])}">{profit_money}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.subheader("📋 보유 종목 표")
+    st.dataframe(_position_table(rows), width="stretch", hide_index=True)
 
 
 # ── 헤더 + 마지막 sync 배지 (D6) ─────────────────────────────────────────────
@@ -1430,7 +1474,7 @@ with tab_pf:
                 unsafe_allow_html=True,
             )
 
-        st.caption("서버가 동기화한 종가 기준으로 평가한 화면입니다.")
+        st.caption(_price_basis_caption(rows))
 
         if not rows:
             run_summary = _latest_live_run_summary()
@@ -1521,112 +1565,29 @@ with tab_pf:
                 st.session_state["dashboard_selected_symbol"] = symbols[0]
                 current = symbols[0]
 
-            card_cols = st.columns(min(max(len(rows), 1), 5))
+            card_items = []
             for idx, row in enumerate(rows):
                 profit_text = _signed_money(row["profit"]) if row["profit"] is not None else "가격 미조회"
                 profit_cls = _profit_class(row["profit"])
                 selected_cls = " selected" if row["symbol"] == current else ""
-                with card_cols[idx % len(card_cols)]:
-                    card_href = f"?holding={_html(row['symbol'])}"
-                    st.markdown(
-                        f"""
-                        <a class="stock-card-link" href="{card_href}" target="_self"
-                           aria-label="{_html(row['symbol'])} 포지션 보기">
-                            <div class="stock-card-panel{selected_cls}">
-                                <div class="stock-card-symbol">{row['symbol']}.US</div>
-                                <div class="stock-card-name">{row['symbol']}</div>
-                                <div class="stock-card-profit {profit_cls}">{profit_text}</div>
-                                <div class="stock-card-shares">보유 {row['shares']:,.0f}주</div>
-                            </div>
-                        </a>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-
-            st.divider()
-            selected = next(r for r in rows if r["symbol"] == current)
-            hist = _load_ohlcv(selected["symbol"])
-            price_label = "최근 종가" if selected["last"] is not None else "매입 단가"
-            delta_html = (
-                f"<span class='{_profit_class(selected['price'] - selected['entry'])}'>"
-                f"{_signed_money(selected['price'] - selected['entry'])} "
-                f"({_signed_percent(selected['profit_pct'])})</span>"
-                if selected["profit_pct"] is not None else
-                "<span class='sub-text'>가격 미조회 · 손익 계산 대기</span>"
+                card_href = f"?holding={_html(row['symbol'])}"
+                card_items.append(
+                    f'<a class="stock-card-link" href="{card_href}" target="_self" '
+                    f'aria-label="{_html(row["symbol"])} 포지션 보기">'
+                    f'<div class="stock-card-panel{selected_cls}">'
+                    f'<div class="stock-card-symbol">{_html(row["symbol"])}.US</div>'
+                    f'<div class="stock-card-name">{_html(row["symbol"])}</div>'
+                    f'<div class="stock-card-profit {profit_cls}">{_html(profit_text)}</div>'
+                    f'<div class="stock-card-shares">보유 {row["shares"]:,.0f}주</div>'
+                    f'</div></a>'
+                )
+            st.markdown(
+                f"<div class=\"stock-card-grid\">{''.join(card_items)}</div>",
+                unsafe_allow_html=True,
             )
 
-            col_main, col_side = st.columns([2.2, 0.8])
-            with col_main:
-                c_title, c_price = st.columns([2, 1])
-                with c_title:
-                    st.markdown(f"<h1 style='margin-bottom:0;'>{selected['symbol']}</h1>", unsafe_allow_html=True)
-                with c_price:
-                    st.markdown(
-                        f"""
-                        <div style="text-align:right;">
-                            <span class="sub-text">{price_label}</span><br>
-                            <span class="price-large">{_money(selected['price'], 2)}</span><br>
-                            {delta_html}
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-
-                if hist.empty:
-                    st.warning(f"{selected['symbol']} 가격 스냅샷 없음")
-                else:
-                    range_label = _price_range_control(
-                        f"position_price_range_{selected['symbol']}")
-                    st.altair_chart(_price_chart(hist, range_label), width="stretch")
-
-                m_col1, m_col2, m_col3 = st.columns(3)
-                with m_col1:
-                    st.write("시장 가치")
-                    st.subheader(_money(selected["value"], 2))
-                with m_col2:
-                    st.write("매입 단가")
-                    st.subheader(_money(selected["entry"], 2))
-                with m_col3:
-                    st.write("미실현 수익")
-                    profit_html = (
-                        f"<div class='detail-profit-value {_profit_class(selected['profit'])}'>{_signed_money(selected['profit'])}</div>"
-                        if selected["profit"] is not None else
-                        "<div class='detail-profit-value profit-flat'>가격 미조회</div>"
-                    )
-                    st.markdown(profit_html, unsafe_allow_html=True)
-
-                st.subheader(f"{selected['symbol']} 최근 거래")
-                if TRADES.exists():
-                    trades = pd.read_csv(TRADES)
-                    if "symbol" in trades.columns:
-                        st.dataframe(trades[trades["symbol"] == selected["symbol"]].tail(5),
-                                     width="stretch", hide_index=True)
-                    else:
-                        st.caption("거래 기록 형식을 확인할 수 없습니다.")
-                else:
-                    st.caption("거래 기록이 아직 동기화되지 않았습니다.")
-
-            with col_side:
-                profit_rate = _signed_percent(selected["profit_pct"]) if selected["profit_pct"] is not None else "가격 미조회"
-                profit_money = _signed_money(selected["profit"]) if selected["profit"] is not None else "가격 미조회"
-                st.markdown(
-                    f"""
-                    <div class="position-panel">
-                        <div class="position-panel-label">보유 수량</div>
-                        <div class="position-panel-value">{selected['shares']:,.0f} 주</div>
-                        <div class="position-panel-label">시장 가치</div>
-                        <div class="position-panel-value">{_money(selected['value'], 2)}</div>
-                        <div class="position-panel-label">수익률</div>
-                        <div class="position-panel-value {_profit_class(selected['profit_pct'])}">{profit_rate}</div>
-                        <div class="position-panel-label">미실현 수익</div>
-                        <div class="position-panel-value {_profit_class(selected['profit'])}">{profit_money}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-
-            st.subheader("📋 보유 종목 표")
-            st.dataframe(_position_table(rows), width="stretch", hide_index=True)
+            selected = next(r for r in rows if r["symbol"] == current)
+            _render_position_detail(selected, rows)
 
 # ── ② 매매 이력 ──────────────────────────────────────────────────────────────
 with tab_trades:
@@ -1654,24 +1615,73 @@ with tab_trades:
                 ]),
                 unsafe_allow_html=True,
             )
-            st.caption("최근 거래부터 표시합니다. 시간은 한국시간 기준이며, 수익 거래 비율은 실현 손익이 있는 거래 기준입니다.")
-            trade_rows = _trade_table(df)
-            page_size = 10
-            page_count = max((len(trade_rows) + page_size - 1) // page_size, 1)
-            if page_count > 1:
-                page_label = st.radio(
-                    "페이지",
-                    [str(i) for i in range(1, page_count + 1)],
-                    horizontal=True,
-                    key="trade_history_page",
+            st.caption("시간은 한국시간 기준이며, 수익 거래 비율은 실현 손익이 있는 거래 기준입니다.")
+
+            date_options = ["전체 기간"]
+            if "date" in df.columns:
+                date_keys = (
+                    df["date"]
+                    .apply(_trade_date_key)
+                    .dropna()
+                    .drop_duplicates()
+                    .sort_values(ascending=False)
+                    .tolist()
                 )
-                page = int(page_label)
+                date_options.extend(date_keys)
+
+            f_col1, f_col2 = st.columns([1.2, 2.2])
+            with f_col1:
+                date_filter = st.selectbox(
+                    "거래일",
+                    date_options,
+                    key="trade_history_date_filter",
+                )
+            with f_col2:
+                action_filter = st.radio(
+                    "구분",
+                    ["전체", "매수", "매도"],
+                    horizontal=True,
+                    key="trade_history_action_filter",
+                )
+
+            filtered_trades = _filter_trade_history(
+                df,
+                date_filter=date_filter,
+                action_filter=action_filter,
+                newest_first=True,
+            )
+            if filtered_trades.empty:
+                st.info("선택한 조건에 해당하는 거래 기록이 없습니다.")
             else:
-                page = 1
-            start = (page - 1) * page_size
-            end = start + page_size
-            st.markdown(_trade_cards(trade_rows.iloc[start:end]), unsafe_allow_html=True)
-            st.caption(f"{start + 1}–{min(end, len(trade_rows))} / {len(trade_rows)}건 표시")
+                page_size = 10
+                page_count = max((len(filtered_trades) + page_size - 1) // page_size, 1)
+                p_col1, p_col2 = st.columns([2.2, 1])
+                with p_col1:
+                    if page_count > 1:
+                        page_label = st.radio(
+                            "페이지",
+                            [str(i) for i in range(1, page_count + 1)],
+                            horizontal=True,
+                            key="trade_history_page",
+                        )
+                        page = int(page_label)
+                    else:
+                        st.markdown("**페이지**")
+                        page = 1
+                with p_col2:
+                    sort_order = st.selectbox(
+                        "정렬",
+                        ["최근 거래순", "오래된 거래순"],
+                        key="trade_history_sort_order",
+                    )
+
+                newest_first = sort_order == "최근 거래순"
+                trade_rows = _trade_table(filtered_trades, newest_first=newest_first)
+                page = min(page, page_count)
+                start = (page - 1) * page_size
+                end = start + page_size
+                st.markdown(_trade_cards(trade_rows.iloc[start:end]), unsafe_allow_html=True)
+                st.caption(f"{start + 1}–{min(end, len(trade_rows))} / {len(trade_rows)}건 표시")
 
 # ── ③ 일일 결정 ──────────────────────────────────────────────────────────────
 with tab_funnel:
@@ -1714,10 +1724,10 @@ with tab_funnel:
                 ).properties(height=170),
                 width="stretch")
             st.caption("커뮤니티에서 언급된 종목은 위 조건을 모두 통과해야 주문 후보가 됩니다.")
-            no_order_message = _daily_no_order_message(funnel)
-            if no_order_message:
+            notice_title, notice_message = _daily_decision_notice(funnel)
+            if notice_message:
                 st.markdown(
-                    _notice_card("주문 없음", no_order_message),
+                    _notice_card(notice_title, notice_message),
                     unsafe_allow_html=True,
                 )
 
@@ -1736,8 +1746,8 @@ with tab_funnel:
                 tool = d.get("tool_interpretation") or {}
                 rows.append({
                     "종목": d.get("symbol", "-"),
-                    "신호": ACTION_KO.get(d.get("current_signal"), d.get("current_signal", "-")),
-                    "최종 판단": ACTION_KO.get(d.get("final_action"), d.get("final_action", "-")),
+                    "신호": _translate_code(d.get("current_signal")),
+                    "최종 판단": _translate_code(d.get("final_action")),
                     "판단 사유": _reasons_ko(d.get("reason_codes")),
                     "여론 점수": (tool.get("opinion_signal") or "").replace("score ", "") or "-",
                     "확신도": f"{d.get('confidence', 0) * 100:.0f}%" if d.get("confidence") is not None else "-",
@@ -1755,9 +1765,9 @@ with tab_opinion:
     snaps = _read_jsonl(SNAPSHOTS)
     run_summary = _latest_live_run_summary()
     run_date = run_summary.get("date")
-    df = pd.DataFrame(snaps) if snaps else pd.DataFrame()
+    df = _normalize_opinion_snapshots(snaps)
     snapshot_latest = df["date"].max() if not df.empty and "date" in df else None
-    _render_opinion_freshness(run_date, snapshot_latest)
+    _render_opinion_freshness(run_date, snapshot_latest, run_summary)
 
     if not snaps:
         if run_date:
