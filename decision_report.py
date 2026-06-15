@@ -1,6 +1,7 @@
 # Design Ref: daily-decision-report §2 — Option C: ReportContext + 순수 Markdown 포매터
 # run_live 종료 시 funnel(입력→중립→컨센서스→게이트→매수/매도)을 사람이 읽는 MD로 집계.
 # read-only: 판단을 재계산하지 않고 기존 결과만 포맷한다(NFR-03).
+import json
 import logging
 import os
 from dataclasses import dataclass, field
@@ -253,8 +254,110 @@ def _fmt_candidate_block(r: dict) -> list[str]:
     ]
 
 
-def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
-    """funnel → 한국어 Markdown 보고서 본문 (Design §6.1 / D7). 순수 함수."""
+# ── LLM 총평 (하이브리드: 숫자·표는 템플릿, 서술 2~4문장만 LLM) ────────────────
+# 설계 원칙: LLM에는 _commentary_facts가 추린 "구조화된 숫자"만 전달하고 숫자 생성은
+# 절대 맡기지 않는다(환각 차단 — 표가 사실의 단일 출처). 호출 실패/비활성 시 None을
+# 반환해 총평 섹션만 생략하며, 보고서 본문(_format_markdown)은 그대로 정상 생성된다.
+def _commentary_facts(ctx: ReportContext, funnel: dict) -> dict:
+    """funnel/ctx → LLM에 줄 구조화 사실(숫자만). 자유서술·원문은 넣지 않는다."""
+    def _slim_orders(items, keys):
+        return [{k: o.get(k) for k in keys} for o in items]
+
+    return {
+        "date": ctx.date,
+        "input_n": funnel["input_n"],
+        "buys": _slim_orders(funnel["buys"], ("symbol", "score", "size_factor", "executed")),
+        "sells": _slim_orders(funnel["sells"], ("symbol", "action", "executed")),
+        "neutral_dropped_n": len(funnel["neutral_dropped"]),
+        "consensus_dropped_n": len(funnel["consensus_dropped"]),
+        "gate_dropped": _slim_orders(funnel["gate_dropped"][:5], ("symbol", "final_action", "reason_codes")),
+        "llm_router_calls": _get(ctx.summary, "llm_calls", 0),
+    }
+
+
+def _format_commentary_prompt(facts: dict) -> str:
+    """구조화 사실 → 한국어 총평 프롬프트. 숫자/종목은 facts에 있는 것만 쓰도록 강하게 제약."""
+    return (
+        "당신은 미국주 커뮤니티 여론 기반 페이퍼 트레이딩 봇의 일일 보고서 작성 보조자입니다. "
+        "아래 JSON은 오늘 판단의 집계 수치입니다. 이를 바탕으로 투자자가 읽을 '오늘의 총평'을 "
+        "한국어로 2~4문장 작성하세요.\n"
+        "규칙:\n"
+        "- JSON에 있는 숫자/종목명만 사용하고, 없는 수치·종목·예측을 새로 지어내지 마세요.\n"
+        "- 매수/매도가 없으면 왜 보류가 많았는지(방향성 부족/합의 부족/위험·비용) 맥락을 짚으세요.\n"
+        "- 중립적·분석적 톤. 과장된 매수 권유 금지. 마크다운 헤더 없이 본문 문장만 출력하세요.\n"
+        f"JSON:\n{json.dumps(facts, ensure_ascii=False, default=str)}"
+    )
+
+
+def _openai_complete(prompt: str) -> str:
+    """기존 OpenAI(config.GPT_MODEL) 호출 — decision_router._openai_complete와 동일 패턴.
+    키/패키지 없으면 예외 → _llm_commentary가 잡아 None 폴백. 신모델 temperature 미지원 시 재시도."""
+    from openai import OpenAI, BadRequestError
+    client = OpenAI(api_key=config.OPENAI_API_KEY)
+    kwargs = dict(
+        model=config.GPT_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        max_completion_tokens=config.COMMUNITY_REPORT_LLM_MAX_TOKENS,
+        temperature=config.COMMUNITY_REPORT_LLM_TEMPERATURE,
+    )
+    try:
+        resp = client.chat.completions.create(**kwargs)
+    except BadRequestError as e:
+        if "temperature" in str(e):
+            kwargs.pop("temperature", None)
+            resp = client.chat.completions.create(**kwargs)
+        else:
+            raise
+    return resp.choices[0].message.content or ""
+
+
+def _log_commentary(facts: dict, prompt: str, response: str, ok: bool,
+                    error: str = "") -> None:
+    """프롬프트+응답 영속 로깅(재현성). 실패는 무시 — 보고서 생성에 영향 없음."""
+    path = getattr(config, "COMMUNITY_REPORT_LLM_LOG_FILE", "")
+    if not path:
+        return
+    try:
+        record = {
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "date": facts.get("date"),
+            "model": config.GPT_MODEL,
+            "ok": ok,
+            "prompt": prompt,
+            "response": response,
+            "error": error,
+        }
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"총평 로깅 실패(무시): {e}")
+
+
+def _llm_commentary(ctx: ReportContext, funnel: dict, *, complete_fn=None) -> str | None:
+    """LLM 총평 1건 생성. flag OFF면 None. 호출 실패 시에도 None(보고서는 정상).
+    complete_fn(prompt)->str 주입 가능(테스트). None이면 OpenAI 호출."""
+    if not getattr(config, "COMMUNITY_REPORT_LLM_COMMENTARY_ENABLED", False):
+        return None
+    facts = _commentary_facts(ctx, funnel)
+    prompt = _format_commentary_prompt(facts)
+    complete = complete_fn or _openai_complete
+    try:
+        text = (complete(prompt) or "").strip()
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"총평 LLM 호출 실패 → 총평 생략: {e}")
+        _log_commentary(facts, prompt, "", ok=False, error=str(e))
+        return None
+    if not text:
+        _log_commentary(facts, prompt, "", ok=False, error="empty_response")
+        return None
+    _log_commentary(facts, prompt, text, ok=True)
+    return text
+
+
+def _format_markdown(ctx: ReportContext, funnel: dict, commentary: str = None) -> str:
+    """funnel → 한국어 Markdown 보고서 본문 (Design §6.1 / D7). 순수 함수.
+    commentary가 있으면 상단에 '오늘의 총평' 섹션을 덧붙인다(LLM 생성, 숫자는 표가 담보)."""
     date = ctx.date
     neutral_n = len(funnel["neutral_dropped"])
     consensus_n = len(funnel["consensus_dropped"])
@@ -268,6 +371,10 @@ def _format_markdown(ctx: ReportContext, funnel: dict) -> str:
         "",
         _hold_reason_sentence(funnel),
         "",
+    ]
+    if commentary:
+        L += ["## 오늘의 총평", "", commentary.strip(), ""]
+    L += [
         "## 요약",
         "",
         "| 항목 | 결과 |",
@@ -386,7 +493,10 @@ def build_daily_report(ctx: ReportContext, path: str = None) -> str | None:
     if not config.COMMUNITY_DECISION_REPORT_ENABLED:
         return None
     funnel = _derive_funnel(ctx)
-    md = _format_markdown(ctx, funnel)
+    # 총평: LLM 호출(부수효과: OpenAI + 로깅)은 IO 경계인 여기서 수행하고,
+    # 순수 포매터에는 결과 문자열만 주입한다. 비활성/실패 시 None → 섹션 생략.
+    commentary = _llm_commentary(ctx, funnel)
+    md = _format_markdown(ctx, funnel, commentary=commentary)
     path = path or os.path.join(config.COMMUNITY_LIVE_REPORTS_DIR, f"{ctx.date}.md")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
