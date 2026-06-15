@@ -39,22 +39,22 @@ cp .env.example .env && nano .env        # KIS/Reddit/Polygon 키, KIS_PAPER_TRA
 
 ```bash
 # deploy/*.service는 /home/ubuntu/auto_stock + User=ubuntu 기준
-sudo cp deploy/auto-stock.service deploy/watchdog.service deploy/watchdog.timer /etc/systemd/system/
+sudo cp deploy/sentiquant.service deploy/watchdog.service deploy/watchdog.timer /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now auto-stock.service     # 부팅 자동시작 + 즉시 시작
+sudo systemctl enable --now sentiquant.service     # 부팅 자동시작 + 즉시 시작
 sudo systemctl enable --now watchdog.timer         # 워치독 15분 주기
 ```
 
 > 워치독이 `systemctl restart` 하려면 서비스 유저에 제한 sudo 권한 필요:
-> `/etc/sudoers.d/auto-stock-watchdog` → `ubuntu ALL=NOPASSWD: /usr/bin/systemctl restart auto-stock.service`
+> `/etc/sudoers.d/sentiquant-watchdog` → `ubuntu ALL=NOPASSWD: /usr/bin/systemctl restart sentiquant.service`
 
 ## 3. 운영 명령
 
 ```bash
-systemctl status auto-stock          # 상태
-journalctl -u auto-stock -f          # 실시간 로그 (또는 data/trading.log)
-systemctl restart auto-stock         # 재시작
-systemctl stop auto-stock            # 중지
+systemctl status sentiquant          # 상태
+journalctl -u sentiquant -f          # 실시간 로그 (또는 data/trading.log)
+systemctl restart sentiquant         # 재시작
+systemctl stop sentiquant            # 중지
 systemctl list-timers watchdog       # 워치독 다음 실행 확인
 ```
 

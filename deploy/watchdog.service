@@ -1,6 +1,6 @@
 # live-scheduler-deploy FR-09 — 워치독 (oneshot, timer가 주기 호출)
 [Unit]
-Description=auto-stock watchdog — heartbeat stale 감지 시 재시작/알림
+Description=SentiQuant watchdog — heartbeat stale 감지 시 재시작/알림
 
 [Service]
 Type=oneshot

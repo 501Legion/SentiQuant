@@ -25,7 +25,7 @@ import notifier
 import pandas_market_calendars as mcal
 import pytz
 
-_SERVICE = "auto-stock.service"
+_SERVICE = "sentiquant.service"
 _ET = pytz.timezone(config.TIMEZONE)
 _NYSE = mcal.get_calendar("NYSE")
 _STATE_FILE = getattr(config, "WATCHDOG_RESTART_STATE_FILE", "data/watchdog_restart_state.json")

@@ -1,6 +1,6 @@
 # streamlit-dashboard-deploy FR-04 — 대시보드 데이터 동기화 (oneshot)
 [Unit]
-Description=auto-stock dashboard data sync (curate + push dashboard-data branch)
+Description=SentiQuant dashboard data sync (curate + push dashboard-data branch)
 
 [Service]
 Type=oneshot

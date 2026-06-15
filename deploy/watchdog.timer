@@ -1,6 +1,6 @@
 # live-scheduler-deploy FR-09 — 워치독 타이머 (15분마다 검사)
 [Unit]
-Description=auto-stock watchdog timer
+Description=SentiQuant watchdog timer
 
 [Timer]
 OnBootSec=5min

@@ -1,7 +1,7 @@
 # live-scheduler-deploy FR-01 — 메인 스케줄러 systemd 유닛
 # 설치: docs/ops/live-scheduler.md 참고. 경로는 환경에 맞게 수정.
 [Unit]
-Description=auto-stock live trading scheduler (community agent, KIS paper)
+Description=SentiQuant live trading scheduler (community agent, KIS paper)
 After=network-online.target
 Wants=network-online.target
 
@@ -13,7 +13,7 @@ EnvironmentFile=/home/ubuntu/auto_stock/.env
 ExecStart=/home/ubuntu/auto_stock/venv/bin/python main.py
 Restart=always
 RestartSec=10
-# stdout/stderr → journald (journalctl -u auto-stock)
+# stdout/stderr → journald (journalctl -u sentiquant)
 StandardOutput=journal
 StandardError=journal
 
