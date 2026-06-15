@@ -1,5 +1,15 @@
 {
-  "cash": 100000.0,
-  "positions": {},
-  "updated_at": "2026-05-31T01:33:20.086250"
+  "cash": 91467.65,
+  "positions": {
+    "VGT": {
+      "symbol": "VGT",
+      "shares": 27,
+      "avg_price": 112.74,
+      "buy_date": "2026-08-03T22:44:26.529954",
+      "total_cost": 3043.98,
+      "current_price": 120.48,
+      "price_asof": "2026-08-19T22:46:52.547087"
+    }
+  },
+  "updated_at": "2026-08-19T22:46:52.547388"
 }
