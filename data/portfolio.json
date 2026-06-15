@@ -1,5 +1,42 @@
 {
-  "cash": 100000.0,
-  "positions": {},
-  "updated_at": "2026-05-31T01:33:20.086250"
+  "cash": 75494.55,
+  "positions": {
+    "AMD": {
+      "symbol": "AMD",
+      "shares": 11,
+      "avg_price": 552.6,
+      "buy_date": "2026-07-01T22:42:07.889038",
+      "total_cost": 6078.6,
+      "current_price": 560.22,
+      "price_asof": "2026-07-01T22:42:07.889038"
+    },
+    "ASML": {
+      "symbol": "ASML",
+      "shares": 3,
+      "avg_price": 1900.85,
+      "buy_date": "2026-07-01T22:42:07.889038",
+      "total_cost": 5702.549999999999,
+      "current_price": 1918.23,
+      "price_asof": "2026-07-01T22:42:07.889038"
+    },
+    "OUST": {
+      "symbol": "OUST",
+      "shares": 92,
+      "avg_price": 56.965,
+      "buy_date": "2026-07-01T22:42:07.889038",
+      "total_cost": 5240.780000000001,
+      "current_price": 59.09,
+      "price_asof": "2026-07-01T22:42:07.889038"
+    },
+    "RKLB": {
+      "symbol": "RKLB",
+      "shares": 31,
+      "avg_price": 102.215,
+      "buy_date": "2026-07-01T22:42:07.889038",
+      "total_cost": 3168.665,
+      "current_price": 99.3,
+      "price_asof": "2026-07-01T22:42:07.889038"
+    }
+  },
+  "updated_at": "2026-07-01T22:42:07.889409"
 }
