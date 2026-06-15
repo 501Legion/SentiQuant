@@ -30,7 +30,7 @@ def notify(event: str, message: str = "", payload: dict = None) -> bool:
         실제 발송 성공 True, no-op/실패 False.
     """
     url = getattr(config, "SLACK_WEBHOOK_URL", "") or ""
-    text = f"[auto-stock:{event}] {_mask(message)}"
+    text = f"[SentiQuant:{event}] {_mask(message)}"
     if payload:
         text += "\n```" + _mask(str(payload))[:1500] + "```"
     if not url:

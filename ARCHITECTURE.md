@@ -1,4 +1,4 @@
-# System Architecture — auto_stock
+# System Architecture — SentiQuant
 
 > 이 문서는 현재 시스템의 전체 구조를 한눈에 파악하기 위한 Living Document입니다.
 > 기능 추가/변경 시 반드시 업데이트하세요.

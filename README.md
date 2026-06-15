@@ -46,8 +46,8 @@ portfolio.py / trader.py → kis_broker.py (KIS OpenAPI 모의투자)
 ## ⚙️ 설치
 
 ```bash
-git clone https://github.com/501Legion/auto_stock.git
-cd auto_stock
+git clone https://github.com/501Legion/SentiQuant.git
+cd SentiQuant
 
 # FinBERT ONNX는 torch CPU 휠을 먼저 깔아야 함 (GPU 없는 서버 기준)
 bash scripts/install_server.sh        # torch==2.3.1+cpu → 나머지 requirements
