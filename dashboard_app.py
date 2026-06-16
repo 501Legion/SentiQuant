@@ -1252,8 +1252,14 @@ def _compact_report_markdown(md: str) -> str:
     for line in md.splitlines():
         line = line.replace("최종 위험/비용 기준에서 보류", "위험/비용 기준에서 보류")
         line = line.replace("매매 합의 기준 미충족", "매수 의견 합의 부족")
+        line = line.replace("weak_consensus", "매수 의견 합의 부족")
+        line = line.replace("WEAK CONSENSUS", "매수 의견 합의 부족")
+        line = line.replace("buy_approved", "매수 기준 통과")
+        line = line.replace("strong_consensus_upsize", "강한 매수 합의 — 비중 확대")
         line = line.replace("참고 코드", "참고")
         line = line.replace("최종 기준에서 보류", "최종 판단: 보류/관망")
+        line = re.sub(r"\bSTRONG_BUY\b", "강한 매수", line)
+        line = re.sub(r"\bBUY\b", "매수", line)
         line = re.sub(r"\bSKIP\b", "보류", line)
         line = re.sub(r"\bHOLD\b", "관망", line)
         line = re.sub(
