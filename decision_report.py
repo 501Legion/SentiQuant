@@ -4,6 +4,7 @@
 import json
 import logging
 import os
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
@@ -16,7 +17,9 @@ _SELL_ACTIONS = {"SELL", "EXIT", "REDUCE"}
 
 ACTION_LABELS = {
     "BUY": "매수",
+    "STRONG_BUY": "강한 매수",
     "SELL": "매도",
+    "STRONG_SELL": "강한 매도",
     "EXIT": "매도",
     "REDUCE": "비중 축소",
     "SKIP": "보류",
@@ -27,6 +30,33 @@ REASON_CODE_LABELS = {
     "universe_blocked": "투자 대상 조건 미충족",
     "cost_blocked": "비용/위험 기준 미충족",
     "EDGE_BELOW_COST_THRESHOLD": "비용 대비 기대수익 부족",
+    "insufficient_cash": "현금 부족",
+    "low_opinion_score": "여론 점수 미달",
+    "weak_consensus": "매수 의견 합의 부족",
+    "high_noise": "중립 의견 비율 과다",
+    "neutral_spike": "중립 의견 급증",
+    "consensus_break": "컨센서스 붕괴",
+    "no_rule_signal": "룰 신호 없음",
+    "bullish_trend": "상승 추세",
+    "high_momentum": "강한 모멘텀",
+    "trend_up_with_moderate_momentum": "완만한 상승 모멘텀",
+    "community_hype_detected": "커뮤니티 과열 감지",
+    "possible_pump_risk": "급등 과열 위험 가능성",
+    "rsi_elevated": "RSI 과열권",
+    "rsi_neutral_to_slightly_weak": "RSI 중립~소폭 약세",
+    "core_universe_allowed": "핵심 유니버스 통과",
+    "bullish_aggregate_but_mixed_social_sentiment": "종합 여론은 긍정이나 반응 혼재",
+    "sarcasm_and_price-prediction_noise": "풍자/가격예측성 잡음",
+    "approve_candidate_but_downsize": "후보 승인, 비중 축소",
+    "history_downsize": "과거 유사 사례 부진 — 비중 축소",
+    "low_persistence_downsize": "신호 지속일 부족 — 비중 축소",
+    "new_spike_downsize": "신규 급등 종목 — 비중 축소",
+    "buy_approved": "매수 기준 통과",
+    "strong_consensus_upsize": "강한 매수 합의 — 비중 확대",
+    "llm_assisted": "LLM 보조 판단",
+    "llm_fallback_to_rule_based": "LLM 실패 — 룰 기반 대체",
+    "llm_low_confidence_kept_rule": "LLM 저신뢰 — 룰 판단 유지",
+    "llm_buy_overridden_by_rule_skip": "룰 우선 — LLM 매수 기각",
 }
 
 
@@ -40,13 +70,47 @@ def _get(obj, key, default=None):
 
 
 def _fmt_action(value) -> str:
-    text = str(value or "-").upper()
+    text = re.sub(r"[\s\-]+", "_", str(value or "-").strip()).upper()
     return ACTION_LABELS.get(text, str(value or "-"))
 
 
+def _code_key(value) -> str:
+    return re.sub(r"[\s\-]+", "_", str(value or "").strip()).lower()
+
+
+def _fmt_reason_code(code) -> str:
+    raw = str(code or "").strip()
+    if not raw or raw.lower() in {"nan", "none", "null"}:
+        return "-"
+    return REASON_CODE_LABELS.get(raw, REASON_CODE_LABELS.get(_code_key(raw), raw.replace("_", " ")))
+
+
 def _fmt_reason_codes(codes) -> str:
-    labels = [REASON_CODE_LABELS.get(c, str(c).replace("_", " ")) for c in (codes or [])]
+    if isinstance(codes, str):
+        parts = [part.strip() for part in re.split(r"[,;]", codes) if part.strip()]
+    else:
+        parts = [str(part).strip() for part in (codes or []) if str(part).strip()]
+    labels = [_fmt_reason_code(part) for part in parts]
     return ", ".join(labels) if labels else "-"
+
+
+def _fmt_reason_text(text) -> str:
+    result = str(text or "").strip()
+    if not result:
+        return ""
+    tokens = sorted(
+        set(REASON_CODE_LABELS) | {key.upper().replace("_", " ") for key in REASON_CODE_LABELS},
+        key=len,
+        reverse=True,
+    )
+    for token in tokens:
+        label = _fmt_reason_code(token)
+        result = re.sub(rf"(?<![\w-]){re.escape(token)}(?![\w-])", label, result)
+    result = re.sub(r"\bSTRONG_BUY\b", ACTION_LABELS["STRONG_BUY"], result)
+    result = re.sub(r"\bBUY\b", ACTION_LABELS["BUY"], result)
+    result = re.sub(r"\bHOLD\b", ACTION_LABELS["HOLD"], result)
+    result = re.sub(r"\bSKIP\b", ACTION_LABELS["SKIP"], result)
+    return result
 
 
 @dataclass
@@ -128,7 +192,7 @@ def _derive_funnel(ctx: ReportContext) -> dict:
         sells.append({
             "symbol": sym,
             "action": _get(dec, "action", "SELL"),
-            "reason": reason,
+            "reason": _fmt_reason_text(reason),
             "shares": o.get("shares", 0),
             "executed": o.get("executed", False),
         })
@@ -245,7 +309,7 @@ def _fmt_candidate_block(r: dict) -> list[str]:
         f"추세 {r.get('opinion_trend') or '-'} · "
         f"지속 {r.get('persistence_days', 0)}d"
     )
-    reasoning = (r.get("reasoning") or "").strip() or "_근거 기록 없음_"
+    reasoning = _fmt_reason_text(r.get("reasoning") or "").strip() or "_근거 기록 없음_"
     return [
         f"#### {sym} — 최종 판단: {final}  ({route})",
         f"- {metrics}",
@@ -421,7 +485,7 @@ def _format_markdown(ctx: ReportContext, funnel: dict, commentary: str = None) -
         L += ["| 종목 | 판단 | 사유 | 수량 | 체결 |",
               "|------|--------|------|--------|------|"]
         for s in funnel["sells"]:
-            L.append(f"| {s['symbol']} | {s['action']} | {s['reason']} | {s['shares']}"
+            L.append(f"| {s['symbol']} | {_fmt_action(s['action'])} | {s['reason']} | {s['shares']}"
                      f" | {'✅' if s['executed'] else '❌'} |")
     else:
         L.append("_매도 주문 없음._")
