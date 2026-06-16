@@ -190,6 +190,40 @@ st.markdown(
         background: #172033;
         border-color: #2563eb;
     }
+    div.stButton > button {
+        align-items: flex-start;
+        background: #171b22;
+        border: 1px solid #2f3744;
+        border-radius: 6px;
+        color: #f8fafc;
+        cursor: pointer;
+        justify-content: flex-start;
+        min-height: 112px;
+        padding: 12px;
+        text-align: left;
+        transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+        white-space: pre-line;
+        width: 100%;
+    }
+    div.stButton > button p {
+        line-height: 1.35;
+        margin: 0;
+        text-align: left;
+        white-space: pre-line;
+    }
+    div.stButton > button[kind="primary"] {
+        background: #172033;
+        border-color: #2563eb;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        div.stButton > button:hover {
+            background: #1b2434;
+            border-color: #3b82f6;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+            color: #f8fafc;
+            transform: translateY(-1px);
+        }
+    }
     .stock-card-symbol {
         color: #cbd5e1;
         font-size: 0.76rem;
@@ -1622,11 +1656,6 @@ with tab_pf:
                 st.info("가격 데이터가 아직 동기화되지 않았습니다.")
         else:
             symbols = [r["symbol"] for r in rows]
-            query_symbol = st.query_params.get("holding")
-            if isinstance(query_symbol, list):
-                query_symbol = query_symbol[0] if query_symbol else None
-            if query_symbol in symbols:
-                st.session_state["dashboard_selected_symbol"] = query_symbol
             current = st.session_state.get("dashboard_selected_symbol")
             if current not in symbols:
                 st.session_state["dashboard_selected_symbol"] = symbols[0]
@@ -1635,24 +1664,21 @@ with tab_pf:
             card_cols = st.columns(min(max(len(rows), 1), 5))
             for idx, row in enumerate(rows):
                 profit_text = _signed_money(row["profit"]) if row["profit"] is not None else "가격 미조회"
-                profit_cls = _profit_class(row["profit"])
-                selected_cls = " selected" if row["symbol"] == current else ""
                 with card_cols[idx % len(card_cols)]:
-                    card_href = f"?holding={_html(row['symbol'])}"
-                    st.markdown(
-                        f"""
-                        <a class="stock-card-link" href="{card_href}" target="_self"
-                           aria-label="{_html(row['symbol'])} 포지션 보기">
-                            <div class="stock-card-panel{selected_cls}">
-                                <div class="stock-card-symbol">{row['symbol']}.US</div>
-                                <div class="stock-card-name">{row['symbol']}</div>
-                                <div class="stock-card-profit {profit_cls}">{profit_text}</div>
-                                <div class="stock-card-shares">보유 {row['shares']:,.0f}주</div>
-                            </div>
-                        </a>
-                        """,
-                        unsafe_allow_html=True,
+                    card_label = (
+                        f"{row['symbol']}.US\n"
+                        f"{row['symbol']}\n\n"
+                        f"{profit_text}\n"
+                        f"보유 {row['shares']:,.0f}주"
                     )
+                    if st.button(
+                        card_label,
+                        key=f"position_card_{row['symbol']}",
+                        type="primary" if row["symbol"] == current else "secondary",
+                        use_container_width=True,
+                    ):
+                        st.session_state["dashboard_selected_symbol"] = row["symbol"]
+                        current = row["symbol"]
 
             st.divider()
             selected = next(r for r in rows if r["symbol"] == current)
