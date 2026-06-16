@@ -166,7 +166,14 @@ st.markdown(
         display: block;
         text-decoration: none !important;
     }
-    .stock-card-link:hover .stock-card-panel,
+    @media (hover: hover) and (pointer: fine) {
+        .stock-card-panel:hover {
+            background: #1b2434;
+            border-color: #3b82f6;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+            transform: translateY(-1px);
+        }
+    }
     .stock-card-link:focus .stock-card-panel {
         background: #1b2434;
         border-color: #3b82f6;
@@ -941,13 +948,12 @@ def _latest_trade_summary() -> dict:
         "total": len(df),
         "date": str(last.get("date", "-"))[:10],
         "symbol": last.get("symbol", "-"),
-        "action": last.get("action", "-"),
+        "action": _trade_action(last.get("action", "-")),
     }
 
 
 def _trade_action(value) -> str:
-    text = str(value or "-").upper()
-    return ACTION_KO.get(text, text)
+    return _translate_code(value)
 
 
 def _trade_date(value) -> str:
@@ -988,7 +994,7 @@ def _trade_table(df: pd.DataFrame) -> pd.DataFrame:
 
     rows = []
     for _, row in src.tail(200).iloc[::-1].iterrows():
-        rows.append({
+        display_row = {
             "일시": _trade_date(row.get("date")),
             "종목": row.get("symbol", "-"),
             "구분": _trade_action(row.get("action")),
@@ -997,7 +1003,10 @@ def _trade_table(df: pd.DataFrame) -> pd.DataFrame:
             "거래 금액": _money(row.get("amount"), 2),
             "실현 손익": _format_signed_money_value(row.get("net_profit_usd")),
             "수익률": _format_signed_pct_value(row.get("net_profit_pct")),
-        })
+        }
+        if "signal" in row.index:
+            display_row["판단 근거"] = _translate_code(row.get("signal"))
+        rows.append(display_row)
     return pd.DataFrame(rows)
 
 
@@ -1035,9 +1044,20 @@ def _trade_cards(rows: pd.DataFrame) -> str:
 
 
 # ── 한글 라벨 매핑 (대시보드 표시 전용 — 데이터는 원문 유지) ─────────────────
-ACTION_KO = {"BUY": "매수", "SELL": "매도", "SKIP": "보류", "HOLD": "관망"}
+ACTION_KO = {
+    "BUY": "매수",
+    "STRONG_BUY": "강한 매수",
+    "SELL": "매도",
+    "STRONG_SELL": "강한 매도",
+    "SKIP": "보류",
+    "HOLD": "관망",
+}
 TREND_KO = {"UP": "상승", "DOWN": "하락", "FLAT": "보합"}
 VELOCITY_KO = {"SPIKE": "급증", "NORMAL": "보통", "FADING": "감소"}
+SOURCE_KO = {
+    "reddit_agent": "여론 에이전트",
+    "community_agent": "커뮤니티 여론",
+}
 REASON_KO = {
     "universe_blocked": "유동성 유니버스 미포함",
     "safety_universe_blocked": "안전장치 — 유니버스 차단",
@@ -1068,13 +1088,45 @@ REASON_KO = {
     "llm_fallback_to_rule_based": "LLM 실패 — 룰 기반 대체",
     "llm_low_confidence_kept_rule": "LLM 저신뢰 — 룰 판단 유지",
     "llm_buy_overridden_by_rule_skip": "룰 우선 — LLM 매수 기각",
+    "buy_approved": "매수 기준 통과",
+    "strong_consensus_upsize": "강한 매수 합의 — 비중 확대",
 }
+
+
+def _code_key(value) -> str:
+    text = str(value or "").strip()
+    return re.sub(r"[\s\-]+", "_", text).lower()
+
+
+def _translate_code(value) -> str:
+    raw = str(value or "").strip()
+    if not raw or raw.lower() in {"nan", "none", "null"}:
+        return "-"
+    upper = re.sub(r"[\s\-]+", "_", raw).upper()
+    key = _code_key(raw)
+    if upper in ACTION_KO:
+        return ACTION_KO[upper]
+    if key in REASON_KO:
+        return REASON_KO[key]
+    if key in SOURCE_KO:
+        return SOURCE_KO[key]
+    if upper in TREND_KO:
+        return TREND_KO[upper]
+    if upper in VELOCITY_KO:
+        return VELOCITY_KO[upper]
+    return raw
 
 
 def _reasons_ko(codes) -> str:
     if not codes:
         return "-"
-    return ", ".join(REASON_KO.get(c, c) for c in codes)
+    if isinstance(codes, str):
+        parts = [part.strip() for part in re.split(r"[,;]", codes) if part.strip()]
+    else:
+        parts = [str(part).strip() for part in codes if str(part).strip()]
+    if not parts:
+        return "-"
+    return ", ".join(_translate_code(part) for part in parts)
 
 
 def _decision_cards(rows: list[dict]) -> str:
@@ -1098,7 +1150,7 @@ def _decision_cards(rows: list[dict]) -> str:
 def _watch_candidate_cards(rows: list[dict]) -> str:
     cards = []
     for row in rows:
-        note = _trade_action(row.get("참고", "-"))
+        note = _translate_code(row.get("참고", "-"))
         cards.append(
             "<div class=\"watch-row\">"
             "<div class=\"watch-row-head\">"
@@ -1632,8 +1684,12 @@ with tab_pf:
                 if TRADES.exists():
                     trades = pd.read_csv(TRADES)
                     if "symbol" in trades.columns:
-                        st.dataframe(trades[trades["symbol"] == selected["symbol"]].tail(5),
-                                     width="stretch", hide_index=True)
+                        symbol_trades = trades[trades["symbol"] == selected["symbol"]]
+                        if symbol_trades.empty:
+                            st.caption("이 종목의 거래 기록이 아직 없습니다.")
+                        else:
+                            st.dataframe(_trade_table(symbol_trades).head(5),
+                                         width="stretch", hide_index=True)
                     else:
                         st.caption("거래 기록 형식을 확인할 수 없습니다.")
                 else:
@@ -1769,8 +1825,8 @@ with tab_funnel:
                 tool = d.get("tool_interpretation") or {}
                 rows.append({
                     "종목": d.get("symbol", "-"),
-                    "신호": ACTION_KO.get(d.get("current_signal"), d.get("current_signal", "-")),
-                    "최종 판단": ACTION_KO.get(d.get("final_action"), d.get("final_action", "-")),
+                    "신호": _translate_code(d.get("current_signal")),
+                    "최종 판단": _translate_code(d.get("final_action")),
                     "판단 사유": _reasons_ko(d.get("reason_codes")),
                     "여론 점수": (tool.get("opinion_signal") or "").replace("score ", "") or "-",
                     "확신도": f"{d.get('confidence', 0) * 100:.0f}%" if d.get("confidence") is not None else "-",
