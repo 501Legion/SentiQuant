@@ -161,6 +161,24 @@ st.markdown(
         position: relative;
         transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
     }
+    .stock-card-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        max-height: 270px;
+        overflow-y: auto;
+        padding: 2px 6px 8px 2px;
+    }
+    .stock-card-grid::-webkit-scrollbar {
+        width: 8px;
+    }
+    .stock-card-grid::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 999px;
+    }
+    .stock-card-grid::-webkit-scrollbar-track {
+        background: transparent;
+    }
     .stock-card-link {
         color: inherit !important;
         display: block;
@@ -1723,27 +1741,29 @@ with tab_pf:
                 st.session_state["dashboard_selected_symbol"] = symbols[0]
                 current = symbols[0]
 
-            card_cols = st.columns(min(max(len(rows), 1), 5))
+            card_items = []
             for idx, row in enumerate(rows):
                 profit_text = _signed_money(row["profit"]) if row["profit"] is not None else "가격 미조회"
                 profit_cls = _profit_class(row["profit"])
                 selected_cls = " selected" if row["symbol"] == current else ""
-                with card_cols[idx % len(card_cols)]:
-                    card_href = f"?holding={_html(row['symbol'])}"
-                    st.markdown(
-                        f"""
-                        <a class="stock-card-link" href="{card_href}" target="_self"
-                           aria-label="{_html(row['symbol'])} 포지션 보기">
-                            <div class="stock-card-panel{selected_cls}">
-                                <div class="stock-card-symbol">{row['symbol']}.US</div>
-                                <div class="stock-card-name">{row['symbol']}</div>
-                                <div class="stock-card-profit {profit_cls}">{profit_text}</div>
-                                <div class="stock-card-shares">보유 {row['shares']:,.0f}주</div>
-                            </div>
-                        </a>
-                        """,
-                        unsafe_allow_html=True,
-                    )
+                card_href = f"?holding={_html(row['symbol'])}"
+                card_items.append(
+                    f"""
+                    <a class="stock-card-link" href="{card_href}" target="_self"
+                       aria-label="{_html(row['symbol'])} 포지션 보기">
+                        <div class="stock-card-panel{selected_cls}">
+                            <div class="stock-card-symbol">{_html(row['symbol'])}.US</div>
+                            <div class="stock-card-name">{_html(row['symbol'])}</div>
+                            <div class="stock-card-profit {profit_cls}">{_html(profit_text)}</div>
+                            <div class="stock-card-shares">보유 {row['shares']:,.0f}주</div>
+                        </div>
+                    </a>
+                    """
+                )
+            st.markdown(
+                f"<div class=\"stock-card-grid\">{''.join(card_items)}</div>",
+                unsafe_allow_html=True,
+            )
 
             selected = next(r for r in rows if r["symbol"] == current)
             _render_position_detail(selected, rows)
