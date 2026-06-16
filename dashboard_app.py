@@ -191,25 +191,53 @@ st.markdown(
         border-color: #2563eb;
     }
     div.stButton > button {
-        align-items: flex-start;
+        align-items: flex-start !important;
         background: #171b22;
         border: 1px solid #2f3744;
         border-radius: 6px;
         color: #f8fafc;
         cursor: pointer;
-        justify-content: flex-start;
+        display: block !important;
+        justify-content: flex-start !important;
         min-height: 112px;
         padding: 12px;
-        text-align: left;
+        text-align: left !important;
         transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-        white-space: pre-line;
-        width: 100%;
+        white-space: normal !important;
+        width: 100% !important;
+    }
+    div.stButton > button > div,
+    div.stButton > button p {
+        display: block !important;
+        line-height: 1.35 !important;
+        margin: 0 !important;
+        text-align: left !important;
+        white-space: normal !important;
+        width: 100% !important;
     }
     div.stButton > button p {
-        line-height: 1.35;
-        margin: 0;
-        text-align: left;
-        white-space: pre-line;
+        color: #f8fafc;
+    }
+    div.stButton > button p:first-child {
+        color: #cbd5e1;
+        font-size: 0.76rem;
+        font-weight: 700;
+        margin-bottom: 4px !important;
+    }
+    div.stButton > button p:nth-child(2) {
+        color: #f8fafc;
+        font-size: 0.95rem;
+        margin-bottom: 24px !important;
+    }
+    div.stButton > button p:nth-child(3) {
+        font-size: 1.0rem;
+        font-weight: 800;
+        margin-top: 10px !important;
+    }
+    div.stButton > button p:nth-child(4) {
+        color: #94a3b8;
+        font-size: 0.82rem;
+        text-align: right !important;
     }
     div.stButton > button[kind="primary"] {
         background: #172033;
@@ -1666,9 +1694,9 @@ with tab_pf:
                 profit_text = _signed_money(row["profit"]) if row["profit"] is not None else "가격 미조회"
                 with card_cols[idx % len(card_cols)]:
                     card_label = (
-                        f"{row['symbol']}.US\n"
+                        f"{row['symbol']}.US\n\n"
                         f"{row['symbol']}\n\n"
-                        f"{profit_text}\n"
+                        f"{profit_text}\n\n"
                         f"보유 {row['shares']:,.0f}주"
                     )
                     if st.button(
