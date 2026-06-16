@@ -190,68 +190,6 @@ st.markdown(
         background: #172033;
         border-color: #2563eb;
     }
-    div.stButton > button {
-        align-items: flex-start !important;
-        background: #171b22;
-        border: 1px solid #2f3744;
-        border-radius: 6px;
-        color: #f8fafc;
-        cursor: pointer;
-        display: block !important;
-        justify-content: flex-start !important;
-        min-height: 112px;
-        padding: 12px;
-        text-align: left !important;
-        transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-        white-space: normal !important;
-        width: 100% !important;
-    }
-    div.stButton > button > div,
-    div.stButton > button p {
-        display: block !important;
-        line-height: 1.35 !important;
-        margin: 0 !important;
-        text-align: left !important;
-        white-space: normal !important;
-        width: 100% !important;
-    }
-    div.stButton > button p {
-        color: #f8fafc;
-    }
-    div.stButton > button p:first-child {
-        color: #cbd5e1;
-        font-size: 0.76rem;
-        font-weight: 700;
-        margin-bottom: 4px !important;
-    }
-    div.stButton > button p:nth-child(2) {
-        color: #f8fafc;
-        font-size: 0.95rem;
-        margin-bottom: 24px !important;
-    }
-    div.stButton > button p:nth-child(3) {
-        font-size: 1.0rem;
-        font-weight: 800;
-        margin-top: 10px !important;
-    }
-    div.stButton > button p:nth-child(4) {
-        color: #94a3b8;
-        font-size: 0.82rem;
-        text-align: right !important;
-    }
-    div.stButton > button[kind="primary"] {
-        background: #172033;
-        border-color: #2563eb;
-    }
-    @media (hover: hover) and (pointer: fine) {
-        div.stButton > button:hover {
-            background: #1b2434;
-            border-color: #3b82f6;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
-            color: #f8fafc;
-            transform: translateY(-1px);
-        }
-    }
     .stock-card-symbol {
         color: #cbd5e1;
         font-size: 0.76rem;
@@ -1383,6 +1321,97 @@ def _daily_decision_notice(funnel: dict) -> tuple[str, str]:
     return "주문 없음", f"이 날은 {input_n}개 종목을 검토했지만 새 주문 후보가 나오지 않았습니다."
 
 
+@st.fragment
+def _render_position_detail(selected: dict, rows: list[dict]) -> None:
+    st.divider()
+    hist = _load_ohlcv(selected["symbol"])
+    price_label = "최근 종가" if selected["last"] is not None else "매입 단가"
+    delta_html = (
+        f"<span class='{_profit_class(selected['price'] - selected['entry'])}'>"
+        f"{_signed_money(selected['price'] - selected['entry'])} "
+        f"({_signed_percent(selected['profit_pct'])})</span>"
+        if selected["profit_pct"] is not None else
+        "<span class='sub-text'>가격 미조회 · 손익 계산 대기</span>"
+    )
+
+    col_main, col_side = st.columns([2.2, 0.8])
+    with col_main:
+        c_title, c_price = st.columns([2, 1])
+        with c_title:
+            st.markdown(f"<h1 style='margin-bottom:0;'>{selected['symbol']}</h1>", unsafe_allow_html=True)
+        with c_price:
+            st.markdown(
+                f"""
+                <div style="text-align:right;">
+                    <span class="sub-text">{price_label}</span><br>
+                    <span class="price-large">{_money(selected['price'], 2)}</span><br>
+                    {delta_html}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        if hist.empty:
+            st.warning(f"{selected['symbol']} 가격 스냅샷 없음")
+        else:
+            range_label = _price_range_control(
+                f"position_price_range_{selected['symbol']}")
+            st.altair_chart(_price_chart(hist, range_label), width="stretch")
+
+        m_col1, m_col2, m_col3 = st.columns(3)
+        with m_col1:
+            st.write("시장 가치")
+            st.subheader(_money(selected["value"], 2))
+        with m_col2:
+            st.write("매입 단가")
+            st.subheader(_money(selected["entry"], 2))
+        with m_col3:
+            st.write("미실현 수익")
+            profit_html = (
+                f"<div class='detail-profit-value {_profit_class(selected['profit'])}'>{_signed_money(selected['profit'])}</div>"
+                if selected["profit"] is not None else
+                "<div class='detail-profit-value profit-flat'>가격 미조회</div>"
+            )
+            st.markdown(profit_html, unsafe_allow_html=True)
+
+        st.subheader(f"{selected['symbol']} 최근 거래")
+        if TRADES.exists():
+            trades = pd.read_csv(TRADES)
+            if "symbol" in trades.columns:
+                symbol_trades = trades[trades["symbol"] == selected["symbol"]]
+                if symbol_trades.empty:
+                    st.caption("이 종목의 거래 기록이 아직 없습니다.")
+                else:
+                    st.dataframe(_trade_table(symbol_trades).head(5),
+                                 width="stretch", hide_index=True)
+            else:
+                st.caption("거래 기록 형식을 확인할 수 없습니다.")
+        else:
+            st.caption("거래 기록이 아직 동기화되지 않았습니다.")
+
+    with col_side:
+        profit_rate = _signed_percent(selected["profit_pct"]) if selected["profit_pct"] is not None else "가격 미조회"
+        profit_money = _signed_money(selected["profit"]) if selected["profit"] is not None else "가격 미조회"
+        st.markdown(
+            f"""
+            <div class="position-panel">
+                <div class="position-panel-label">보유 수량</div>
+                <div class="position-panel-value">{selected['shares']:,.0f} 주</div>
+                <div class="position-panel-label">시장 가치</div>
+                <div class="position-panel-value">{_money(selected['value'], 2)}</div>
+                <div class="position-panel-label">수익률</div>
+                <div class="position-panel-value {_profit_class(selected['profit_pct'])}">{profit_rate}</div>
+                <div class="position-panel-label">미실현 수익</div>
+                <div class="position-panel-value {_profit_class(selected['profit'])}">{profit_money}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.subheader("📋 보유 종목 표")
+    st.dataframe(_position_table(rows), width="stretch", hide_index=True)
+
+
 # ── 헤더 + 마지막 sync 배지 (D6) ─────────────────────────────────────────────
 _logo_uri = _logo_data_uri()
 _logo_html = (
@@ -1684,6 +1713,11 @@ with tab_pf:
                 st.info("가격 데이터가 아직 동기화되지 않았습니다.")
         else:
             symbols = [r["symbol"] for r in rows]
+            query_symbol = st.query_params.get("holding")
+            if isinstance(query_symbol, list):
+                query_symbol = query_symbol[0] if query_symbol else None
+            if query_symbol in symbols:
+                st.session_state["dashboard_selected_symbol"] = query_symbol
             current = st.session_state.get("dashboard_selected_symbol")
             if current not in symbols:
                 st.session_state["dashboard_selected_symbol"] = symbols[0]
@@ -1692,110 +1726,27 @@ with tab_pf:
             card_cols = st.columns(min(max(len(rows), 1), 5))
             for idx, row in enumerate(rows):
                 profit_text = _signed_money(row["profit"]) if row["profit"] is not None else "가격 미조회"
+                profit_cls = _profit_class(row["profit"])
+                selected_cls = " selected" if row["symbol"] == current else ""
                 with card_cols[idx % len(card_cols)]:
-                    card_label = (
-                        f"{row['symbol']}.US\n\n"
-                        f"{row['symbol']}\n\n"
-                        f"{profit_text}\n\n"
-                        f"보유 {row['shares']:,.0f}주"
-                    )
-                    if st.button(
-                        card_label,
-                        key=f"position_card_{row['symbol']}",
-                        type="primary" if row["symbol"] == current else "secondary",
-                        use_container_width=True,
-                    ):
-                        st.session_state["dashboard_selected_symbol"] = row["symbol"]
-                        current = row["symbol"]
-
-            st.divider()
-            selected = next(r for r in rows if r["symbol"] == current)
-            hist = _load_ohlcv(selected["symbol"])
-            price_label = "최근 종가" if selected["last"] is not None else "매입 단가"
-            delta_html = (
-                f"<span class='{_profit_class(selected['price'] - selected['entry'])}'>"
-                f"{_signed_money(selected['price'] - selected['entry'])} "
-                f"({_signed_percent(selected['profit_pct'])})</span>"
-                if selected["profit_pct"] is not None else
-                "<span class='sub-text'>가격 미조회 · 손익 계산 대기</span>"
-            )
-
-            col_main, col_side = st.columns([2.2, 0.8])
-            with col_main:
-                c_title, c_price = st.columns([2, 1])
-                with c_title:
-                    st.markdown(f"<h1 style='margin-bottom:0;'>{selected['symbol']}</h1>", unsafe_allow_html=True)
-                with c_price:
+                    card_href = f"?holding={_html(row['symbol'])}"
                     st.markdown(
                         f"""
-                        <div style="text-align:right;">
-                            <span class="sub-text">{price_label}</span><br>
-                            <span class="price-large">{_money(selected['price'], 2)}</span><br>
-                            {delta_html}
-                        </div>
+                        <a class="stock-card-link" href="{card_href}" target="_self"
+                           aria-label="{_html(row['symbol'])} 포지션 보기">
+                            <div class="stock-card-panel{selected_cls}">
+                                <div class="stock-card-symbol">{row['symbol']}.US</div>
+                                <div class="stock-card-name">{row['symbol']}</div>
+                                <div class="stock-card-profit {profit_cls}">{profit_text}</div>
+                                <div class="stock-card-shares">보유 {row['shares']:,.0f}주</div>
+                            </div>
+                        </a>
                         """,
                         unsafe_allow_html=True,
                     )
 
-                if hist.empty:
-                    st.warning(f"{selected['symbol']} 가격 스냅샷 없음")
-                else:
-                    range_label = _price_range_control(
-                        f"position_price_range_{selected['symbol']}")
-                    st.altair_chart(_price_chart(hist, range_label), width="stretch")
-
-                m_col1, m_col2, m_col3 = st.columns(3)
-                with m_col1:
-                    st.write("시장 가치")
-                    st.subheader(_money(selected["value"], 2))
-                with m_col2:
-                    st.write("매입 단가")
-                    st.subheader(_money(selected["entry"], 2))
-                with m_col3:
-                    st.write("미실현 수익")
-                    profit_html = (
-                        f"<div class='detail-profit-value {_profit_class(selected['profit'])}'>{_signed_money(selected['profit'])}</div>"
-                        if selected["profit"] is not None else
-                        "<div class='detail-profit-value profit-flat'>가격 미조회</div>"
-                    )
-                    st.markdown(profit_html, unsafe_allow_html=True)
-
-                st.subheader(f"{selected['symbol']} 최근 거래")
-                if TRADES.exists():
-                    trades = pd.read_csv(TRADES)
-                    if "symbol" in trades.columns:
-                        symbol_trades = trades[trades["symbol"] == selected["symbol"]]
-                        if symbol_trades.empty:
-                            st.caption("이 종목의 거래 기록이 아직 없습니다.")
-                        else:
-                            st.dataframe(_trade_table(symbol_trades).head(5),
-                                         width="stretch", hide_index=True)
-                    else:
-                        st.caption("거래 기록 형식을 확인할 수 없습니다.")
-                else:
-                    st.caption("거래 기록이 아직 동기화되지 않았습니다.")
-
-            with col_side:
-                profit_rate = _signed_percent(selected["profit_pct"]) if selected["profit_pct"] is not None else "가격 미조회"
-                profit_money = _signed_money(selected["profit"]) if selected["profit"] is not None else "가격 미조회"
-                st.markdown(
-                    f"""
-                    <div class="position-panel">
-                        <div class="position-panel-label">보유 수량</div>
-                        <div class="position-panel-value">{selected['shares']:,.0f} 주</div>
-                        <div class="position-panel-label">시장 가치</div>
-                        <div class="position-panel-value">{_money(selected['value'], 2)}</div>
-                        <div class="position-panel-label">수익률</div>
-                        <div class="position-panel-value {_profit_class(selected['profit_pct'])}">{profit_rate}</div>
-                        <div class="position-panel-label">미실현 수익</div>
-                        <div class="position-panel-value {_profit_class(selected['profit'])}">{profit_money}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-
-            st.subheader("📋 보유 종목 표")
-            st.dataframe(_position_table(rows), width="stretch", hide_index=True)
+            selected = next(r for r in rows if r["symbol"] == current)
+            _render_position_detail(selected, rows)
 
 # ── ② 매매 이력 ──────────────────────────────────────────────────────────────
 with tab_trades:
