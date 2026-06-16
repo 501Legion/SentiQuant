@@ -1748,17 +1748,14 @@ with tab_pf:
                 selected_cls = " selected" if row["symbol"] == current else ""
                 card_href = f"?holding={_html(row['symbol'])}"
                 card_items.append(
-                    f"""
-                    <a class="stock-card-link" href="{card_href}" target="_self"
-                       aria-label="{_html(row['symbol'])} 포지션 보기">
-                        <div class="stock-card-panel{selected_cls}">
-                            <div class="stock-card-symbol">{_html(row['symbol'])}.US</div>
-                            <div class="stock-card-name">{_html(row['symbol'])}</div>
-                            <div class="stock-card-profit {profit_cls}">{_html(profit_text)}</div>
-                            <div class="stock-card-shares">보유 {row['shares']:,.0f}주</div>
-                        </div>
-                    </a>
-                    """
+                    f'<a class="stock-card-link" href="{card_href}" target="_self" '
+                    f'aria-label="{_html(row["symbol"])} 포지션 보기">'
+                    f'<div class="stock-card-panel{selected_cls}">'
+                    f'<div class="stock-card-symbol">{_html(row["symbol"])}.US</div>'
+                    f'<div class="stock-card-name">{_html(row["symbol"])}</div>'
+                    f'<div class="stock-card-profit {profit_cls}">{_html(profit_text)}</div>'
+                    f'<div class="stock-card-shares">보유 {row["shares"]:,.0f}주</div>'
+                    f'</div></a>'
                 )
             st.markdown(
                 f"<div class=\"stock-card-grid\">{''.join(card_items)}</div>",
