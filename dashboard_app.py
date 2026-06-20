@@ -741,7 +741,18 @@ def _profit_class(value) -> str:
 def _position_values(symbol: str, raw: dict) -> dict:
     shares = float(raw.get("shares") or raw.get("quantity") or 0)
     entry = float(raw.get("entry_price") or raw.get("avg_price") or raw.get("average_price") or 0)
-    last = _latest_close(symbol)
+    # 1순위: 서버가 KIS 동기화 시 캐시한 실계좌 현재가(current_price). Source of Truth.
+    # 2순위(폴백): 커밋된 OHLCV 스냅샷 종가 — 며칠 낡을 수 있어 손익이 왜곡될 수 있음.
+    live = raw.get("current_price")
+    live = float(live) if live not in (None, 0, "") else None
+    if live is not None:
+        last = live
+        price_source = "live"
+        price_asof = raw.get("price_asof")
+    else:
+        last = _latest_close(symbol)
+        price_source = "snapshot" if last is not None else None
+        price_asof = None
     price = last if last is not None else entry
     value = price * shares
     profit = (price - entry) * shares if last is not None and entry else None
@@ -755,7 +766,28 @@ def _position_values(symbol: str, raw: dict) -> dict:
         "value": value,
         "profit": profit,
         "profit_pct": profit_pct,
+        "price_source": price_source,
+        "price_asof": price_asof,
     }
+
+
+def _price_basis_caption(rows: list[dict]) -> str:
+    """평가 기준 가격의 출처/신선도를 한 줄로 요약."""
+    if not rows:
+        return "보유 포지션이 없습니다."
+    live = [r for r in rows if r.get("price_source") == "live"]
+    snap = [r for r in rows if r.get("price_source") == "snapshot"]
+    if live and not snap:
+        asof = next((r.get("price_asof") for r in live if r.get("price_asof")), None)
+        asof_kst = _format_kst(asof) if asof else None
+        asof_txt = f" ({asof_kst} KST 동기화)" if asof_kst else ""
+        return f"KIS 실계좌 현재가 기준 평가입니다{asof_txt}."
+    if live and snap:
+        return (
+            f"{len(live)}개는 KIS 실계좌 현재가, "
+            f"{len(snap)}개는 커밋된 스냅샷 종가(낡았을 수 있음) 기준입니다."
+        )
+    return "커밋된 OHLCV 스냅샷 종가 기준입니다 — 며칠 낡았을 수 있어 실계좌 손익과 다를 수 있습니다."
 
 
 def _position_table(rows: list[dict]) -> pd.DataFrame:
@@ -1650,7 +1682,7 @@ with tab_pf:
                 unsafe_allow_html=True,
             )
 
-        st.caption("서버가 동기화한 종가 기준으로 평가한 화면입니다.")
+        st.caption(_price_basis_caption(rows))
 
         if not rows:
             run_summary = _latest_live_run_summary()

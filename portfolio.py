@@ -20,6 +20,11 @@ class Position:
     avg_price: float       # 평균 매수가
     buy_date: str          # 최초 매수일 (ISO 8601)
     total_cost: float      # 총 투자 비용 (avg_price * shares)
+    # KIS 동기화 시 실계좌 현재가를 함께 캐시 (Source of Truth).
+    # 대시보드가 낡은 커밋 OHLCV 스냅샷 대신 이 값으로 평가손익을 표시한다.
+    # 비-KIS 경로(백테스트/수기 입력)에서는 None → 대시보드가 스냅샷 종가로 폴백.
+    current_price: float | None = None
+    price_asof: str | None = None   # current_price 기준 시각 (ISO 8601)
 
 
 @dataclass
@@ -238,6 +243,10 @@ def sync_from_kis(portfolio: Portfolio, broker) -> Portfolio:
             avg_price=p.avg_price,
             buy_date=buy_date,
             total_cost=p.avg_price * p.shares,
+            # KIS 잔고가 돌려준 현재가를 캐시 → 대시보드 평가손익 정확도 확보.
+            # current_price가 0/없으면 None으로 저장해 대시보드가 스냅샷으로 폴백.
+            current_price=(p.current_price or None),
+            price_asof=(now_iso if p.current_price else None),
         )
     return Portfolio(cash=snap.cash_usd, positions=new_positions)
 
