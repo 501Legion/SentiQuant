@@ -12,7 +12,7 @@ import json
 import logging
 import os
 from contextlib import contextmanager
-from datetime import date as _date, datetime, timedelta
+from datetime import date as _date, datetime, timedelta, timezone
 
 import config
 import indicators
@@ -30,6 +30,7 @@ from decision_router import DecisionRouter
 from opinion_reflection import build_high_level, build_low_level
 from reddit_collector import RedditCollector
 from reddit_portfolio import RedditPortfolio
+from portfolio import Trade, record_trade
 from sentiment_provider import get_provider
 from universe_filter import UniverseFilter
 from wsb_signal_engine import WSBSignalEngine, build_daily_snapshot
@@ -630,11 +631,35 @@ def run_live(
 
     sell_trades: list[dict] = []
     for intent, price, action in sell_intents:
-        orders.append(executor.execute(intent))
+        rec = executor.execute(intent)
+        orders.append(rec)
         trade = portfolio._sell(intent.symbol, price, date, reason=action.lower())  # 미러 갱신
         if trade:
             sell_trades.append(trade)
         wsb_state.remove_position_score(position_scores, intent.symbol)
+
+        # trades.csv에 실체결 거래 기록
+        if rec.get("executed"):
+            try:
+                fill_price = rec.get("fill_price") or price
+                net_profit_pct = trade.get("pnl_pct", 0.0) if trade else 0.0
+                net_profit_usd = trade.get("net_pnl", 0.0) if trade else 0.0
+                t_obj = Trade(
+                    symbol=intent.symbol,
+                    date=datetime.now(timezone.utc).isoformat(),
+                    action="SELL",
+                    signal="reddit_agent",
+                    price=float(fill_price),
+                    shares=int(intent.shares),
+                    amount=float(fill_price * intent.shares),
+                    net_profit_pct=float(net_profit_pct),
+                    net_profit_usd=float(net_profit_usd),
+                    order_no=rec.get("order_no"),
+                    kis_status="FILLED"
+                )
+                record_trade(t_obj)
+            except Exception as e:
+                logger.error(f"[record_trade] SELL 기록 실패: {e}")
 
     # live-scheduler-deploy §6.2 D2 — 매수 실행 전 일일/노출 한도 게이트 (Plan SC-04)
     #   매도 실행 직후라 portfolio.positions가 현재 보유를 반영. today_buy_count=0(런당 상한);
@@ -651,11 +676,33 @@ def run_live(
     for intent, price in buy_intents:
         if price <= 0 or intent.shares <= 0:
             continue
-        orders.append(executor.execute(intent))
+        rec = executor.execute(intent)
+        orders.append(rec)
         # 미러 갱신 (llm-p1 ③: 라우터가 정한 포지션별 손절/트레일링 한도 저장)
         portfolio._buy(intent.symbol, price, intent.shares, date,
                        stop_loss_pct=getattr(intent, "stop_loss_pct", None),
                        trailing_stop_pct=getattr(intent, "trailing_stop_pct", None))
+
+        # trades.csv에 실체결 거래 기록
+        if rec.get("executed"):
+            try:
+                fill_price = rec.get("fill_price") or price
+                t_obj = Trade(
+                    symbol=intent.symbol,
+                    date=datetime.now(timezone.utc).isoformat(),
+                    action="BUY",
+                    signal="reddit_agent",
+                    price=float(fill_price),
+                    shares=int(intent.shares),
+                    amount=float(fill_price * intent.shares),
+                    net_profit_pct=0.0,
+                    net_profit_usd=0.0,
+                    order_no=rec.get("order_no"),
+                    kis_status="FILLED"
+                )
+                record_trade(t_obj)
+            except Exception as e:
+                logger.error(f"[record_trade] BUY 기록 실패: {e}")
 
     # 8.5 reflection (FR-09): 청산분 → high-level, forward 확정분 → low-level (decision_id join)
     refl_counts = _build_reflections(memory, ohlcv_full, date, sell_trades, snap_by_key)

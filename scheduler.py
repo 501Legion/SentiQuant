@@ -133,6 +133,19 @@ def order_processing_job(dry_run: bool = False) -> None:
         try:
             import community_live
             community_live.run_live(dry_run=dry_run)
+
+            # KIS Sync (portfolio.json 캐시 갱신)
+            if not dry_run:
+                try:
+                    broker = get_broker()
+                    broker.connect()
+                    portfolio = load_portfolio()
+                    portfolio = sync_from_kis(portfolio, broker)
+                    save_portfolio(portfolio)
+                    logger.info("[KIS] Agent 라이브 완료 후 sync_from_kis 성공")
+                except Exception as e:
+                    logger.warning(f"[KIS] Agent 라이브 완료 후 sync_from_kis 실패: {e}")
+
             runtime_guard.write_heartbeat("order")   # 성공 시각 기록(워치독, SC-09)
         except Exception as e:
             logger.error(f"[agent] 라이브 구동 실패: {e}", exc_info=True)
