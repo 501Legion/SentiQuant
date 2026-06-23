@@ -33,7 +33,8 @@ import config
 import community_live
 import wsb_state
 from community_memory import CommunityMemoryStore, InMemoryBackend
-from reddit_portfolio import RedditPortfolio
+from kis_broker import PositionSnapshot
+from reddit_portfolio import Position, RedditPortfolio
 from mock_broker import MockBroker
 
 _DATE = "2026-06-01"
@@ -156,6 +157,66 @@ def test_t2_live_places_order(tmp_path=None):
         assert broker._order_seq >= 1, "실모의주문 모드인데 place_order 미호출"
         buys = [o for o in res["orders"] if o.get("side") == "BUY"]
         assert buys and buys[0]["executed"] and buys[0]["status"] == "FILLED"
+
+
+def test_t2b_live_initializes_from_broker_and_preserves_metadata(tmp_path=None):
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        saved_dir = config.REDDIT_DATA_DIR
+        try:
+            config.REDDIT_DATA_DIR = d
+            prior = RedditPortfolio(config.COMMUNITY_LIVE_STRATEGY_KEY)
+            prior.cash = 1.0
+            prior.positions["NVDA"] = Position(
+                symbol="NVDA", entry_date="2026-05-01", entry_price=90.0,
+                shares=3, highest_price=130.0, size_factor=0.7,
+                entry_decision_id="decision-1", stop_loss_pct=-4.0,
+                trailing_stop_pct=-3.0)
+            prior.save_state("2026-05-31")
+            broker = MockBroker(
+                initial_cash=4321.0,
+                positions={
+                    "NVDA": PositionSnapshot(
+                        shares=7, avg_price=110.0, current_price=125.0),
+                    "AAPL": PositionSnapshot(
+                        shares=2, avg_price=200.0, current_price=210.0),
+                },
+            )
+
+            restored = community_live._portfolio_from_broker_account(
+                broker, config.COMMUNITY_LIVE_STRATEGY_KEY, _DATE)
+
+            assert restored.cash == 4321.0
+            assert set(restored.positions) == {"NVDA", "AAPL"}
+            nvda = restored.positions["NVDA"]
+            assert (nvda.shares, nvda.entry_price) == (7, 110.0)
+            assert nvda.entry_date == "2026-05-01"
+            assert nvda.highest_price == 130.0
+            assert nvda.size_factor == 0.7
+            assert nvda.entry_decision_id == "decision-1"
+            assert nvda.stop_loss_pct == -4.0
+            assert restored.positions["AAPL"].entry_date == _DATE
+        finally:
+            config.REDDIT_DATA_DIR = saved_dir
+
+
+def test_t2c_rejected_buy_does_not_mutate_mirror(tmp_path=None):
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        p = _portfolio()
+        before_cash = p.cash
+        broker = MockBroker(tradable=[], quote=100.0)
+        with _live_env(decisions_path=os.path.join(d, "dec.jsonl")):
+            res = community_live.run_live(
+                date=_DATE, dry_run=False, universe_mode="community_liquid",
+                broker=broker,
+                posts_by_symbol={"NVDA": [{"title": "NVDA moon", "body_excerpt": "calls"}]},
+                ohlcv_full={"NVDA": _make_df("NVDA")}, portfolio=p,
+                memory=CommunityMemoryStore(backend=InMemoryBackend()))
+        buys = [o for o in res["orders"] if o.get("side") == "BUY"]
+        assert buys and not buys[0]["executed"]
+        assert p.cash == before_cash
+        assert "NVDA" not in p.positions
 
 
 # --- T3: decision log(live) 영속 — BUY/SKIP 모두 (SC-04) --------------------
@@ -305,11 +366,13 @@ def test_t5_scheduler_switch():
     saved = {"trading": scheduler.is_trading_day, "run_live": community_live.run_live,
              "load_signals": getattr(scheduler, "load_signals", None),
              "strategy": config.LIVE_STRATEGY,
-             "heartbeat": runtime_guard.write_heartbeat}
+             "heartbeat": runtime_guard.write_heartbeat,
+             "halted": runtime_guard.is_halted}
     calls = {"n": 0}
     try:
         # 실 운영 data/heartbeat.json 오염 방지 — 워치독이 stale 감지를 못 하게 됨
         runtime_guard.write_heartbeat = lambda *a, **k: None
+        runtime_guard.is_halted = lambda: False
         scheduler.is_trading_day = lambda: True
         community_live.run_live = lambda *a, **k: calls.__setitem__("n", calls["n"] + 1)
         scheduler.load_signals = lambda: {}        # 뉴스 경로 조기 종료
@@ -328,12 +391,12 @@ def test_t5_scheduler_switch():
             scheduler.load_signals = saved["load_signals"]
         config.LIVE_STRATEGY = saved["strategy"]
         runtime_guard.write_heartbeat = saved["heartbeat"]
+        runtime_guard.is_halted = saved["halted"]
 
 
 # --- T7: 청산 시 high-level reflection 생성 (FR-09) -------------------------
 def test_t7_high_level_reflection_on_close(tmp_path=None):
     import tempfile
-    from reddit_portfolio import Position
 
     sell_scored = {"symbol": "NVDA", "bullish": 1, "bearish": 5, "neutral": 1,
                    "score": 40, "mentions": 7, "neutral_ratio": 0.14,
@@ -349,15 +412,64 @@ def test_t7_high_level_reflection_on_close(tmp_path=None):
         p.positions["NVDA"] = Position(symbol="NVDA", entry_date="2026-05-01",
                                        entry_price=120.0, shares=20, highest_price=130.0)
         mem = CommunityMemoryStore(backend=InMemoryBackend())
+        broker = MockBroker(
+            tradable=["NVDA"],
+            positions={"NVDA": PositionSnapshot(
+                shares=20, avg_price=120.0, current_price=100.0)},
+        )
         with _live_env(decisions_path=os.path.join(d, "dec.jsonl")):
             community_live.WSBSignalEngine = _EngSell      # 청산 신호 엔진으로 교체
             res = community_live.run_live(
-                date=_DATE, dry_run=True, universe_mode="community_liquid",
-                broker=MockBroker(tradable=["NVDA"]),
+                date=_DATE, dry_run=False, universe_mode="community_liquid",
+                broker=broker,
                 posts_by_symbol={"NVDA": [{"title": "NVDA dump", "body_excerpt": "puts"}]},
                 ohlcv_full={"NVDA": _make_df("NVDA")}, portfolio=p, memory=mem)
         assert res["summary"]["sells"] >= 1, res["summary"]
         assert res["summary"]["reflections"]["high"] >= 1, res["summary"]
+        assert "NVDA" not in p.positions
+
+
+def test_t7b_rejected_sell_does_not_mutate_mirror(tmp_path=None):
+    import tempfile
+
+    sell_scored = {"symbol": "NVDA", "bullish": 1, "bearish": 5, "neutral": 1,
+                   "score": 40, "mentions": 7, "neutral_ratio": 0.14,
+                   "velocity_state": "DECLINING", "signal": "BUY"}
+
+    class _EngSell(_FakeEngine):
+        def run_pipeline(self, posts_by_symbol, ohlcv_cache, date_str=None):
+            return ["NVDA"], [sell_scored]
+
+    with tempfile.TemporaryDirectory() as d:
+        p = _portfolio()
+        p.cash = 50_000.0
+        p.positions["NVDA"] = Position(
+            symbol="NVDA", entry_date="2026-05-01",
+            entry_price=120.0, shares=20, highest_price=130.0)
+        before_cash = p.cash
+        with _live_env(decisions_path=os.path.join(d, "dec.jsonl")):
+            community_live.WSBSignalEngine = _EngSell
+            res = community_live.run_live(
+                date=_DATE, dry_run=False, universe_mode="community_liquid",
+                broker=MockBroker(tradable=[]),
+                posts_by_symbol={"NVDA": [{"title": "NVDA dump", "body_excerpt": "puts"}]},
+                ohlcv_full={"NVDA": _make_df("NVDA")}, portfolio=p,
+                memory=CommunityMemoryStore(backend=InMemoryBackend()))
+        sells = [o for o in res["orders"] if o.get("side") == "SELL"]
+        assert sells and not sells[0]["executed"]
+        assert p.cash == before_cash
+        assert p.positions["NVDA"].shares == 20
+
+
+def test_t7c_partial_sell_keeps_remaining_position():
+    p = RedditPortfolio("partial")
+    p.cash = 1_000.0
+    p.positions["NVDA"] = Position(
+        symbol="NVDA", entry_date="2026-05-01",
+        entry_price=100.0, shares=10, highest_price=120.0)
+    trade = p._sell("NVDA", 110.0, _DATE, reason="reduce", shares=4)
+    assert trade and trade["shares"] == 4
+    assert p.positions["NVDA"].shares == 6
 
 
 # --- T8: forward 확정분 → low-level reflection 생성 (FR-09) -----------------

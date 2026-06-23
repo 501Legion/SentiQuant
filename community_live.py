@@ -29,7 +29,7 @@ from decision_log import (
 from decision_router import DecisionRouter
 from opinion_reflection import build_high_level, build_low_level
 from reddit_collector import RedditCollector
-from reddit_portfolio import RedditPortfolio
+from reddit_portfolio import Position, RedditPortfolio
 from portfolio import Trade, record_trade
 from sentiment_provider import get_provider
 from universe_filter import UniverseFilter
@@ -173,7 +173,8 @@ class OrderExecutor:
                "dry_run": False, "decision_id": intent.decision_id,
                "order_no": getattr(result, "order_no", ""),
                "status": getattr(result, "status", ""),
-               "fill_price": getattr(result, "fill_price", None)}
+               "fill_price": getattr(result, "fill_price", None),
+               "fill_shares": getattr(result, "fill_shares", None)}
         self.placed.append(rec)
         logger.info(
             f"[LIVE] place_order {intent.side} {intent.symbol} x{intent.shares} "
@@ -382,6 +383,70 @@ def _build_reflections(memory, ohlcv_full: dict, today: str,
 # =============================================================================
 # run_live — 라이브 1일 구동
 # =============================================================================
+def _latest_portfolio_state_date(strategy_key: str, through_date: str) -> str | None:
+    """Return the newest saved strategy state date at or before through_date."""
+    root = config.REDDIT_DATA_DIR
+    if not os.path.isdir(root):
+        return None
+    filename = f"portfolio_state_{strategy_key}.json"
+    dates = [
+        name for name in os.listdir(root)
+        if name <= through_date and os.path.isfile(os.path.join(root, name, filename))
+    ]
+    return max(dates) if dates else None
+
+
+def _load_latest_portfolio_state(strategy_key: str, through_date: str) -> RedditPortfolio:
+    portfolio = RedditPortfolio(strategy_key)
+    state_date = _latest_portfolio_state_date(strategy_key, through_date)
+    if state_date:
+        portfolio.load_state(state_date)
+    return portfolio
+
+
+def _portfolio_from_broker_account(broker, strategy_key: str, run_date: str) -> RedditPortfolio:
+    """Build the live strategy mirror from the broker account, preserving local metadata."""
+    previous = _load_latest_portfolio_state(strategy_key, run_date)
+    snapshot = broker.get_account()
+    portfolio = RedditPortfolio(strategy_key, initial_cash=float(snapshot.cash_usd))
+    added = []
+    preserved = []
+
+    for symbol, broker_pos in snapshot.positions.items():
+        prior = previous.positions.get(symbol)
+        current_price = float(getattr(broker_pos, "current_price", 0.0) or 0.0)
+        entry_price = float(broker_pos.avg_price)
+        highest_price = max(
+            entry_price,
+            current_price,
+            float(prior.highest_price) if prior else 0.0,
+        )
+        portfolio.positions[symbol] = Position(
+            symbol=symbol,
+            entry_date=prior.entry_date if prior else run_date,
+            entry_price=entry_price,
+            shares=int(broker_pos.shares),
+            highest_price=highest_price,
+            size_factor=prior.size_factor if prior else 1.0,
+            entry_decision_id=prior.entry_decision_id if prior else "",
+            stop_loss_pct=prior.stop_loss_pct if prior else None,
+            trailing_stop_pct=prior.trailing_stop_pct if prior else None,
+        )
+        (preserved if prior else added).append(symbol)
+
+    removed = sorted(set(previous.positions) - set(portfolio.positions))
+    logger.info(
+        "[KIS] 전략 미러 초기화: cash=$%.2f positions=%d metadata_preserved=%s "
+        "new=%s removed=%s",
+        portfolio.cash,
+        len(portfolio.positions),
+        sorted(preserved),
+        sorted(added),
+        removed,
+    )
+    return portfolio
+
+
 def run_live(
     date: str = None,
     dry_run: bool = None,
@@ -463,12 +528,27 @@ def run_live(
         return {"decisions": [], "orders": [], "decision_log_path": decision_log_path(live=True),
                 "summary": summary}
 
-    # 2. 영속 상태 로드
+    # 2. 영속 상태 로드. LIVE는 KIS 계좌가 Source of Truth이며 조회 실패 시 중단한다.
     history = wsb_state.load_score_history()                 # 영속 score_history
     if memory is None:
         memory = CommunityMemoryStore()                      # 영속 jsonl backend
+    if not dry_run and broker is None:
+        try:
+            from kis_broker import get_broker
+            broker = get_broker()
+            broker.connect()
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"KIS broker 초기화 실패: {e}") from e
     if portfolio is None:
-        portfolio = RedditPortfolio(config.COMMUNITY_LIVE_STRATEGY_KEY)
+        if dry_run:
+            portfolio = _load_latest_portfolio_state(
+                config.COMMUNITY_LIVE_STRATEGY_KEY, date)
+        else:
+            try:
+                portfolio = _portfolio_from_broker_account(
+                    broker, config.COMMUNITY_LIVE_STRATEGY_KEY, date)
+            except Exception as e:  # noqa: BLE001
+                raise RuntimeError(f"KIS 계좌 기반 전략 미러 초기화 실패: {e}") from e
 
     # 3. 신호 엔진 파이프라인
     provider = get_provider(_LIVE_MODEL)
@@ -483,13 +563,6 @@ def run_live(
     # 보강①: 라이브(실모의주문)면 broker 실시간 현재가로 체결가 보정.
     #   09:35 ET엔 당일 일봉이 미마감 → get_quote로 정확한 시가/현재가 확보.
     #   dry-run이고 broker 미주입이면 today_ohlcv proxy(최신 종가) 사용.
-    if not dry_run and broker is None:
-        try:
-            from kis_broker import get_broker
-            broker = get_broker()
-            broker.connect()
-        except Exception as e:  # noqa: BLE001
-            logger.error(f"[KIS] Broker 초기화 실패 — 라이브 가격/주문 불가: {e}")
     today_ohlcv = _resolve_live_prices(today_ohlcv, watch, broker)
 
     top_n, signal_details = engine.run_pipeline(posts_by_symbol, df_cache, date)
@@ -633,15 +706,17 @@ def run_live(
     for intent, price, action in sell_intents:
         rec = executor.execute(intent)
         orders.append(rec)
-        trade = portfolio._sell(intent.symbol, price, date, reason=action.lower())  # 미러 갱신
-        if trade:
-            sell_trades.append(trade)
-        wsb_state.remove_position_score(position_scores, intent.symbol)
-
-        # trades.csv에 실체결 거래 기록
         if rec.get("executed"):
             try:
                 fill_price = rec.get("fill_price") or price
+                fill_shares = int(rec.get("fill_shares") or intent.shares)
+                trade = portfolio._sell(
+                    intent.symbol, fill_price, date,
+                    reason=action.lower(), shares=fill_shares)
+                if trade:
+                    sell_trades.append(trade)
+                if intent.symbol not in portfolio.positions:
+                    wsb_state.remove_position_score(position_scores, intent.symbol)
                 net_profit_pct = trade.get("pnl_pct", 0.0) if trade else 0.0
                 net_profit_usd = trade.get("net_pnl", 0.0) if trade else 0.0
                 t_obj = Trade(
@@ -650,8 +725,8 @@ def run_live(
                     action="SELL",
                     signal="reddit_agent",
                     price=float(fill_price),
-                    shares=int(intent.shares),
-                    amount=float(fill_price * intent.shares),
+                    shares=fill_shares,
+                    amount=float(fill_price * fill_shares),
                     net_profit_pct=float(net_profit_pct),
                     net_profit_usd=float(net_profit_usd),
                     order_no=rec.get("order_no"),
@@ -678,23 +753,23 @@ def run_live(
             continue
         rec = executor.execute(intent)
         orders.append(rec)
-        # 미러 갱신 (llm-p1 ③: 라우터가 정한 포지션별 손절/트레일링 한도 저장)
-        portfolio._buy(intent.symbol, price, intent.shares, date,
-                       stop_loss_pct=getattr(intent, "stop_loss_pct", None),
-                       trailing_stop_pct=getattr(intent, "trailing_stop_pct", None))
-
-        # trades.csv에 실체결 거래 기록
         if rec.get("executed"):
             try:
                 fill_price = rec.get("fill_price") or price
+                fill_shares = int(rec.get("fill_shares") or intent.shares)
+                # 미러는 체결 가격/수량만 반영한다.
+                portfolio._buy(
+                    intent.symbol, fill_price, fill_shares, date,
+                    stop_loss_pct=getattr(intent, "stop_loss_pct", None),
+                    trailing_stop_pct=getattr(intent, "trailing_stop_pct", None))
                 t_obj = Trade(
                     symbol=intent.symbol,
                     date=datetime.now(timezone.utc).isoformat(),
                     action="BUY",
                     signal="reddit_agent",
                     price=float(fill_price),
-                    shares=int(intent.shares),
-                    amount=float(fill_price * intent.shares),
+                    shares=fill_shares,
+                    amount=float(fill_price * fill_shares),
                     net_profit_pct=0.0,
                     net_profit_usd=0.0,
                     order_no=rec.get("order_no"),
@@ -715,8 +790,8 @@ def run_live(
 
     summary = {
         "date": date, "posts_date": posts_date, "candidates": len(decisions),
-        "buys": sum(1 for o in orders if o.get("side") == "BUY"),
-        "sells": sum(1 for o in orders if o.get("side") == "SELL"),
+        "buys": sum(1 for o in orders if o.get("side") == "BUY" and o.get("executed")),
+        "sells": sum(1 for o in orders if o.get("side") == "SELL" and o.get("executed")),
         "llm_calls": llm_calls, "dry_run": dry_run,
         "placed": sum(1 for o in orders if o.get("executed")),
         "reflections": refl_counts,

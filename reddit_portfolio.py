@@ -264,30 +264,40 @@ class RedditPortfolio:
         return record
 
     def _sell(
-        self, symbol: str, price: float, date_str: str, reason: str = ""
+        self, symbol: str, price: float, date_str: str, reason: str = "",
+        shares: int | None = None,
     ) -> dict | None:
-        """포지션 청산 + P&L 계산(수수료 포함) + 거래 기록."""
-        pos = self.positions.pop(symbol, None)
+        """포지션 전부 또는 일부 매도 + P&L 계산(수수료 포함) + 거래 기록."""
+        pos = self.positions.get(symbol)
         if pos is None:
             return None
+        sell_shares = pos.shares if shares is None else min(max(int(shares), 0), pos.shares)
+        if sell_shares <= 0:
+            return None
 
-        trade_value = price * pos.shares
+        trade_value = price * sell_shares
         commission = self._calc_commission(trade_value)
-        gross_pnl = (price - pos.entry_price) * pos.shares
+        gross_pnl = (price - pos.entry_price) * sell_shares
         net_pnl = gross_pnl - commission
-        # 매수 시 수수료도 P&L에 반영
+        # 부분 매도 시 매수 수수료도 매도 수량 비율로 배분한다.
         buy_commission = self._calc_commission(pos.entry_price * pos.shares)
+        buy_commission *= sell_shares / pos.shares
         net_pnl -= buy_commission
 
         self.cash += trade_value - commission
-        pnl_pct = net_pnl / (pos.entry_price * pos.shares) * 100
+        pnl_pct = net_pnl / (pos.entry_price * sell_shares) * 100
+        remaining_shares = pos.shares - sell_shares
+        if remaining_shares:
+            pos.shares = remaining_shares
+        else:
+            del self.positions[symbol]
 
         record = {
             "type": "sell",
             "symbol": symbol,
             "date": date_str,
             "price": round(price, 4),
-            "shares": pos.shares,
+            "shares": sell_shares,
             "trade_value": round(trade_value, 2),
             "commission": round(commission, 2),
             "gross_pnl": round(gross_pnl, 2),
@@ -300,7 +310,7 @@ class RedditPortfolio:
         }
         self.trade_log.append(record)
         logger.info(
-            f"[{symbol}] 매도({reason}): {pos.shares}주 × ${price:.2f}"
+            f"[{symbol}] 매도({reason}): {sell_shares}주 × ${price:.2f}"
             f" → net_pnl=${net_pnl:.2f} ({pnl_pct:.2f}%)"
         )
         return record
@@ -329,6 +339,8 @@ class RedditPortfolio:
                 "entry_price": round(pos.entry_price, 4),
                 "shares": pos.shares,
                 "highest_price": round(pos.highest_price, 4),
+                "size_factor": pos.size_factor,
+                "entry_decision_id": pos.entry_decision_id,
                 "stop_loss_pct": pos.stop_loss_pct,
                 "trailing_stop_pct": pos.trailing_stop_pct,
             }
@@ -369,6 +381,8 @@ class RedditPortfolio:
                 entry_price=pos_data["entry_price"],
                 shares=pos_data["shares"],
                 highest_price=pos_data["highest_price"],
+                size_factor=pos_data.get("size_factor", 1.0),
+                entry_decision_id=pos_data.get("entry_decision_id", ""),
                 stop_loss_pct=pos_data.get("stop_loss_pct"),
                 trailing_stop_pct=pos_data.get("trailing_stop_pct"),
             )
