@@ -194,6 +194,35 @@ def reconcile_trades_from_kis(fills, trades_file: str | None = None) -> dict:
             updated += 1
 
     rows.sort(key=lambda row: row.get("date", ""))
+    inventory: dict[str, dict[str, float]] = {}
+    for row in rows:
+        symbol = row.get("symbol", "")
+        action = row.get("action", "")
+        try:
+            shares = int(float(row.get("shares", 0) or 0))
+            price = float(row.get("price", 0) or 0)
+        except (TypeError, ValueError):
+            continue
+        if not symbol or shares <= 0 or price <= 0:
+            continue
+
+        state = inventory.setdefault(symbol, {"shares": 0.0, "cost": 0.0})
+        if action == "BUY":
+            state["shares"] += shares
+            state["cost"] += shares * price
+        elif action == "SELL":
+            held = int(state["shares"])
+            sold = min(shares, held)
+            if sold > 0:
+                avg_cost = state["cost"] / state["shares"]
+                if row.get("signal") == "kis_reconcile":
+                    pnl = (price - avg_cost) * sold
+                    row["net_profit_usd"] = str(round(pnl, 8))
+                    row["net_profit_pct"] = str(round(
+                        pnl / (avg_cost * sold) * 100, 8))
+                state["shares"] -= sold
+                state["cost"] -= avg_cost * sold
+
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with tempfile.NamedTemporaryFile(
         mode="w", encoding="utf-8", newline="", dir=os.path.dirname(os.path.abspath(path)),

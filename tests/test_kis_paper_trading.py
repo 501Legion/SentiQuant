@@ -187,6 +187,8 @@ def test_t11_reconcile_trades_updates_and_adds(tmp_path):
     assert rows[0]["price"] == "2064.89"
     assert rows[1]["action"] == "SELL"
     assert rows[1]["signal"] == "kis_reconcile"
+    assert float(rows[1]["net_profit_usd"]) == 70.22
+    assert round(float(rows[1]["net_profit_pct"]), 4) == 1.7003
 
 
 # --- 단독 실행 러너 (pytest 미설치 환경) ----------------------------------

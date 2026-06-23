@@ -473,6 +473,64 @@ def test_t7c_partial_sell_keeps_remaining_position():
     assert p.positions["NVDA"].shares == 6
 
 
+def test_t7d_buy_hold_sell_across_consecutive_runs():
+    import tempfile
+
+    hold_scored = dict(_BUY_SCORED)
+    sell_scored = {
+        "symbol": "NVDA", "bullish": 1, "bearish": 5, "neutral": 1,
+        "score": 40, "mentions": 7, "neutral_ratio": 0.14,
+        "velocity_state": "DECLINING", "signal": "BUY",
+    }
+
+    class _EngHold(_FakeEngine):
+        def run_pipeline(self, posts_by_symbol, ohlcv_cache, date_str=None):
+            return ["NVDA"], [hold_scored]
+
+    class _EngSell(_FakeEngine):
+        def run_pipeline(self, posts_by_symbol, ohlcv_cache, date_str=None):
+            return ["NVDA"], [sell_scored]
+
+    with tempfile.TemporaryDirectory() as d:
+        broker = MockBroker(initial_cash=100_000.0, tradable=["NVDA"], quote=100.0)
+        portfolio = _portfolio()
+        memory = CommunityMemoryStore(backend=InMemoryBackend())
+        posts = {"NVDA": [{"title": "NVDA", "body_excerpt": "calls"}]}
+        ohlcv = {"NVDA": _make_df("NVDA")}
+
+        with _live_env(decisions_path=os.path.join(d, "day1.jsonl")):
+            day1 = community_live.run_live(
+                date="2026-06-01", dry_run=False, broker=broker,
+                universe_mode="community_liquid", posts_by_symbol=posts,
+                ohlcv_full=ohlcv, portfolio=portfolio, memory=memory,
+            )
+        assert day1["summary"]["buys"] == 1
+        bought_shares = portfolio.positions["NVDA"].shares
+        assert bought_shares > 0
+
+        with _live_env(decisions_path=os.path.join(d, "day2.jsonl")):
+            community_live.WSBSignalEngine = _EngHold
+            day2 = community_live.run_live(
+                date="2026-06-02", dry_run=False, broker=broker,
+                universe_mode="community_liquid", posts_by_symbol=posts,
+                ohlcv_full=ohlcv, portfolio=portfolio, memory=memory,
+            )
+        assert day2["summary"]["buys"] == 0
+        assert day2["summary"]["sells"] == 0
+        assert portfolio.positions["NVDA"].shares == bought_shares
+
+        with _live_env(decisions_path=os.path.join(d, "day3.jsonl")):
+            community_live.WSBSignalEngine = _EngSell
+            day3 = community_live.run_live(
+                date="2026-06-03", dry_run=False, broker=broker,
+                universe_mode="community_liquid", posts_by_symbol=posts,
+                ohlcv_full=ohlcv, portfolio=portfolio, memory=memory,
+            )
+        assert day3["summary"]["sells"] == 1
+        assert "NVDA" not in portfolio.positions
+        assert [fill.action for fill in broker.get_order_history("", "")] == ["BUY", "SELL"]
+
+
 # --- T8: forward 확정분 → low-level reflection 생성 (FR-09) -----------------
 def test_t8_low_level_forward_reflection():
     mem = CommunityMemoryStore(backend=InMemoryBackend())
