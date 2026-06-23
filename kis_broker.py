@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Literal, Protocol
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -56,6 +57,17 @@ class OrderResult:
     error_msg: str | None = None
 
 
+@dataclass(frozen=True)
+class FillRecord:
+    order_no: str
+    symbol: str
+    action: Literal["BUY", "SELL"]
+    fill_price: float
+    fill_shares: int
+    timestamp: str
+    status: Literal["FILLED"] = "FILLED"
+
+
 # =============================================================================
 # Broker Protocol (Design §3.1)
 # =============================================================================
@@ -72,6 +84,7 @@ class Broker(Protocol):
         price: float | None = None,
     ) -> OrderResult: ...
     def get_account(self) -> AccountSnapshot: ...
+    def get_order_history(self, start_date: str, end_date: str) -> list[FillRecord]: ...
     def get_quote(self, symbol: str) -> float: ...
     def get_tradable_symbols(self) -> list[str]: ...
 
@@ -91,6 +104,7 @@ _TR_ID_BUY_PAPER = "VTTT1002U"        # 미국주식 매수 — 모의
 _TR_ID_SELL_PAPER = "VTTT1001U"       # 미국주식 매도 — 모의
 _TR_ID_BALANCE_PAPER = "VTTS3012R"    # 미국주식 잔고(보유종목) — 모의
 _TR_ID_PSAMOUNT_PAPER = "VTTS3007R"   # 미국주식 매수가능금액(가용현금) — 모의
+_TR_ID_ORDER_HISTORY_PAPER = "VTTS3035R"  # 해외주식 주문체결내역 — 모의
 _TR_ID_QUOTE = "HHDFS00000300"        # 해외주식 현재가 (실전/모의 공통)
 
 # 같은 토큰으로 KIS는 "초당 거래건수" 제한 → 연속 호출 사이 짧은 sleep
@@ -404,6 +418,84 @@ class KISBroker:
             cash_usd=cash_usd,
             positions=positions,
             updated_at=_now_iso(),
+        )
+
+    def get_order_history(self, start_date: str, end_date: str) -> list[FillRecord]:
+        """KIS 주문체결내역을 조회한다. 날짜는 YYYYMMDD 형식이다."""
+        self._ensure_connected()
+        fk200 = nk200 = ""
+        fills: list[FillRecord] = []
+        seen_pages: set[tuple[str, str]] = set()
+
+        for _ in range(10):
+            params = {
+                "CANO": self._cano,
+                "ACNT_PRDT_CD": self._acnt_prdt_cd,
+                # 모의투자는 전체 조회 파라미터를 공란으로만 허용한다.
+                "PDNO": "",
+                "ORD_STRT_DT": start_date,
+                "ORD_END_DT": end_date,
+                "SLL_BUY_DVSN": "00",
+                "CCLD_NCCS_DVSN": "00",
+                "OVRS_EXCG_CD": "",
+                "SORT_SQN": "DS",
+                "ORD_DT": "",
+                "ORD_GNO_BRNO": "",
+                "ODNO": "",
+                "CTX_AREA_FK200": fk200,
+                "CTX_AREA_NK200": nk200,
+            }
+            data = self._get(
+                "/uapi/overseas-stock/v1/trading/inquire-ccnl",
+                _TR_ID_ORDER_HISTORY_PAPER,
+                params,
+            )
+            for row in data.get("output", []) or []:
+                fill = self._parse_fill_record(row)
+                if fill is not None:
+                    fills.append(fill)
+
+            next_fk = str(data.get("ctx_area_fk200", "") or "")
+            next_nk = str(data.get("ctx_area_nk200", "") or "")
+            page_key = (next_fk, next_nk)
+            if not next_fk and not next_nk or page_key in seen_pages:
+                break
+            seen_pages.add(page_key)
+            fk200, nk200 = next_fk, next_nk
+
+        unique = {
+            (f.timestamp[:10], f.order_no, f.symbol, f.action): f
+            for f in fills
+        }
+        return sorted(unique.values(), key=lambda f: f.timestamp)
+
+    @staticmethod
+    def _parse_fill_record(row: dict[str, Any]) -> FillRecord | None:
+        shares = int(float(row.get("ft_ccld_qty", 0) or 0))
+        price = float(row.get("ft_ccld_unpr3", 0) or 0)
+        action = {"01": "SELL", "02": "BUY"}.get(str(row.get("sll_buy_dvsn_cd", "")))
+        symbol = str(row.get("pdno", "") or "").strip().upper()
+        order_no = str(row.get("odno", "") or "").strip()
+        if not action or not symbol or not order_no or shares <= 0 or price <= 0:
+            return None
+
+        raw_dt = f"{row.get('ord_dt', '')}{str(row.get('ord_tmd', '')).zfill(6)}"
+        try:
+            timestamp = (
+                datetime.strptime(raw_dt, "%Y%m%d%H%M%S")
+                .replace(tzinfo=ZoneInfo("Asia/Seoul"))
+                .astimezone(timezone.utc)
+                .isoformat()
+            )
+        except ValueError:
+            timestamp = _now_iso()
+        return FillRecord(
+            order_no=order_no,
+            symbol=symbol,
+            action=action,
+            fill_price=price,
+            fill_shares=shares,
+            timestamp=timestamp,
         )
 
     def _fetch_positions(self) -> dict[str, PositionSnapshot]:

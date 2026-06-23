@@ -7,6 +7,7 @@ import os
 import tempfile
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import config
 
@@ -129,6 +130,82 @@ def record_trade(trade: Trade) -> None:
             writer.writerow(asdict(trade))
     except Exception as e:
         logger.error(f"거래 이력 저장 실패: {e}")
+
+
+def reconcile_trades_from_kis(fills, trades_file: str | None = None) -> dict:
+    """KIS 체결내역으로 기존 거래를 보정하고 누락 체결을 추가한다."""
+    path = trades_file or config.TRADES_FILE
+    rows: list[dict] = []
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8", newline="") as f:
+            rows = list(csv.DictReader(f))
+
+    def _order_key(value) -> str:
+        text = str(value or "").strip()
+        return text.lstrip("0") or ("0" if text else "")
+
+    def _local_date(timestamp: str) -> str:
+        try:
+            return (
+                datetime.fromisoformat(timestamp)
+                .astimezone(ZoneInfo("Asia/Seoul"))
+                .strftime("%Y-%m-%d")
+            )
+        except (TypeError, ValueError):
+            return str(timestamp or "")[:10]
+
+    def _trade_key(date, order_no, symbol, action):
+        return (_local_date(date), _order_key(order_no), symbol, action)
+
+    by_order = {
+        _trade_key(
+            row.get("date"), row.get("order_no"),
+            row.get("symbol"), row.get("action"),
+        ): row
+        for row in rows if _order_key(row.get("order_no"))
+    }
+    added = updated = 0
+    for fill in fills:
+        key = _trade_key(
+            fill.timestamp, fill.order_no, fill.symbol, fill.action)
+        row = by_order.get(key)
+        values = {
+            "date": fill.timestamp,
+            "symbol": fill.symbol,
+            "action": fill.action,
+            "price": str(fill.fill_price),
+            "shares": str(fill.fill_shares),
+            "amount": str(round(fill.fill_price * fill.fill_shares, 8)),
+            "order_no": str(fill.order_no),
+            "kis_status": fill.status,
+        }
+        if row is None:
+            row = {
+                **values,
+                "signal": "kis_reconcile",
+                "net_profit_pct": "0.0",
+                "net_profit_usd": "0.0",
+            }
+            rows.append(row)
+            by_order[key] = row
+            added += 1
+        else:
+            row.update(values)
+            updated += 1
+
+    rows.sort(key=lambda row: row.get("date", ""))
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        mode="w", encoding="utf-8", newline="", dir=os.path.dirname(os.path.abspath(path)),
+        delete=False, suffix=".tmp",
+    ) as tmp:
+        writer = csv.DictWriter(tmp, fieldnames=_TRADES_FIELDNAMES, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+        tmp_path = tmp.name
+    os.replace(tmp_path, path)
+    logger.info("[KIS] 거래 이력 정합화 완료: added=%d updated=%d", added, updated)
+    return {"added": added, "updated": updated, "total": len(rows)}
 
 
 def _ensure_trades_header_current() -> bool:

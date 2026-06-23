@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from kis_broker import AccountSnapshot, OrderResult, PositionSnapshot
+from kis_broker import AccountSnapshot, FillRecord, OrderResult, PositionSnapshot
 
 
 def _iso() -> str:
@@ -30,6 +30,7 @@ class MockBroker:
         self._quote = quote
         self._positions: dict[str, PositionSnapshot] = dict(positions or {})
         self._order_seq = 0
+        self._fills: list[FillRecord] = []
 
     def connect(self) -> None:
         pass
@@ -56,6 +57,10 @@ class MockBroker:
         else:  # SELL
             self._cash += px * shares
             self._positions.pop(symbol, None)
+        self._fills.append(FillRecord(
+            order_no=str(self._order_seq), symbol=symbol, action=action,
+            fill_price=px, fill_shares=shares, timestamp=_iso(),
+        ))
         return OrderResult(
             order_no=str(self._order_seq), status="FILLED",
             fill_price=px, fill_shares=shares,
@@ -68,6 +73,9 @@ class MockBroker:
             positions=dict(self._positions),
             updated_at=_iso(),
         )
+
+    def get_order_history(self, start_date: str, end_date: str) -> list[FillRecord]:
+        return list(self._fills)
 
     def get_tradable_symbols(self) -> list[str]:
         return list(self._tradable)

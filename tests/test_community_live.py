@@ -98,6 +98,7 @@ def _live_env(*, decisions_path, llm_router_cls=None, strategy="agent"):
     # 신호 엔진/프로바이더 stub (FinBERT 미로드)
     _save(community_live, "get_provider"); community_live.get_provider = lambda name: object()
     _save(community_live, "WSBSignalEngine"); community_live.WSBSignalEngine = _FakeEngine
+    _save(community_live, "record_trade"); community_live.record_trade = lambda *a, **k: None
     # decision log → tmp
     _save(config, "COMMUNITY_LIVE_DECISIONS_FILE"); config.COMMUNITY_LIVE_DECISIONS_FILE = decisions_path
     _save(config, "COMMUNITY_LIVE_RUN_SUMMARIES_FILE")

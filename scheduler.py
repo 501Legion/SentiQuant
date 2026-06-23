@@ -2,7 +2,7 @@
 # Plan SC-01: 매 거래일 신호 자동 생성
 # Plan SC-06: NYSE 휴장일에는 스케줄러 실행 안 함
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas_market_calendars as mcal
 import pytz
@@ -20,6 +20,7 @@ from portfolio import (
     load_portfolio,
     load_signals,
     print_portfolio_report,
+    reconcile_trades_from_kis,
     record_trade,
     save_portfolio,
     save_signals,
@@ -142,6 +143,10 @@ def order_processing_job(dry_run: bool = False) -> None:
                     portfolio = load_portfolio()
                     portfolio = sync_from_kis(portfolio, broker)
                     save_portfolio(portfolio)
+                    end_date = datetime.now(ET).strftime("%Y%m%d")
+                    start_date = (datetime.now(ET) - timedelta(days=90)).strftime("%Y%m%d")
+                    fills = broker.get_order_history(start_date, end_date)
+                    reconcile_trades_from_kis(fills)
                     logger.info("[KIS] Agent 라이브 완료 후 sync_from_kis 성공")
                 except Exception as e:
                     logger.warning(f"[KIS] Agent 라이브 완료 후 sync_from_kis 실패: {e}")
@@ -184,6 +189,10 @@ def order_processing_job(dry_run: bool = False) -> None:
             try:
                 portfolio = sync_from_kis(portfolio, broker)
                 save_portfolio(portfolio)
+                end_date = datetime.now(ET).strftime("%Y%m%d")
+                start_date = (datetime.now(ET) - timedelta(days=90)).strftime("%Y%m%d")
+                fills = broker.get_order_history(start_date, end_date)
+                reconcile_trades_from_kis(fills)
             except Exception as e:
                 logger.warning(f"[KIS] sync_from_kis 실패 — 캐시 유지: {e}")
 

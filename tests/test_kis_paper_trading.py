@@ -9,6 +9,7 @@ trader / portfolio / signal_provider / signals 필터링을 검증한다.
 """
 from __future__ import annotations
 
+import csv
 import json
 import math
 import os
@@ -27,7 +28,7 @@ import kis_broker
 import portfolio as portfolio_mod
 import signal_provider
 import trader
-from kis_broker import PositionSnapshot
+from kis_broker import FillRecord, PositionSnapshot
 from mock_broker import MockBroker
 
 
@@ -146,6 +147,46 @@ def test_t9_tradable_filter_excludes():
         config.KIS_SYMBOLS_FILE = original
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+
+def test_t10_parse_kis_fill_record():
+    fill = kis_broker.KISBroker._parse_fill_record({
+        "ord_dt": "20260623",
+        "ord_tmd": "223756",
+        "odno": "40440",
+        "pdno": "SNDK",
+        "sll_buy_dvsn_cd": "01",
+        "ft_ccld_qty": "5",
+        "ft_ccld_unpr3": "2064.89000000",
+    })
+    assert fill is not None
+    assert fill.action == "SELL"
+    assert fill.symbol == "SNDK"
+    assert fill.fill_shares == 5
+    assert fill.timestamp.startswith("2026-06-23T13:37:56")
+
+
+def test_t11_reconcile_trades_updates_and_adds(tmp_path):
+    path = tmp_path / "trades.csv"
+    path.write_text(
+        "date,symbol,action,signal,price,shares,amount,net_profit_pct,"
+        "net_profit_usd,order_no,kis_status\n"
+        "2026-06-15T00:00:00+00:00,SNDK,BUY,reddit_agent,2072.75,5,"
+        "10363.75,0.0,0.0,0000040440,FILLED\n",
+        encoding="utf-8",
+    )
+    fills = [
+        FillRecord("40440", "SNDK", "BUY", 2064.89, 5,
+                   "2026-06-15T13:37:56+00:00"),
+        FillRecord("50000", "SNDK", "SELL", 2100.0, 2,
+                   "2026-06-16T13:37:56+00:00"),
+    ]
+    result = portfolio_mod.reconcile_trades_from_kis(fills, str(path))
+    assert result == {"added": 1, "updated": 1, "total": 2}
+    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    assert rows[0]["price"] == "2064.89"
+    assert rows[1]["action"] == "SELL"
+    assert rows[1]["signal"] == "kis_reconcile"
 
 
 # --- 단독 실행 러너 (pytest 미설치 환경) ----------------------------------
