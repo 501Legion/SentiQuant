@@ -99,6 +99,9 @@ _TOKEN_PREEMPT_REFRESH_SECONDS = 5 * 60
 # place_order 네트워크 에러 시 1회 재시도 (Design §6 Error Handling)
 _ORDER_RETRY_COUNT = 1
 
+# 거래소별 잔고조회는 부분 실패를 전체 잔고로 오인하지 않도록 짧게만 재시도한다.
+_BALANCE_RETRY_COUNT = 1
+
 # 모의투자 tr_id (KIS Developers 포털 — 해외주식주문/잔고/시세)
 _TR_ID_BUY_PAPER = "VTTT1002U"        # 미국주식 매수 — 모의
 _TR_ID_SELL_PAPER = "VTTT1001U"       # 미국주식 매도 — 모의
@@ -500,8 +503,12 @@ class KISBroker:
         )
 
     def _fetch_positions(self) -> dict[str, PositionSnapshot]:
-        """해외주식 잔고조회 — 보유종목만. 주문이 거래소별로 라우팅되므로
-        미국 3개 거래소(NASD/NYSE/AMEX)를 합산 조회해 보유 누락을 방지."""
+        """해외주식 잔고조회 — 보유종목만.
+
+        주문이 거래소별로 라우팅되므로 미국 3개 거래소(NASD/NYSE/AMEX)를
+        모두 조회해야 완전한 스냅샷이다. 한 거래소라도 끝까지 실패하면
+        부분 잔고를 반환하지 않고 예외를 올려 포트폴리오 캐시 덮어쓰기를 막는다.
+        """
         positions: dict[str, PositionSnapshot] = {}
         for _excd, ovrs in _US_EXCHANGES:
             params = {
@@ -512,15 +519,28 @@ class KISBroker:
                 "CTX_AREA_FK200": "",
                 "CTX_AREA_NK200": "",
             }
-            try:
-                data = self._get(
-                    "/uapi/overseas-stock/v1/trading/inquire-balance",
-                    _TR_ID_BALANCE_PAPER,
-                    params,
-                )
-            except Exception as e:  # noqa: BLE001 — 한 거래소 실패가 전체를 막지 않음
-                logger.warning(f"[KIS] {ovrs} 잔고조회 실패 — 건너뜀: {e}")
-                continue
+            last_exc: Exception | None = None
+            for attempt in range(_BALANCE_RETRY_COUNT + 1):
+                try:
+                    data = self._get(
+                        "/uapi/overseas-stock/v1/trading/inquire-balance",
+                        _TR_ID_BALANCE_PAPER,
+                        params,
+                    )
+                    break
+                except Exception as e:  # noqa: BLE001 — 부분 잔고 반환 방지
+                    last_exc = e
+                    logger.warning(
+                        f"[KIS] {ovrs} 잔고조회 실패 "
+                        f"(attempt {attempt + 1}/{_BALANCE_RETRY_COUNT + 1}): {e}"
+                    )
+                    if attempt < _BALANCE_RETRY_COUNT:
+                        time.sleep(0.5)
+            else:
+                raise RuntimeError(
+                    f"KIS balance snapshot incomplete: {ovrs} 잔고조회 실패"
+                ) from last_exc
+
             for row in data.get("output1", []) or []:
                 sym = str(row.get("ovrs_pdno", "") or row.get("pdno", ""))
                 if not sym:

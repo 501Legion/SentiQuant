@@ -191,6 +191,29 @@ def test_t11_reconcile_trades_updates_and_adds(tmp_path):
     assert round(float(rows[1]["net_profit_pct"]), 4) == 1.7003
 
 
+def test_t12_fetch_positions_fails_closed_on_partial_exchange_failure():
+    broker = kis_broker.KISBroker(
+        app_key="k", app_secret="s", account_no="12345678-01", paper=True,
+    )
+    calls = []
+
+    def fake_get(path, tr_id, params):
+        exchange = params["OVRS_EXCG_CD"]
+        calls.append(exchange)
+        if exchange == "NYSE":
+            raise RuntimeError("temporary balance outage")
+        return {"output1": []}
+
+    broker._get = fake_get
+    raised = False
+    try:
+        broker._fetch_positions()
+    except RuntimeError as e:
+        raised = "snapshot incomplete" in str(e) and "NYSE" in str(e)
+    assert raised, "partial balance failure must not return a partial portfolio"
+    assert calls.count("NYSE") == 2, "expected one retry before fail-closed"
+
+
 # --- 단독 실행 러너 (pytest 미설치 환경) ----------------------------------
 def _run_standalone() -> int:
     # Windows 콘솔(cp949)에서 유니코드 출력 깨짐 방지
