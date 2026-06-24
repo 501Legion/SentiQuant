@@ -178,6 +178,10 @@ def _derive_funnel(ctx: ReportContext) -> dict:
             "shares": o.get("shares", 0),
             "decision_id": _get(dec, "decision_id", ""),
             "executed": o.get("executed", False),
+            "accepted": bool(o.get("accepted")),
+            "status": o.get("status", ""),
+            "order_no": o.get("order_no", ""),
+            "order_status": _order_status_label(o),
         })
 
     # 최종 매도 — orders SELL을 decision action/reason으로 보강 (보유-only 종목 포함, D5)
@@ -195,6 +199,10 @@ def _derive_funnel(ctx: ReportContext) -> dict:
             "reason": _fmt_reason_text(reason),
             "shares": o.get("shares", 0),
             "executed": o.get("executed", False),
+            "accepted": bool(o.get("accepted")),
+            "status": o.get("status", ""),
+            "order_no": o.get("order_no", ""),
+            "order_status": _order_status_label(o),
         })
 
     return {
@@ -224,6 +232,21 @@ def _fmt_pct(v) -> str:
 
 def _fmt_num(v, nd=2) -> str:
     return f"{v:.{nd}f}" if isinstance(v, (int, float)) else "-"
+
+
+def _order_status_label(order: dict) -> str:
+    """KIS 주문의 접수/체결 단계를 보고서용 상태로 표시한다."""
+    status = str(order.get("status") or "").strip().upper()
+    order_no = str(order.get("order_no") or "").strip()
+    if order.get("executed") or status == "FILLED":
+        label = "체결"
+    elif order.get("accepted") or order_no or status == "PENDING":
+        label = "접수"
+    else:
+        label = "미접수"
+    if order_no and label in {"체결", "접수"}:
+        return f"{label} ({order_no})"
+    return label
 
 
 def _status_sentence(funnel: dict) -> str:
@@ -330,8 +353,8 @@ def _commentary_facts(ctx: ReportContext, funnel: dict) -> dict:
     return {
         "date": ctx.date,
         "input_n": funnel["input_n"],
-        "buys": _slim_orders(funnel["buys"], ("symbol", "score", "size_factor", "executed")),
-        "sells": _slim_orders(funnel["sells"], ("symbol", "action", "executed")),
+        "buys": _slim_orders(funnel["buys"], ("symbol", "score", "size_factor", "order_status")),
+        "sells": _slim_orders(funnel["sells"], ("symbol", "action", "order_status")),
         "neutral_dropped_n": len(funnel["neutral_dropped"]),
         "consensus_dropped_n": len(funnel["consensus_dropped"]),
         "gate_dropped": _slim_orders(funnel["gate_dropped"][:5], ("symbol", "final_action", "reason_codes")),
@@ -470,11 +493,11 @@ def _format_markdown(ctx: ReportContext, funnel: dict, commentary: str = None) -
     # ⑤ 매수
     L += ["## 매수", ""]
     if funnel["buys"]:
-        L += ["| 종목 | 여론 점수 | 합의 비율 | 비중 | 수량 | 체결 |",
+        L += ["| 종목 | 여론 점수 | 합의 비율 | 비중 | 수량 | 주문 상태 |",
               "|------|------|---------|------|--------|------|"]
         for b in funnel["buys"]:
             L.append(f"| {b['symbol']} | {_fmt_num(b['score'], 1)} | {_fmt_num(b['consensus_ratio'])}"
-                     f" | {_fmt_num(b['size_factor'])} | {b['shares']} | {'✅' if b['executed'] else '❌'} |")
+                     f" | {_fmt_num(b['size_factor'])} | {b['shares']} | {b['order_status']} |")
     else:
         L.append("_매수 주문 없음._")
     L.append("")
@@ -482,11 +505,11 @@ def _format_markdown(ctx: ReportContext, funnel: dict, commentary: str = None) -
     # ⑥ 매도
     L += ["## 매도", ""]
     if funnel["sells"]:
-        L += ["| 종목 | 판단 | 사유 | 수량 | 체결 |",
+        L += ["| 종목 | 판단 | 사유 | 수량 | 주문 상태 |",
               "|------|--------|------|--------|------|"]
         for s in funnel["sells"]:
             L.append(f"| {s['symbol']} | {_fmt_action(s['action'])} | {s['reason']} | {s['shares']}"
-                     f" | {'✅' if s['executed'] else '❌'} |")
+                     f" | {s['order_status']} |")
     else:
         L.append("_매도 주문 없음._")
     L.append("")

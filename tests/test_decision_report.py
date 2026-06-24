@@ -269,6 +269,39 @@ def test_tc13_commentary_facts_numbers_only():
     assert "excerpts" not in facts and "reasoning" not in facts
 
 
+# --- TC-14: 접수된 KIS 주문은 체결 실패처럼 표시하지 않음 ---
+def test_tc14_pending_order_status_is_acceptance_not_failed():
+    ctx = ReportContext(
+        date=_DATE,
+        signal_details=[
+            {"symbol": "PLTR", "neutral_filtered": False, "passed_consensus": True,
+             "neutral_ratio": 0.12, "bullish": 8, "bearish": 3},
+            {"symbol": "AVGO", "neutral_filtered": False, "passed_consensus": True,
+             "neutral_ratio": 0.20, "bullish": 2, "bearish": 6},
+        ],
+        decisions=[
+            {"symbol": "PLTR", "action": "BUY", "size_factor": 1.0, "decision_id": "id-pltr"},
+            {"symbol": "AVGO", "action": "SELL", "reason": "consensus_break"},
+        ],
+        orders=[
+            {"symbol": "PLTR", "side": "BUY", "shares": 84, "accepted": True,
+             "status": "PENDING", "order_no": "0000056615", "executed": False},
+            {"symbol": "AVGO", "side": "SELL", "shares": 15, "accepted": True,
+             "status": "PENDING", "order_no": "0000056608", "executed": False},
+        ],
+        snapshots={("PLTR", _DATE): {"opinion_score": 54.8, "consensus_ratio": 1.6}},
+        summary={"date": _DATE},
+    )
+    f = _derive_funnel(ctx)
+    md = dr._format_markdown(ctx, f)
+
+    assert "| 종목 | 여론 점수 | 합의 비율 | 비중 | 수량 | 주문 상태 |" in md
+    assert "| 종목 | 판단 | 사유 | 수량 | 주문 상태 |" in md
+    assert "| PLTR | 54.8 | 1.60 | 1.00 | 84 | 접수 (0000056615) |" in md
+    assert "| AVGO | 매도 | 컨센서스 붕괴 | 15 | 접수 (0000056608) |" in md
+    assert "❌" not in md
+
+
 def _run_standalone() -> int:
     try:
         sys.stdout.reconfigure(encoding="utf-8")
