@@ -583,9 +583,13 @@ def _format_kst(value: str | None) -> str | None:
     if not value:
         return None
     try:
-        return datetime.fromisoformat(value).astimezone(
-            timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
-    except ValueError:
+        raw = value.replace("Z", "+00:00") if value.endswith("Z") else value
+        parsed = datetime.fromisoformat(raw)
+        kst = timezone(timedelta(hours=9))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=kst)
+        return parsed.astimezone(kst).strftime("%Y-%m-%d %H:%M")
+    except (AttributeError, ValueError):
         return value
 
 

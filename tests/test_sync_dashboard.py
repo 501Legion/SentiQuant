@@ -9,10 +9,12 @@ push_branch()는 임시 git repo + bare origin으로 멱등성만 검증.
 """
 from __future__ import annotations
 
+import ast
 import os
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -50,6 +52,19 @@ def _build_fake_src(root: Path):
     (root / ".streamlit/config.toml").write_text("[server]\n", encoding="utf-8")
     (root / "assets").mkdir()
     (root / "assets/sentiquant-logo.jpeg").write_bytes(b"JPEG")
+
+
+def _load_dashboard_format_kst():
+    source = Path(_ROOT, "dashboard_app.py").read_text(encoding="utf-8")
+    module = ast.parse(source)
+    fn = next(
+        node for node in module.body
+        if isinstance(node, ast.FunctionDef) and node.name == "_format_kst"
+    )
+    code = compile(ast.Module(body=[fn], type_ignores=[]), "dashboard_app.py", "exec")
+    ns = {"datetime": datetime, "timedelta": timedelta, "timezone": timezone}
+    exec(code, ns)
+    return ns["_format_kst"]
 
 
 # --- TC-01: allowlist 데이터 포함 ---
@@ -221,6 +236,15 @@ def test_tc07_push_branch_keeps_heartbeat_when_payload_unchanged():
             assert '"payload_changed_at": "2026-06-12T00:00:00+00:00"' in last_sync
         finally:
             sync.ROOT = old_root
+
+
+# --- TC-08: 대시보드 KST 시각 포맷 ---
+def test_tc08_dashboard_format_kst_handles_naive_server_time():
+    fmt = _load_dashboard_format_kst()
+    assert fmt("2026-06-24T22:42:04.189633") == "2026-06-24 22:42"
+    assert fmt("2026-06-24T15:40:56+00:00") == "2026-06-25 00:40"
+    assert fmt("2026-06-24T15:40:56Z") == "2026-06-25 00:40"
+    assert fmt(None) is None
 
 
 def _run_standalone() -> int:
