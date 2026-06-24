@@ -115,6 +115,9 @@ def _process_buy(
         return None
 
     result = broker.place_order(symbol, "BUY", shares)
+    if result.status == "PENDING":
+        logger.info(f"[{symbol}] BUY 주문 접수: order_no={result.order_no} — 체결 확인 대기")
+        return None
     if result.status != "FILLED":
         logger.warning(f"[{symbol}] BUY 거부: {result.error_msg}")
         return None
@@ -201,6 +204,9 @@ def _execute_sell(
         return None
 
     result = broker.place_order(symbol, "SELL", shares)
+    if result.status == "PENDING":
+        logger.info(f"[{symbol}] SELL 주문 접수: order_no={result.order_no} — 체결 확인 대기")
+        return None
     if result.status != "FILLED":
         logger.warning(f"[{symbol}] SELL 거부: {result.error_msg}")
         return None

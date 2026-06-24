@@ -168,17 +168,21 @@ class OrderExecutor:
             self.broker = get_broker()
             self.broker.connect()
         result = self.broker.place_order(intent.symbol, intent.side, intent.shares)
+        status = getattr(result, "status", "")
+        order_no = getattr(result, "order_no", "")
+        accepted = bool(order_no) and status in ("PENDING", "FILLED")
         rec = {"symbol": intent.symbol, "side": intent.side, "shares": intent.shares,
-               "executed": getattr(result, "status", "") == "FILLED",
+               "accepted": accepted,
+               "executed": status == "FILLED",
                "dry_run": False, "decision_id": intent.decision_id,
-               "order_no": getattr(result, "order_no", ""),
-               "status": getattr(result, "status", ""),
+               "order_no": order_no,
+               "status": status,
                "fill_price": getattr(result, "fill_price", None),
                "fill_shares": getattr(result, "fill_shares", None)}
         self.placed.append(rec)
         logger.info(
             f"[LIVE] place_order {intent.side} {intent.symbol} x{intent.shares} "
-            f"→ {rec['status']} (order_no={rec['order_no']})"
+            f"→ {rec['status']} (accepted={accepted}, order_no={rec['order_no']})"
         )
         return rec
 
@@ -706,6 +710,11 @@ def run_live(
     for intent, price, action in sell_intents:
         rec = executor.execute(intent)
         orders.append(rec)
+        if rec.get("accepted") and not rec.get("executed"):
+            logger.info(
+                f"[주문 접수] SELL {intent.symbol} x{intent.shares} "
+                f"order_no={rec.get('order_no')} — 체결 확인 후 거래 기록 반영"
+            )
         if rec.get("executed"):
             try:
                 fill_price = rec.get("fill_price") or price
@@ -753,6 +762,11 @@ def run_live(
             continue
         rec = executor.execute(intent)
         orders.append(rec)
+        if rec.get("accepted") and not rec.get("executed"):
+            logger.info(
+                f"[주문 접수] BUY {intent.symbol} x{intent.shares} "
+                f"order_no={rec.get('order_no')} — 체결 확인 후 거래 기록 반영"
+            )
         if rec.get("executed"):
             try:
                 fill_price = rec.get("fill_price") or price

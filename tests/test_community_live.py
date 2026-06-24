@@ -33,7 +33,7 @@ import config
 import community_live
 import wsb_state
 from community_memory import CommunityMemoryStore, InMemoryBackend
-from kis_broker import PositionSnapshot
+from kis_broker import OrderResult, PositionSnapshot
 from reddit_portfolio import Position, RedditPortfolio
 from mock_broker import MockBroker
 
@@ -158,6 +158,25 @@ def test_t2_live_places_order(tmp_path=None):
         assert broker._order_seq >= 1, "실모의주문 모드인데 place_order 미호출"
         buys = [o for o in res["orders"] if o.get("side") == "BUY"]
         assert buys and buys[0]["executed"] and buys[0]["status"] == "FILLED"
+
+
+def test_t2c_pending_order_is_not_executed():
+    class PendingBroker:
+        def place_order(self, symbol, side, shares):
+            return OrderResult(
+                order_no="P-1", status="PENDING",
+                fill_price=None, fill_shares=None,
+                timestamp="2026-06-01T00:00:00+00:00", error_msg=None,
+            )
+
+    intent = SimpleNamespace(
+        symbol="NVDA", side="BUY", shares=3, action="BUY",
+        size_factor=1.0, decision_id="d1",
+    )
+    rec = community_live.OrderExecutor(broker=PendingBroker(), dry_run=False).execute(intent)
+    assert rec["accepted"] is True
+    assert rec["executed"] is False
+    assert rec["status"] == "PENDING"
 
 
 def test_t2b_live_initializes_from_broker_and_preserves_metadata(tmp_path=None):

@@ -389,12 +389,13 @@ class KISBroker:
                 timestamp=_now_iso(), error_msg=error_msg,
             )
 
-        # 모의투자는 즉시 체결 가정 — 정확한 체결가/수량은 잔고 조회로 사후 확인
+        # KIS 주문 응답은 접수 확인일 뿐 체결 확인이 아니다. 실제 체결은
+        # get_order_history()와 sync_from_kis()로 후속 확인한다.
         return OrderResult(
             order_no=order_no,
-            status="FILLED",
-            fill_price=price,
-            fill_shares=shares,
+            status="PENDING",
+            fill_price=None,
+            fill_shares=None,
             timestamp=_now_iso(),
             error_msg=None,
         )
