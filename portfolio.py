@@ -321,10 +321,23 @@ def apply_buy(portfolio: Portfolio, trade: Trade) -> None:
 
 
 def apply_sell(portfolio: Portfolio, trade: Trade) -> None:
-    """매도 체결을 포트폴리오에 반영한다. 포지션을 제거하고 현금을 증가시킨다."""
+    """매도 체결을 포트폴리오에 반영한다.
+
+    부분 매도는 남은 수량과 원가를 줄이고, 전량 매도일 때만 포지션을 제거한다.
+    """
     portfolio.cash += trade.price * trade.shares
-    if trade.symbol in portfolio.positions:
+    pos = portfolio.positions.get(trade.symbol)
+    if pos is None:
+        return
+
+    sell_shares = max(0, min(int(trade.shares), int(pos.shares)))
+    remaining_shares = pos.shares - sell_shares
+    if remaining_shares <= 0:
         del portfolio.positions[trade.symbol]
+        return
+
+    pos.shares = remaining_shares
+    pos.total_cost = pos.avg_price * remaining_shares
 
 
 # ---------- KIS 동기화 (Plan FR-11~13, Design §3.4) ----------

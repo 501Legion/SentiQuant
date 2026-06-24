@@ -108,6 +108,47 @@ def test_t7_sync_from_kis():
     assert synced.positions["AAPL"].avg_price == 100.0
 
 
+# --- T7b: 공통 apply_sell 부분 매도 보존 -------------------------------
+def test_t7b_apply_sell_partial_keeps_remaining_position():
+    port = portfolio_mod.Portfolio(cash=1_000.0)
+    port.positions["AAPL"] = portfolio_mod.Position(
+        symbol="AAPL", shares=10, avg_price=100.0,
+        buy_date="2026-06-01", total_cost=1_000.0,
+    )
+    trade = portfolio_mod.Trade(
+        symbol="AAPL", date="2026-06-02T00:00:00+00:00",
+        action="SELL", signal="TEST", price=120.0, shares=4,
+        amount=480.0, net_profit_pct=20.0, net_profit_usd=80.0,
+    )
+
+    portfolio_mod.apply_sell(port, trade)
+
+    assert port.cash == 1_480.0
+    assert "AAPL" in port.positions
+    assert port.positions["AAPL"].shares == 6
+    assert port.positions["AAPL"].avg_price == 100.0
+    assert port.positions["AAPL"].total_cost == 600.0
+
+
+# --- T7c: 공통 apply_sell 전량 매도 삭제 -------------------------------
+def test_t7c_apply_sell_full_removes_position():
+    port = portfolio_mod.Portfolio(cash=1_000.0)
+    port.positions["AAPL"] = portfolio_mod.Position(
+        symbol="AAPL", shares=10, avg_price=100.0,
+        buy_date="2026-06-01", total_cost=1_000.0,
+    )
+    trade = portfolio_mod.Trade(
+        symbol="AAPL", date="2026-06-02T00:00:00+00:00",
+        action="SELL", signal="TEST", price=120.0, shares=10,
+        amount=1_200.0, net_profit_pct=20.0, net_profit_usd=200.0,
+    )
+
+    portfolio_mod.apply_sell(port, trade)
+
+    assert port.cash == 2_200.0
+    assert "AAPL" not in port.positions
+
+
 # --- T8: paper=False는 RuntimeError (FR-20) ------------------------------
 def test_t8_paper_false_raises():
     raised = False
