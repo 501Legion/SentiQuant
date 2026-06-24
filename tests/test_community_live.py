@@ -103,6 +103,8 @@ def _live_env(*, decisions_path, llm_router_cls=None, strategy="agent"):
     _save(config, "COMMUNITY_LIVE_DECISIONS_FILE"); config.COMMUNITY_LIVE_DECISIONS_FILE = decisions_path
     _save(config, "COMMUNITY_LIVE_RUN_SUMMARIES_FILE")
     config.COMMUNITY_LIVE_RUN_SUMMARIES_FILE = os.path.join(os.path.dirname(decisions_path), "run_summaries.jsonl")
+    _save(config, "TRADES_FILE")
+    config.TRADES_FILE = os.path.join(os.path.dirname(decisions_path), "trades.csv")
     # decision report → tmp (daily-decision-report: 실 data/community/live/reports 미오염)
     _save(config, "COMMUNITY_LIVE_REPORTS_DIR")
     config.COMMUNITY_LIVE_REPORTS_DIR = os.path.join(os.path.dirname(decisions_path), "reports")
@@ -237,6 +239,32 @@ def test_t2c_rejected_buy_does_not_mutate_mirror(tmp_path=None):
         assert buys and not buys[0]["executed"]
         assert p.cash == before_cash
         assert "NVDA" not in p.positions
+
+
+def test_t2d_daily_buy_limit_counts_previous_run_summary(tmp_path=None):
+    import tempfile
+    saved_cap = config.MAX_DAILY_BUYS
+    with tempfile.TemporaryDirectory() as d:
+        try:
+            config.MAX_DAILY_BUYS = 1
+            summary_path = os.path.join(d, "run_summaries.jsonl")
+            with open(summary_path, "w", encoding="utf-8") as f:
+                f.write(json.dumps({
+                    "date": _DATE, "dry_run": False,
+                    "buy_order_count": 1, "buy_order_nos": ["P-OLD"],
+                }) + "\n")
+            broker = MockBroker(tradable=["NVDA"], quote=100.0)
+            with _live_env(decisions_path=os.path.join(d, "dec.jsonl")):
+                res = community_live.run_live(
+                    date=_DATE, dry_run=False, universe_mode="community_liquid",
+                    broker=broker,
+                    posts_by_symbol={"NVDA": [{"title": "NVDA moon", "body_excerpt": "calls"}]},
+                    ohlcv_full={"NVDA": _make_df("NVDA")}, portfolio=_portfolio(),
+                    memory=CommunityMemoryStore(backend=InMemoryBackend()))
+            assert broker._order_seq == 0, res["orders"]
+            assert not [o for o in res["orders"] if o.get("side") == "BUY"]
+        finally:
+            config.MAX_DAILY_BUYS = saved_cap
 
 
 # --- T3: decision log(live) 영속 — BUY/SKIP 모두 (SC-04) --------------------

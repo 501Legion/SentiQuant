@@ -746,16 +746,20 @@ def run_live(
                 logger.error(f"[record_trade] SELL 기록 실패: {e}")
 
     # live-scheduler-deploy §6.2 D2 — 매수 실행 전 일일/노출 한도 게이트 (Plan SC-04)
-    #   매도 실행 직후라 portfolio.positions가 현재 보유를 반영. today_buy_count=0(런당 상한);
-    #   교차-런 누적은 절대 노출%(현재 포지션 기준)가 방어. 신호/사이징 판단은 불변.
+    #   매도 실행 직후라 portfolio.positions가 현재 보유를 반영한다.
+    #   재실행/수동 실행도 같은 일자 매수 이력을 합산해 하루 상한을 지킨다.
     import runtime_guard
     _pos_val = {s: p.shares * (today_ohlcv.get(s, {}).get("close") or p.entry_price)
                 for s, p in portfolio.positions.items()}
+    today_buy_count = runtime_guard.count_today_buy_activity(date)
     buy_intents, _blocked = runtime_guard.filter_by_limits(
         buy_intents, equity=account_equity, positions_value=sum(_pos_val.values()),
-        position_value_by_symbol=_pos_val, today_buy_count=0)
+        position_value_by_symbol=_pos_val, today_buy_count=today_buy_count)
     if _blocked:
-        logger.info(f"[한도 게이트] 매수 차단 {len(_blocked)}건: {_blocked}")
+        logger.info(
+            f"[한도 게이트] 기존 매수 활동 {today_buy_count}건, "
+            f"추가 차단 {len(_blocked)}건: {_blocked}"
+        )
 
     for intent, price in buy_intents:
         if price <= 0 or intent.shares <= 0:
@@ -802,10 +806,16 @@ def run_live(
     except Exception as e:  # noqa: BLE001
         logger.warning(f"포트폴리오 상태 저장 실패: {e}")
 
+    buy_order_nos = [
+        str(o.get("order_no")) for o in orders
+        if o.get("side") == "BUY" and o.get("accepted") and o.get("order_no")
+    ]
     summary = {
         "date": date, "posts_date": posts_date, "candidates": len(decisions),
         "buys": sum(1 for o in orders if o.get("side") == "BUY" and o.get("executed")),
         "sells": sum(1 for o in orders if o.get("side") == "SELL" and o.get("executed")),
+        "buy_order_count": len(buy_order_nos),
+        "buy_order_nos": buy_order_nos,
         "llm_calls": llm_calls, "dry_run": dry_run,
         "placed": sum(1 for o in orders if o.get("executed")),
         "reflections": refl_counts,

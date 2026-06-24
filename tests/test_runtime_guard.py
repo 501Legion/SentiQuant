@@ -60,6 +60,40 @@ def test_tc02_daily_buy_limit():
         today_buy_count=0)
     assert len(allowed) == 2
 
+def test_tc02b_count_today_buy_activity_from_trades_and_summaries():
+    import csv
+    import json
+    with tempfile.TemporaryDirectory() as d:
+        trades = os.path.join(d, "trades.csv")
+        summaries = os.path.join(d, "run_summaries.jsonl")
+        with open(trades, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=[
+                "date", "symbol", "action", "signal", "price", "shares",
+                "amount", "net_profit_pct", "net_profit_usd", "order_no", "kis_status",
+            ])
+            writer.writeheader()
+            writer.writerow({
+                "date": "2026-06-01T15:00:00+00:00", "symbol": "AAA",
+                "action": "BUY", "order_no": "00001", "kis_status": "FILLED",
+            })
+            writer.writerow({
+                "date": "2026-06-01T16:00:00+00:00", "symbol": "BBB",
+                "action": "SELL", "order_no": "00002", "kis_status": "FILLED",
+            })
+        with open(summaries, "w", encoding="utf-8") as f:
+            f.write(json.dumps({
+                "date": "2026-06-01", "dry_run": False,
+                "buy_order_count": 1, "buy_order_nos": ["00003"],
+            }) + "\n")
+            f.write(json.dumps({
+                "date": "2026-06-01", "dry_run": True,
+                "buy_order_count": 5, "buy_order_nos": ["00004"],
+            }) + "\n")
+        assert rg.count_today_buy_activity(
+            "2026-06-01", trades_file=trades,
+            run_summaries_file=summaries, tz_name="UTC",
+        ) == 2
+
 
 # --- TC-03: 종목당 비중 한도 ---
 def test_tc03_symbol_weight_cap():

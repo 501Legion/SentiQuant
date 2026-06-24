@@ -1,10 +1,12 @@
 # Design Ref: live-scheduler-deploy §2/§6.1 — 무인 실주문 안전장치 (순수 정책 + 얇은 IO)
 # 키스위치·일일/노출 한도·heartbeat·기동 자가점검. scheduler/community_live가 호출.
 # 판단 로직(신호/사이징/라우터)은 건드리지 않고, "주문 실행 전 게이트/관측"으로만 동작.
+import csv
 import json
 import logging
 import os
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 import config
 
@@ -64,6 +66,95 @@ def filter_by_limits(
         allowed.append((intent, price))
         running += buy_value
     return allowed, blocked
+
+
+# ── 일일 매수 활동 집계 (D2 보강) ────────────────────────────────────────────
+def _local_date(value: str, tz_name: str) -> str:
+    """ISO 시각을 운영 타임존의 YYYY-MM-DD로 변환. 실패 시 앞 10자리 폴백."""
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    try:
+        dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(ZoneInfo(tz_name)).strftime("%Y-%m-%d")
+    except (ValueError, TypeError):
+        return text[:10]
+
+
+def _order_key(value) -> str:
+    text = str(value or "").strip()
+    return text.lstrip("0") or ("0" if text else "")
+
+
+def count_today_buy_activity(
+    target_date: str,
+    *,
+    trades_file: str | None = None,
+    run_summaries_file: str | None = None,
+    tz_name: str | None = None,
+) -> int:
+    """해당 날짜의 매수 활동 수를 계산한다.
+
+    trades.csv의 BUY 체결과 run_summaries.jsonl의 실주문 BUY 접수/체결을 함께 본다.
+    새 요약에는 주문번호가 저장되므로 중복을 주문번호 기준으로 제거하고,
+    주문번호가 없는 과거 요약은 trades.csv와 중복될 수 있어 더 큰 값만 사용한다.
+    """
+    trades_file = trades_file or config.TRADES_FILE
+    run_summaries_file = run_summaries_file or config.COMMUNITY_LIVE_RUN_SUMMARIES_FILE
+    tz_name = tz_name or getattr(config, "TIMEZONE", "UTC") or "UTC"
+
+    order_nos: set[str] = set()
+    trades_without_order = 0
+    legacy_summary_count = 0
+
+    if os.path.exists(trades_file):
+        try:
+            with open(trades_file, "r", encoding="utf-8", newline="") as f:
+                for row in csv.DictReader(f):
+                    if str(row.get("action", "")).upper() != "BUY":
+                        continue
+                    if _local_date(row.get("date", ""), tz_name) != target_date:
+                        continue
+                    order_no = _order_key(row.get("order_no"))
+                    if order_no:
+                        order_nos.add(order_no)
+                    else:
+                        trades_without_order += 1
+        except Exception as e:  # noqa: BLE001
+            logger.warning(f"일일 매수 이력 집계 실패(trades): {e}")
+
+    if os.path.exists(run_summaries_file):
+        try:
+            with open(run_summaries_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    try:
+                        rec = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if rec.get("date") != target_date or rec.get("dry_run"):
+                        continue
+                    nos = rec.get("buy_order_nos") or []
+                    if nos:
+                        for order_no in nos:
+                            key = _order_key(order_no)
+                            if key:
+                                order_nos.add(key)
+                    else:
+                        legacy_summary_count += int(
+                            rec.get("buy_order_count")
+                            or rec.get("buy_attempts")
+                            or rec.get("buys")
+                            or 0
+                        )
+        except Exception as e:  # noqa: BLE001
+            logger.warning(f"일일 매수 이력 집계 실패(run_summaries): {e}")
+
+    counted_with_orders = len(order_nos) + trades_without_order
+    return max(counted_with_orders, legacy_summary_count)
 
 
 # ── heartbeat (D5) ──────────────────────────────────────────────────────────
