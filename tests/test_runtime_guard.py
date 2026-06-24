@@ -154,8 +154,26 @@ def test_tc07_notifier_noop_and_mask():
     assert "SECRET123" not in masked and "abc123" not in masked
 
 
-# --- TC-08: 워치독 stale 판정 (SC-09 핵심 로직) ---
-def test_tc08_watchdog_stale_logic():
+# --- TC-08: Slack webhook env 로딩 ---
+def test_tc08_slack_webhook_url_from_env():
+    import importlib
+    import os
+
+    old_env = os.environ.get("SLACK_WEBHOOK_URL")
+    try:
+        os.environ["SLACK_WEBHOOK_URL"] = "https://hooks.slack.test/services/T000/B000/XXX"
+        reloaded = importlib.reload(config)
+        assert reloaded.SLACK_WEBHOOK_URL == os.environ["SLACK_WEBHOOK_URL"]
+    finally:
+        if old_env is None:
+            os.environ.pop("SLACK_WEBHOOK_URL", None)
+        else:
+            os.environ["SLACK_WEBHOOK_URL"] = old_env
+        importlib.reload(config)
+
+
+# --- TC-09: 워치독 stale 판정 (SC-09 핵심 로직) ---
+def test_tc09_watchdog_stale_logic():
     import datetime as dt
     now = dt.datetime(2026, 6, 9, 12, 0, tzinfo=dt.timezone.utc)
     fresh = {"order": (now - dt.timedelta(minutes=10)).isoformat()}

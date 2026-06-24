@@ -425,7 +425,7 @@ WATCHDOG_ORDER_GRACE_MINUTES = 90            # 09:35 ET 주문 잡 완료 유예
 WATCHDOG_SIGNAL_GRACE_MINUTES = 180          # 16:30 ET 신호 잡 완료 유예시간
 WATCHDOG_RESTART_STATE_FILE = "data/watchdog_restart_state.json"  # 일일 잡 재시작 중복 방지
 HEARTBEAT_ALIVE_INTERVAL_MINUTES = 5         # alive heartbeat 갱신 주기
-SLACK_WEBHOOK_URL = ""                       # 미설정 시 알림 no-op (env로 주입 권장)
+SLACK_WEBHOOK_URL: str = os.getenv("SLACK_WEBHOOK_URL", "")  # 미설정 시 알림 no-op
 
 # --- v3 Decision Router / LLM Router (Design Ref: §3.5) ---
 # 2026-06-13 ON 전환 — rule 1차 판단의 승인/축소/보류만 가능(자율매매 불가, rule SKIP
