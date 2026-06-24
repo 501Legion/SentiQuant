@@ -12,7 +12,9 @@ import shutil
 import subprocess
 import sys
 import hashlib
-from datetime import datetime, timezone
+import csv
+import re
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,7 +28,6 @@ SYNC_ALLOWLIST = [
     "data/community/live/decisions.jsonl",
     "data/community/live/run_summaries.jsonl",
     "data/community/daily_opinion_snapshots.jsonl",
-    "data/backtest_snapshots/v2/ohlcv",             # 가격 차트용(공개 시세, 비밀 아님)
 ]
 SYNC_CODE = [
     "dashboard_app.py",
@@ -36,6 +37,13 @@ SYNC_CODE = [
 ]
 # 방어적 차단 — 경로에 이 문자열이 있으면 절대 복사 금지(비밀/모델/캐시)
 DENY_SUBSTR = [".env", "kis_token", "models/", "models\\", "cache", "secret", ".key", "token"]
+OHLCV_SOURCE_DIR = "data/backtest_snapshots/v2/ohlcv"
+OHLCV_MAX_FILES_PER_SYMBOL = 5
+OHLCV_RECENT_DAYS = 90
+OHLCV_RECENT_DECISION_LINES = 1000
+OHLCV_RECENT_TRADE_ROWS = 300
+OHLCV_SNAPSHOT_LOOKBACK_DAYS = 30
+OHLCV_TOP_SNAPSHOT_SYMBOLS = 30
 
 
 def _denied(rel: str) -> bool:
@@ -48,6 +56,163 @@ def _read_json(path: Path) -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return {}
+
+
+def _symbol(value) -> str:
+    text = str(value or "").strip().upper()
+    if not text:
+        return ""
+    text = text.split(".")[0]
+    return text if re.fullmatch(r"[A-Z0-9][A-Z0-9.-]{0,9}", text) else ""
+
+
+def _parse_date(value):
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        return datetime.fromisoformat(text.replace("Z", "+00:00")).date()
+    except ValueError:
+        pass
+    try:
+        return datetime.fromisoformat(text[:10]).date()
+    except ValueError:
+        return None
+
+
+def _recent_records(records: list[dict], date_keys: tuple[str, ...], days: int) -> list[dict]:
+    dated = []
+    undated = []
+    for rec in records:
+        d = None
+        for key in date_keys:
+            d = _parse_date(rec.get(key))
+            if d:
+                break
+        if d:
+            dated.append((d, rec))
+        else:
+            undated.append(rec)
+    if not dated:
+        return records
+    latest = max(d for d, _ in dated)
+    cutoff = latest - timedelta(days=days)
+    return [rec for d, rec in dated if d >= cutoff] + undated[-50:]
+
+
+def _read_jsonl_tail(path: Path, max_lines: int) -> list[dict]:
+    if not path.exists():
+        return []
+    lines = path.read_text(encoding="utf-8").splitlines()[-max_lines:]
+    rows = []
+    for line in lines:
+        try:
+            rows.append(json.loads(line))
+        except Exception:
+            continue
+    return rows
+
+
+def _iter_symbols(value):
+    if isinstance(value, str):
+        sym = _symbol(value)
+        if sym:
+            yield sym
+    elif isinstance(value, (list, tuple, set)):
+        for item in value:
+            yield from _iter_symbols(item)
+    elif isinstance(value, dict):
+        for key in ("symbol", "ticker"):
+            if key in value:
+                yield from _iter_symbols(value.get(key))
+
+
+def _dashboard_ohlcv_symbols(src: Path) -> set[str]:
+    """대시보드가 실제로 볼 가능성이 높은 종목만 추린다.
+
+    원본 OHLCV 캐시는 서버에 그대로 두고, Cloud payload에는 보유/최근 거래/최근 판단/
+    최근 여론 상위 종목만 복사해 파일 수 증가를 제한한다.
+    """
+    symbols: set[str] = set()
+
+    portfolio = _read_json(src / "data/portfolio.json")
+    positions = portfolio.get("positions") or {}
+    if isinstance(positions, dict):
+        for sym in positions:
+            if s := _symbol(sym):
+                symbols.add(s)
+
+    trades_path = src / "data/trades.csv"
+    if trades_path.exists():
+        try:
+            with trades_path.open(encoding="utf-8", newline="") as f:
+                rows = list(csv.DictReader(f))[-OHLCV_RECENT_TRADE_ROWS:]
+            for row in _recent_records(rows, ("date", "timestamp", "created_at"), OHLCV_RECENT_DAYS):
+                if s := _symbol(row.get("symbol")):
+                    symbols.add(s)
+        except Exception:
+            pass
+
+    decisions = _read_jsonl_tail(
+        src / "data/community/live/decisions.jsonl",
+        OHLCV_RECENT_DECISION_LINES,
+    )
+    for rec in _recent_records(decisions, ("date", "created_at", "ts"), OHLCV_RECENT_DAYS):
+        for key in ("symbol", "candidate_symbols", "symbols"):
+            symbols.update(_iter_symbols(rec.get(key)))
+
+    summaries = _read_jsonl_tail(
+        src / "data/community/live/run_summaries.jsonl",
+        OHLCV_RECENT_DECISION_LINES,
+    )
+    for rec in _recent_records(summaries, ("date", "created_at", "ts"), OHLCV_RECENT_DAYS):
+        for key in ("symbols", "candidate_symbols", "top_symbols", "observed_symbols"):
+            symbols.update(_iter_symbols(rec.get(key)))
+
+    snapshots = _read_jsonl_tail(
+        src / "data/community/daily_opinion_snapshots.jsonl",
+        5000,
+    )
+    snapshot_rows = _recent_records(
+        snapshots,
+        ("date", "snapshot_date", "created_at", "ts"),
+        OHLCV_SNAPSHOT_LOOKBACK_DAYS,
+    )
+    scored: dict[str, float] = {}
+    for rec in snapshot_rows:
+        sym = _symbol(rec.get("symbol"))
+        if not sym:
+            continue
+        try:
+            mentions = float(rec.get("total_mentions") or rec.get("mentions") or 0)
+        except (TypeError, ValueError):
+            mentions = 0.0
+        scored[sym] = max(scored.get(sym, 0.0), mentions)
+    for sym, _ in sorted(scored.items(), key=lambda kv: (-kv[1], kv[0]))[:OHLCV_TOP_SNAPSHOT_SYMBOLS]:
+        symbols.add(sym)
+
+    return symbols
+
+
+def _copy_curated_ohlcv(src: Path, staging: Path, included: list[str]) -> dict:
+    source = src / OHLCV_SOURCE_DIR
+    if not source.exists():
+        return {"symbols": 0, "files": 0}
+    wanted = _dashboard_ohlcv_symbols(src)
+    copied_symbols: set[str] = set()
+    copied_files = 0
+    for sym in sorted(wanted):
+        files = sorted(source.glob(f"{sym}_*.csv"), key=lambda p: p.name)
+        for f in files[-OHLCV_MAX_FILES_PER_SYMBOL:]:
+            rel = f.relative_to(src).as_posix()
+            if _denied(rel):
+                continue
+            (staging / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, staging / rel)
+            included.append(rel)
+            copied_symbols.add(sym)
+            copied_files += 1
+    return {"symbols": len(copied_symbols), "files": copied_files}
 
 
 def _payload_files(staging: Path) -> list[Path]:
@@ -101,6 +266,7 @@ def curate(src: Path, staging: Path) -> list[str]:
 
     for rel in SYNC_CODE + SYNC_ALLOWLIST:
         _copy(rel)
+    ohlcv_meta = _copy_curated_ohlcv(src, staging, included)
 
     # Streamlit Cloud는 배포 브랜치 루트의 requirements.txt를 자동 감지 → 슬림 deps를 그 이름으로 제공.
     # (main의 무거운 requirements.txt는 이 orphan 브랜치에 없음)
@@ -122,6 +288,15 @@ def curate(src: Path, staging: Path) -> list[str]:
         "source_commit": sha,
         "payload_hash": current_payload_hash,
         "payload_file_count": len(_payload_files(staging)),
+        "ohlcv_policy": {
+            "mode": "curated",
+            "recent_days": OHLCV_RECENT_DAYS,
+            "snapshot_lookback_days": OHLCV_SNAPSHOT_LOOKBACK_DAYS,
+            "top_snapshot_symbols": OHLCV_TOP_SNAPSHOT_SYMBOLS,
+            "max_files_per_symbol": OHLCV_MAX_FILES_PER_SYMBOL,
+        },
+        "ohlcv_symbol_count": ohlcv_meta["symbols"],
+        "ohlcv_file_count": ohlcv_meta["files"],
         "payload_changed": True,
         "payload_changed_at": synced_at,
     }), encoding="utf-8")

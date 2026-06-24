@@ -34,11 +34,31 @@ def _build_fake_src(root: Path):
     """비밀 + 데이터 혼재 src 트리 생성."""
     (root / "data/community/live/reports").mkdir(parents=True)
     (root / "data/community/live/reports/2026-06-08.md").write_text("# report", encoding="utf-8")
-    (root / "data/community/live/decisions.jsonl").write_text('{"symbol":"X"}\n', encoding="utf-8")
-    (root / "data/community/live/run_summaries.jsonl").write_text('{"date":"2026-06-08"}\n', encoding="utf-8")
-    (root / "data/community/daily_opinion_snapshots.jsonl").write_text('{"date":"2026-06-08"}\n', encoding="utf-8")
-    (root / "data/portfolio.json").write_text('{"cash":100000}', encoding="utf-8")
-    (root / "data/trades.csv").write_text("date,symbol\n", encoding="utf-8")
+    (root / "data/community/live/decisions.jsonl").write_text(
+        '{"date":"2026-06-08","symbol":"PLTR"}\n',
+        encoding="utf-8",
+    )
+    (root / "data/community/live/run_summaries.jsonl").write_text(
+        '{"date":"2026-06-08","candidate_symbols":["SNDK"]}\n',
+        encoding="utf-8",
+    )
+    (root / "data/community/daily_opinion_snapshots.jsonl").write_text(
+        '{"date":"2026-06-08","symbol":"SNDK","total_mentions":20}\n',
+        encoding="utf-8",
+    )
+    (root / "data/portfolio.json").write_text(
+        '{"cash":100000,"positions":{"AAPL.US":{"shares":1}}}',
+        encoding="utf-8",
+    )
+    (root / "data/trades.csv").write_text("date,symbol\n2026-06-08,NVDA\n", encoding="utf-8")
+    ohlcv = root / "data/backtest_snapshots/v2/ohlcv"
+    ohlcv.mkdir(parents=True)
+    for sym in ["AAPL", "NVDA", "PLTR", "SNDK", "TSLA"]:
+        for idx, end in enumerate(["2026-06-01", "2026-06-08", "2026-06-15", "2026-06-22", "2026-06-29", "2026-07-06"]):
+            (ohlcv / f"{sym}_2026-01-01_{end}.csv").write_text(
+                "date,close\n2026-06-01,100\n",
+                encoding="utf-8",
+            )
     # --- 비밀/모델/캐시 (절대 포함되면 안 됨) ---
     (root / ".env").write_text("KIS_APP_KEY=secret", encoding="utf-8")
     (root / "data/kis_token.json").write_text('{"token":"x"}', encoding="utf-8")
@@ -81,6 +101,12 @@ def test_tc01_allowlist_included():
         assert "data/community/live/run_summaries.jsonl" in incset
         assert "data/community/daily_opinion_snapshots.jsonl" in incset
         assert "data/community/live/reports/2026-06-08.md" in incset
+        assert "data/backtest_snapshots/v2/ohlcv/AAPL_2026-01-01_2026-07-06.csv" in incset
+        assert "data/backtest_snapshots/v2/ohlcv/NVDA_2026-01-01_2026-07-06.csv" in incset
+        assert "data/backtest_snapshots/v2/ohlcv/PLTR_2026-01-01_2026-07-06.csv" in incset
+        assert "data/backtest_snapshots/v2/ohlcv/SNDK_2026-01-01_2026-07-06.csv" in incset
+        assert not any("/TSLA_" in p for p in incset)
+        assert sum(1 for p in incset if "/AAPL_" in p) == sync.OHLCV_MAX_FILES_PER_SYMBOL
         # 코드도 포함
         assert "dashboard_app.py" in incset and "requirements-dashboard.txt" in incset
         assert "assets/sentiquant-logo.jpeg" in incset
@@ -115,6 +141,9 @@ def test_tc03_last_sync_written():
         assert "synced_at" in meta
         assert len(meta.get("payload_hash", "")) == 64
         assert meta.get("payload_file_count", 0) > 0
+        assert meta.get("ohlcv_policy", {}).get("mode") == "curated"
+        assert meta.get("ohlcv_symbol_count") == 4
+        assert meta.get("ohlcv_file_count") == 20
         assert meta.get("payload_changed") is True
         assert meta.get("payload_changed_at") == meta.get("synced_at")
 
