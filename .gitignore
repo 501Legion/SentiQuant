@@ -56,3 +56,11 @@ data/community/daily_opinion_snapshots.jsonl
 data/backup/
 data/backtest_snapshots/v2/ohlcv/
 data/pip-freeze-*.txt
+
+# Generated backtest / diagnostic outputs
+data/community/backtests/
+data/*_result.txt
+data/*_report.txt
+data/*_stdout.log
+data/*_progress.txt
+data/*_cron.log
