@@ -3,35 +3,50 @@
 > 이 문서는 현재 시스템의 전체 구조를 한눈에 파악하기 위한 Living Document입니다.
 > 기능 추가/변경 시 반드시 업데이트하세요.
 >
-> **마지막 업데이트**: 2026-05-31
-> **브랜치**: community-opinion-agent
+> **마지막 업데이트**: 2026-06-25
+> **기준 브랜치**: `main`
+> **대시보드 배포 브랜치**: `dashboard-data` (Streamlit Community Cloud 전용 orphan branch)
 
 ---
 
 ## 1. 시스템 개요
 
 뉴스 감성 분석(TextBlob/FinBERT/GPT-5.4 Mini)과 Reddit 군중심리를 결합한 미국주 페이퍼 트레이딩 시스템.
-RSI + 감성 점수 → 매매 신호 → 포지션 관리 → 백테스팅/포워드 테스팅.
+현재 운영 기준으로는 **Ubuntu 서버가 수집·판단·KIS 모의투자 주문·잔고 동기화를 수행**하고,
+**Streamlit Community Cloud는 서버가 커밋/동기화한 공개 데이터만 읽는 읽기 전용 대시보드**로 동작한다.
+
+핵심 운영 원칙:
+
+- `main`: 실제 서버 코드와 스케줄러 기준 브랜치
+- `dashboard-data`: Streamlit Cloud 배포용 슬림 브랜치. `scripts/sync_dashboard_data.py`가 allowlist 파일만 복사해 force-push
+- 서버 로컬 `data/`: 주문/포트폴리오/판단/스냅샷의 mutable runtime state
+- Cloud 대시보드: 주문·동기화 실행 없음. 커밋된 `dashboard-data`의 공개 파일만 렌더링
 
 ```
-[뉴스 파이프라인]                     [Reddit 파이프라인]
-collector.get_news()                  reddit_collector.py (6 subreddits)
-    ↓                                     ↓
-sentiment_provider.py                 wsb_signal_engine.py  [V3]
-(TextBlob / FinBERT / GPT-5.4 Mini)   (Velocity 보정 → 중립필터 → TopN)
-    ↓                                     ↓
-signals.generate_signals_for_all()    reddit_portfolio.py
-(SIGNAL_ENGINE 디스패처               (포지션 추적 / Stop-Loss / Trailing)
- → RSI + Sentiment → Signal)
-    ↓
-market_filter.apply_market_filter()
-(QQQ RSI → 시장 과열 시 다운그레이드)
-    ↓
-portfolio.py / trader.py
-(포지션 관리 / 주문 실행 → kis_broker 위임)
-    ↓
-kis_broker.py
-(KIS OpenAPI 모의투자 — OAuth / 주문 / 계좌 / 시세)
+[Ubuntu 서버: /home/ubuntu/auto_stock, main]
+  systemd sentiquant.service
+      └─ python main.py
+          └─ scheduler.py (APScheduler)
+              ├─ 08:45 ET: Reddit/뉴스 수집 및 신호 준비
+              ├─ 09:35 ET: community_live.run_live() 주문 판단/실행
+              └─ alive/order heartbeat 기록
+                    ↓
+  community_live.py
+      ├─ reddit_collector.py → wsb_signal_engine.py
+      ├─ universe_filter.py → cost_aware_trade_filter.py → decision_router.py
+      ├─ runtime_guard.py 안전장치
+      ├─ kis_broker.py / portfolio.py / trades.csv 동기화
+      └─ decision_report.py 일일 판단 보고서 생성
+                    ↓
+  data/portfolio.json, data/trades.csv,
+  data/community/live/*, data/community/daily_opinion_snapshots.jsonl
+                    ↓
+  sync-dashboard.timer / scripts/sync_dashboard_data.py
+      └─ allowlist만 dashboard-data 브랜치로 force-push
+                    ↓
+[Streamlit Community Cloud: dashboard-data]
+  dashboard_app.py
+      └─ 커밋된 data만 읽어 SentiQuant 대시보드 렌더링
 ```
 
 > **신호 엔진 추상화** (kis-paper-trading): `signals.generate_signals_for_all()`은
@@ -42,6 +57,18 @@ kis_broker.py
 >
 > **주문 실행 위임** (kis-paper-trading): `trader.process_orders()`는 자체 시뮬레이션
 > 대신 `Broker` Protocol(`kis_broker.KISBroker`)의 `place_order()`에 위임한다.
+
+### 1.1 운영/배포 경계
+
+| 영역 | 위치/브랜치 | 역할 | 쓰기 권한 |
+|------|-------------|------|-----------|
+| 라이브 서버 | `/home/ubuntu/auto_stock`, `main` | 수집, 판단, 주문, KIS reconcile, 보고서 생성, 대시보드 데이터 동기화 | 있음 |
+| Streamlit Cloud | GitHub `dashboard-data` | 읽기 전용 대시보드 렌더링 | 없음 |
+| GitHub `main` | 소스 코드 기준 | 코드 리뷰/협업/배포 기준 | 코드 변경 |
+| GitHub `dashboard-data` | 슬림 배포 페이로드 | 공개 가능한 데이터와 대시보드 코드만 포함 | 서버 스크립트가 force-push |
+
+`dashboard-data`에는 `.env`, KIS 토큰, 모델 캐시, secret/key/token 경로가 복사되지 않는다.
+동기화 allowlist는 `scripts/sync_dashboard_data.py`의 `SYNC_ALLOWLIST`, `SYNC_CODE`가 단일 출처다.
 
 ---
 
@@ -57,6 +84,10 @@ kis_broker.py
 | `signal_provider.py` | `SignalProvider` Protocol + `SIGNAL_ENGINE` Provider 디스패처 | `get_provider(name)` |
 | `kis_broker.py` | KIS OpenAPI 모의투자 브로커 어댑터 (OAuth 24h / 주문 / 계좌 / 시세 / 매매가능 종목) | `KISBroker`, `place_order()`, `get_account()` |
 | `sentiment_provider.py` | TextBlob/FinBERT/GPT-5.4 Mini Provider ABC | `get_provider(name)` |
+| `community_live.py` | 라이브 여론 에이전트 1일 구동 드라이버. 수집→스냅샷→게이트→주문→보고서→요약까지 묶는 현재 운영 주 경로 | `run_live()` |
+| `runtime_guard.py` | 라이브 주문 안전장치. 킬스위치, 일일 주문 한도, 노출 한도, heartbeat, 주문 접수 기록 | `preflight_check()`, `record_order_acceptance()` |
+| `decision_report.py` | 일일 판단 Markdown 보고서 생성. 주문 상태는 `체결/접수/미접수`로 구분 | `build_daily_report()` |
+| `decision_log.py` | 종목별 판단 원본 jsonl 저장. 대시보드/보고서의 상세 판단 근거로 사용 | `DecisionLog` |
 | `wsb_preprocessor.py` | WSB 슬랭/이모지/반어법 → FinBERT 친화적 변환 | `WSBPreprocessor.preprocess()` |
 | `collector.py` | OHLCV(Polygon) + 뉴스(Finnhub) 수집 | `get_ohlcv()`, `get_news()` |
 | `reddit_collector.py` | Reddit PRAW 6서브레딧 + Daily Thread + **flair 품질가중·티커 오탐 필터** | `RedditCollector.collect()`, `source_quality_weight()`, `is_ambiguous_ticker()` |
@@ -64,8 +95,10 @@ kis_broker.py
 | `indicators.py` | RSI, MA, ATR, VolumeMA20 계산 | `get_latest_rsi()`, `get_ma()`, `calculate_atr()` |
 | `position_sizer.py` | Equal/Sentiment/Volatility/**OpinionTrend(9-factor)** 사이징 ABC | `get_sizer(name)` |
 | `wsb_state.py` | mention_history / position_scores / score_history JSON + **daily_opinion_snapshots.jsonl** I/O | `load_position_scores()`, `append_daily_snapshot()` |
+| `dashboard_app.py` | Streamlit Cloud용 읽기 전용 SentiQuant 대시보드. `dashboard-data` 브랜치에서 실행 | `streamlit run dashboard_app.py` |
+| `app.py` | 로컬/기존 대시보드 진입점. 현재 Cloud 운영 기준은 `dashboard_app.py` | `streamlit run app.py` |
 
-### Community Opinion Agent 모듈 (community-opinion-agent)
+### Community Opinion Agent / Live 모듈
 
 | 파일 | 역할 | 주요 진입점 |
 |------|------|------------|
@@ -94,6 +127,11 @@ kis_broker.py
 | `portfolio.py` | 뉴스 모델 포지션 관리 + `sync_from_kis()` KIS 잔고 동기화 |
 | `trader.py` | 주문 실행 — `Broker` Protocol(`kis_broker`)에 `place_order` 위임 (`--dry-run` 지원) |
 | `scheduler.py` | APScheduler 스케줄러 — 수집 잡 08:45 ET(timing-fix), 주문 잡 09:35 ET, alive heartbeat |
+| `deploy/sentiquant.service` | Ubuntu systemd 메인 스케줄러 서비스. `python main.py` 실행, crash 시 자동 재시작 |
+| `deploy/sync-dashboard.service` / `.timer` | 대시보드 데이터 allowlist curate 후 `dashboard-data` force-push |
+| `deploy/watchdog.service` / `.timer` | heartbeat stale 감지 시 알림 및 서비스 재시작 |
+| `scripts/sync_dashboard_data.py` | `dashboard-data` 브랜치 생성/갱신. 공개 데이터 allowlist와 secret denylist를 함께 적용 |
+| `scripts/watchdog_check.py` | heartbeat 기반 hang 감지 및 선택적 systemd restart |
 
 ---
 
@@ -188,7 +226,7 @@ reddit_portfolio.py
     → 수수료 0.25% 양방 공제
 ```
 
-### 5.1 Community Opinion Agent 게이팅 (opinion_trend 전용, community-opinion-agent)
+### 5.1 Community Opinion Agent 게이팅 (opinion_trend 전용)
 
 > WSB V3 신호(BUY/STRONG_BUY)를 **1차 후보**로 유지하고, 매수 직전에 에이전트 게이팅을 적용.
 > `--sizing equal` 등 기존 경로는 게이팅 미적용 → **회귀 0** (regression_check_reddit.py로 검증).
@@ -213,6 +251,65 @@ reddit_backtester.run()  [opinion_trend일 때만 _agent_gate]
 ```
 
 **핵심 원칙**: 급등추격 금지(size_factor ≤ 1.3, NEW_SPIKE 축소) · LLM은 보조 라우터(자율매매 ❌, 기본 OFF) · `signals.py`/`backtester.py`/뉴스 경로 불가침.
+
+### 5.2 라이브 운영 흐름 (2026-06 기준)
+
+현재 실운영의 주 경로는 `scheduler.py`가 `community_live.run_live()`를 호출하는 여론 에이전트 경로다.
+뉴스 모델 경로와 백테스트 경로는 유지되지만, 자동 매매/대시보드 발표 기준은 아래 흐름을 따른다.
+
+```
+systemd sentiquant.service
+  → main.py
+    → scheduler.start_scheduler()
+      → signal_calculation_job() 08:45 ET
+         - Reddit/뉴스 수집 및 신호 준비
+         - heartbeat 기록
+      → order_processing_job() 09:35 ET
+         - LIVE_STRATEGY=agent이면 community_live.run_live()
+         - runtime_guard preflight
+         - KIS 모의투자 주문 접수
+         - KIS 잔고/거래 reconcile
+         - decision_report Markdown 생성
+         - run_summaries/decisions/snapshots 기록
+```
+
+운영 산출물:
+
+| 경로 | 성격 | 대시보드 포함 |
+|------|------|---------------|
+| `data/portfolio.json` | 서버가 동기화한 현재 포트폴리오 상태 | 예 |
+| `data/trades.csv` | 주문/체결/동기화 거래 기록. `kis_reconcile`도 포함 | 예 |
+| `data/community/live/reports/*.md` | 일일 판단 보고서 | 예 |
+| `data/community/live/decisions.jsonl` | 종목별 판단 원본 | 예 |
+| `data/community/live/run_summaries.jsonl` | 일별 실행 요약 | 예 |
+| `data/community/daily_opinion_snapshots.jsonl` | 종목별 여론 스냅샷 | 예 |
+| `data/kis_token.json` | KIS OAuth 캐시 | 아니오(비밀/런타임 캐시) |
+| `.env` | API 키/계좌/Slack/KIS 설정 | 아니오 |
+
+대시보드 동기화:
+
+```
+sync-dashboard.timer
+  → deploy/sync-dashboard.service
+    → scripts/sync_dashboard_data.py
+      → .dashboard-staging curate
+      → dashboard-data orphan branch force-push
+      → Streamlit Cloud 자동 재배포/갱신
+```
+
+`scripts/sync_dashboard_data.py`는 `SYNC_ALLOWLIST`와 `SYNC_CODE`만 복사하고,
+`.env`, `kis_token`, `models/`, `cache`, `secret`, `.key`, `token` 문자열이 포함된 경로는 이중 차단한다.
+페이로드가 바뀌지 않아도 heartbeat commit은 발생할 수 있으며, 화면의 “데이터 최종 변경”은 `payload_hash` 기준으로 판단한다.
+
+서비스 확인 명령:
+
+```bash
+systemctl status sentiquant.service
+systemctl status sync-dashboard.timer
+systemctl status watchdog.timer
+journalctl -u sentiquant.service -n 100 --no-pager
+journalctl -u sync-dashboard.service -n 100 --no-pager
+```
 
 ---
 
@@ -243,6 +340,14 @@ python main.py --run-now
 
 # Reddit Forward Testing (스케줄러)
 python main.py --reddit-run-now
+
+# Community Opinion Agent 라이브 1일 구동
+python main.py --agent-run-now              # 기본 dry-run/config 기준
+python main.py --agent-run-now --no-dry-run # KIS 모의투자 주문 접수까지 수행
+
+# 대시보드 데이터 동기화
+python scripts/sync_dashboard_data.py
+python scripts/sync_dashboard_data.py --no-push
 
 # KIS 모의투자 주문 처리 (kis-paper-trading)
 python main.py --order-now              # 신호 기반 KIS 모의투자 실주문 처리
@@ -290,7 +395,7 @@ python main.py --run-now --source kis   # KIS 잔고 동기화 후 신호 생성
 | `WSB_RSI_EXIT_OVERBOUGHT` | 70.0 | RSI 과매수 청산 기준 |
 | `WSB_GAP_DOWN_PCT` | -5.0 | Gap Down 청산 기준 (%) |
 
-**Community Opinion Agent 상수** (community-opinion-agent, `COMMUNITY_*`):
+**Community Opinion Agent 상수** (`COMMUNITY_*`):
 
 | 상수 | 기본값 | 설명 |
 |------|--------|------|
@@ -344,6 +449,9 @@ python main.py --run-now --source kis   # KIS 잔고 동기화 후 신호 생성
 | `community-opinion-agent` | 2026-05-30 | universe/cost 필터 + source quality/ticker ambiguity + DailyOpinionSnapshot + community memory/reflection + DecisionRouter(rule+LLM OFF) + gross/net·skip metric. 신규 5모듈. **equal 회귀 0**, Match Rate 98% | `docs/0*/features/community-opinion-agent.*` (미아카이브) |
 | `funnel-fix` | 2026-06-13 | 라이브 매수 0건 깔때기 정상화: score 표본수축(K=8) + 방향성 멘션 최소치(3, 중립 킬스위치 폐지) + RSI 30~50 역추세 창 폐지(과매수만 회피) + 중립 게이트 0.90 완화·sizer damper 전환 + edge/cost 1.5배 완화 + 백테스트 metrics.json 영속화. ⚠ 신호 자체가 변경(의도) — equal regression baseline `--update` 필요 | — |
 | `timing-fix` | 2026-06-13 | Reddit 수집 잡 16:30 ET → 08:45 ET 이동 — 수집→주문 지연 17시간 → 50분 (당일 아침 여론으로 당일 시가 매매). 주문 잡 09:35 ET 유지. + stale-config 사고 해결(Daily Thread 댓글 0개 수집, 서비스 재시작으로 복구) | — |
+| `streamlit-dashboard-sync` | 2026-06-24 | Ubuntu 서버가 `dashboard-data` orphan 브랜치로 공개 데이터/슬림 앱만 force-push하고 Streamlit Cloud는 읽기 전용 렌더링. `last_sync.json` payload hash로 데이터 변경/heartbeat 구분 | `scripts/sync_dashboard_data.py` |
+| `dashboard-ui-polish` | 2026-06-24~25 | SentiQuant 브랜딩, 탭/카드형 UI, 일일 판단/여론 흐름/거래 기록 가독성 개선, KST 시간 표기 정정, 과거 스냅샷 선택 지원 | `dashboard_app.py` |
+| `live-order-reconcile-fix` | 2026-06-25 | 매도/부분매도 반영, 일일 매수 한도, Slack env, 주문 접수/체결 상태 표기 개선. 보고서의 주문 상태를 `체결/접수/미접수`로 구분 | `community_live.py`, `portfolio.py`, `runtime_guard.py`, `decision_report.py` |
 
 ---
 
