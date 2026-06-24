@@ -135,7 +135,7 @@ class CommunityOpinionTrendSizer(PositionSizer):
                  neutral_ratio, velocity_state, atr, prev_close
 
     진입 게이팅(0 반환):
-        opinion_score < WSB_OPINION_SCORE_LOW(57)
+        opinion_score < WSB_OPINION_SCORE_LOW
         or neutral_ratio > WSB_OPINION_NEUTRAL_ENTRY_MAX(0.90 — 극단 노이즈만 차단)
         or consensus_ratio < WSB_OPINION_CONSENSUS_MIN_RATIO(1.5)
     중립비율 0.5~0.9 구간은 차단 대신 _neutral_factor damper로 사이즈만 축소 (funnel-fix).

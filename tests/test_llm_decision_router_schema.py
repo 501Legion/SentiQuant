@@ -125,14 +125,14 @@ def test_t3_invalid_json_fallback():
         _toggle(orig)
 
 
-# --- T4: BUY 금지 조건(neutral 높음)에서 LLM BUY → SKIP 보정 ---
+# --- T4: BUY 금지 조건(neutral 상한 초과)에서 LLM BUY → SKIP 보정 ---
 def test_t4_llm_buy_cannot_override_skip():
     orig = config.COMMUNITY_LLM_ROUTER_ENABLED
     try:
         _toggle(True)
         fake = _Counter('{"action":"BUY","confidence":0.95,"size_factor_modifier":1.0}')
         router = DecisionRouter(llm_router=True, llm=LLMRouter(complete_fn=fake))
-        d = _decide(router, snap=_snap(neutral_ratio=0.94))   # rule SKIP
+        d = _decide(router, snap=_snap(neutral_ratio=config.COMMUNITY_NEUTRAL_RATIO_MAX + 0.01))   # rule SKIP
         assert d.action == "SKIP"
         assert "llm_buy_overridden_by_rule_skip" in d.warnings
     finally:

@@ -75,12 +75,12 @@ def test_t7_dollar_single_letter_accepted():
     assert rc.is_ambiguous_ticker("ALL", has_dollar=True) is False  # $ALL → 인정
 
 
-# --- T8: neutral_ratio > COMMUNITY_NEUTRAL_RATIO_MAX(0.90) → consensus_buy False ---
+# --- T8: neutral_ratio가 현재 상한을 넘으면 consensus_buy False ---
 def test_t8_high_neutral_no_consensus_buy():
     snap = build_daily_snapshot(
         "X",
         {"bullish": 3, "bearish": 1, "neutral": 60, "score": 72,
-         "mentions": 64, "neutral_ratio": 0.94, "velocity_state": "NORMAL"},
+         "mentions": 64, "neutral_ratio": config.COMMUNITY_NEUTRAL_RATIO_MAX + 0.01, "velocity_state": "NORMAL"},
         history=[],
     )
     assert snap.is_consensus_buy is False

@@ -1,7 +1,7 @@
 # funnel-fix 2026-06-13 — 신호 깔때기 정상화 회귀 테스트.
 # 배경: 라이브 에이전트가 가동 후 매수 0건 (중립 킬스위치·극소표본 랭킹·역추세 RSI 창).
 # 1) score 표본 수축: 방향성 멘션 n이 적을수록 50으로 수축 (극소표본 노이즈 랭킹 차단)
-# 2) 중립 필터 → 방향성 멘션 최소치(3) + 극단 노이즈 컷(0.95)
+# 2) 중립 필터 → 방향성 멘션 최소치(config) + 극단 노이즈 컷(config)
 # 3) RSI 매수 창 30~50 폐지 → 과매수(>=70)만 회피
 import pytest
 
@@ -77,7 +77,7 @@ def test_neutral_filter_allows_high_neutral_with_directional_mass():
 
 
 def test_neutral_filter_extreme_noise_still_blocked():
-    # 방향성 3건이어도 중립 > 0.95면 극단 노이즈로 차단
+    # 방향성 멘션이 충분해도 중립이 상한을 넘으면 극단 노이즈로 차단
     labels = ["positive"] * 3 + ["neutral"] * 97
     eng = _engine(70.0, labels)
     scored = eng._score_posts({"ORCL": [{"title": "t"}] * len(labels)})

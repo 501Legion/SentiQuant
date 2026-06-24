@@ -71,10 +71,10 @@ def test_t1_buy_intent():
         "2026-06-01|NVDA|reddit|finbert-wsb|sentiment|opinion_trend|community_liquid"
 
 
-# --- T2: SKIP (neutral 극단 — funnel-fix 후 상한 0.90 초과만 차단) → side "", shares 0 ---
+# --- T2: SKIP (neutral 극단 — 현재 neutral 상한 초과만 차단) → side "", shares 0 ---
 def test_t2_skip_no_order():
     dec, intent = _eval(scored={"bullish": 3, "bearish": 1, "neutral": 60, "score": 72,
-                                "mentions": 64, "neutral_ratio": 0.94,
+                                "mentions": 64, "neutral_ratio": config.COMMUNITY_NEUTRAL_RATIO_MAX + 0.01,
                                 "velocity_state": "NORMAL", "signal": "BUY"})
     assert dec.action == "SKIP"
     assert intent.side == "" and intent.shares == 0

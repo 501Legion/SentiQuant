@@ -74,9 +74,9 @@ def test_t2_new_spike_downsize():
         assert "new_spike_downsize" in spike.reason_codes
 
 
-# --- T3: neutral_ratio 높음 → SKIP ---
+# --- T3: neutral_ratio가 현재 상한을 넘으면 SKIP ---
 def test_t3_high_neutral_skip():
-    d = _decide(snap=_snap(neutral_ratio=0.94))
+    d = _decide(snap=_snap(neutral_ratio=config.COMMUNITY_NEUTRAL_RATIO_MAX + 0.01))
     assert d.action == "SKIP"
     assert "high_noise" in d.reason_codes
 

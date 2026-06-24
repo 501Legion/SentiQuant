@@ -54,9 +54,9 @@ def test_t2_score_high():
     assert _shares(opinion_score=85.0) == 120
 
 
-# --- T3: opinion_score < 60 → 진입 제외 (0) ---
+# --- T3: opinion_score가 현재 하한 미만이면 진입 제외 (0) ---
 def test_t3_score_low_excluded():
-    assert _shares(opinion_score=55.0) == 0
+    assert _shares(opinion_score=config.WSB_OPINION_SCORE_LOW - 1.0) == 0
 
 
 # --- T4: 3일 상승 trend → factor 증가 ---
@@ -74,9 +74,9 @@ def test_t6_weak_consensus_excluded():
     assert _shares(consensus_ratio=1.2) == 0
 
 
-# --- T7: neutral_ratio 높음(>0.70) → 진입 제외 ---
+# --- T7: neutral_ratio가 진입 상한을 넘으면 진입 제외 ---
 def test_t7_high_neutral_excluded():
-    assert _shares(neutral_ratio=0.94) == 0
+    assert _shares(neutral_ratio=config.WSB_OPINION_NEUTRAL_ENTRY_MAX + 0.01) == 0
 
 
 # --- T8: NEW_SPIKE 단독(persistence 부족) → 축소 ---
