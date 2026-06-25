@@ -31,6 +31,7 @@ SYNC_ALLOWLIST = [
 ]
 SYNC_CODE = [
     "dashboard_app.py",
+    "dashboard_utils.py",
     "requirements-dashboard.txt",
     ".streamlit/config.toml",
     "assets/sentiquant-logo.jpeg",

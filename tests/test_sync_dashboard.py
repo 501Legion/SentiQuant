@@ -9,12 +9,10 @@ push_branch()는 임시 git repo + bare origin으로 멱등성만 검증.
 """
 from __future__ import annotations
 
-import ast
 import os
 import subprocess
 import sys
 import tempfile
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -28,6 +26,11 @@ _spec = importlib.util.spec_from_file_location(
     "sync_dashboard_data", os.path.join(_ROOT, "scripts", "sync_dashboard_data.py"))
 sync = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(sync)
+
+_utils_spec = importlib.util.spec_from_file_location(
+    "dashboard_utils", os.path.join(_ROOT, "dashboard_utils.py"))
+dashboard_utils = importlib.util.module_from_spec(_utils_spec)
+_utils_spec.loader.exec_module(dashboard_utils)
 
 
 def _build_fake_src(root: Path):
@@ -67,25 +70,12 @@ def _build_fake_src(root: Path):
     (root / "data/gpt_cache.json").write_text("{}", encoding="utf-8")
     # 코드(있으면 포함 대상)
     (root / "dashboard_app.py").write_text("# app", encoding="utf-8")
+    (root / "dashboard_utils.py").write_text("# utils", encoding="utf-8")
     (root / "requirements-dashboard.txt").write_text("streamlit\n", encoding="utf-8")
     (root / ".streamlit").mkdir()
     (root / ".streamlit/config.toml").write_text("[server]\n", encoding="utf-8")
     (root / "assets").mkdir()
     (root / "assets/sentiquant-logo.jpeg").write_bytes(b"JPEG")
-
-
-def _load_dashboard_format_kst():
-    source = Path(_ROOT, "dashboard_app.py").read_text(encoding="utf-8")
-    module = ast.parse(source)
-    fn = next(
-        node for node in module.body
-        if isinstance(node, ast.FunctionDef) and node.name == "_format_kst"
-    )
-    code = compile(ast.Module(body=[fn], type_ignores=[]), "dashboard_app.py", "exec")
-    ns = {"datetime": datetime, "timedelta": timedelta, "timezone": timezone}
-    exec(code, ns)
-    return ns["_format_kst"]
-
 
 # --- TC-01: allowlist 데이터 포함 ---
 def test_tc01_allowlist_included():
@@ -108,7 +98,8 @@ def test_tc01_allowlist_included():
         assert not any("/TSLA_" in p for p in incset)
         assert sum(1 for p in incset if "/AAPL_" in p) == sync.OHLCV_MAX_FILES_PER_SYMBOL
         # 코드도 포함
-        assert "dashboard_app.py" in incset and "requirements-dashboard.txt" in incset
+        assert "dashboard_app.py" in incset and "dashboard_utils.py" in incset
+        assert "requirements-dashboard.txt" in incset
         assert "assets/sentiquant-logo.jpeg" in incset
 
 
@@ -161,7 +152,10 @@ def test_tc04_denied_logic():
 # --- TC-05: dashboard_app heavy import 0 (소스 스캔) ---
 def test_tc05_dashboard_no_heavy_import():
     # 주석 제외, 실제 import/from 문만 스캔 (주석에 모듈명이 들어가도 오탐 방지)
-    lines = Path(_ROOT, "dashboard_app.py").read_text(encoding="utf-8").splitlines()
+    lines = (
+        Path(_ROOT, "dashboard_app.py").read_text(encoding="utf-8").splitlines()
+        + Path(_ROOT, "dashboard_utils.py").read_text(encoding="utf-8").splitlines()
+    )
     import_lines = [ln for ln in lines
                     if ln.strip().startswith(("import ", "from ")) and not ln.strip().startswith("#")]
     forbidden = ["torch", "transformers", "optimum", "onnxruntime", "community_live",
@@ -269,7 +263,7 @@ def test_tc07_push_branch_keeps_heartbeat_when_payload_unchanged():
 
 # --- TC-08: 대시보드 KST 시각 포맷 ---
 def test_tc08_dashboard_format_kst_handles_naive_server_time():
-    fmt = _load_dashboard_format_kst()
+    fmt = dashboard_utils._format_kst
     assert fmt("2026-06-24T22:42:04.189633") == "2026-06-24 22:42"
     assert fmt("2026-06-24T15:40:56+00:00") == "2026-06-25 00:40"
     assert fmt("2026-06-24T15:40:56Z") == "2026-06-25 00:40"
