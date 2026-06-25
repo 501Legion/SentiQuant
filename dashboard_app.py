@@ -15,6 +15,8 @@ from dashboard_utils import (
     REPORTS,
     SNAPSHOTS,
     TRADES,
+    TREND_KO,
+    VELOCITY_KO,
     _available_symbols,
     _compact_report_markdown,
     _format_kst,

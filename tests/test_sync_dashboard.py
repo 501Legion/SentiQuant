@@ -9,6 +9,7 @@ push_branch()는 임시 git repo + bare origin으로 멱등성만 검증.
 """
 from __future__ import annotations
 
+import ast
 import os
 import subprocess
 import sys
@@ -163,6 +164,26 @@ def test_tc05_dashboard_no_heavy_import():
                  "praw", "reddit_collector"]
     hits = [f for f in forbidden if any(f in ln for ln in import_lines)]
     assert hits == [], f"대시보드가 무거운 모듈 import: {hits}"
+
+
+def test_tc05b_dashboard_ko_mappings_are_imported():
+    source = Path(_ROOT, "dashboard_app.py").read_text(encoding="utf-8")
+    module = ast.parse(source)
+    imported = set()
+    assigned = set()
+    used = set()
+    for node in ast.walk(module):
+        if isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                imported.add(alias.asname or alias.name)
+        elif isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    assigned.add(target.id)
+        elif isinstance(node, ast.Name) and node.id.endswith("_KO"):
+            used.add(node.id)
+    missing = sorted(used - imported - assigned)
+    assert missing == [], f"대시보드 한글 매핑 import 누락: {missing}"
 
 
 # --- TC-06: push_branch 멱등성 (기존 dashboard-data 로컬 브랜치 있어도 2회차 성공) ---
