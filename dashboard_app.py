@@ -919,10 +919,14 @@ def _trade_action_code(value) -> str:
 
 
 def _trade_date_key(value) -> str | None:
-    parsed = pd.to_datetime(value, errors="coerce", utc=True)
+    parsed = _parse_trade_datetime(value)
     if pd.isna(parsed):
         return None
     return (parsed + pd.Timedelta(hours=9)).strftime("%Y-%m-%d")
+
+
+def _parse_trade_datetime(value):
+    return pd.to_datetime(value, errors="coerce", utc=True)
 
 
 def _filter_trade_history(
@@ -937,7 +941,7 @@ def _filter_trade_history(
 
     src = df.copy()
     if "date" in src.columns:
-        src["_sort_date"] = pd.to_datetime(src["date"], errors="coerce", utc=True)
+        src["_sort_date"] = src["date"].apply(_parse_trade_datetime)
         src["_date_key"] = src["date"].apply(_trade_date_key)
     else:
         src["_sort_date"] = pd.NaT
@@ -965,7 +969,7 @@ def _trade_table(df: pd.DataFrame, *, newest_first: bool = True) -> pd.DataFrame
 
     src = df.copy()
     if "date" in src.columns:
-        src["_sort_date"] = pd.to_datetime(src["date"], errors="coerce", utc=True)
+        src["_sort_date"] = src["date"].apply(_parse_trade_datetime)
         src = src.sort_values("_sort_date", ascending=not newest_first, na_position="last")
 
     rows = []
@@ -1624,11 +1628,11 @@ with tab_trades:
                 with p_col2:
                     sort_order = st.selectbox(
                         "정렬",
-                        ["최근 거래 먼저", "오래된 거래 먼저"],
+                        ["최근 거래순", "오래된 거래순"],
                         key="trade_history_sort_order",
                     )
 
-                newest_first = sort_order == "최근 거래 먼저"
+                newest_first = sort_order == "최근 거래순"
                 trade_rows = _trade_table(filtered_trades, newest_first=newest_first)
                 page = min(page, page_count)
                 start = (page - 1) * page_size
