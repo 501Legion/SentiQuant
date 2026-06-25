@@ -55,6 +55,7 @@ data/community/daily_opinion_snapshots.jsonl
 
 # Generated market data / diagnostics
 data/backup/
+data/backtest_snapshots/v2/news/
 data/backtest_snapshots/v2/ohlcv/
 data/pip-freeze-*.txt
 
