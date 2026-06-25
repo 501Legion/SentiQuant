@@ -536,6 +536,12 @@ st.markdown(
         color: #86efac;
         font-weight: 800;
     }
+    .trade-buy {
+        color: #86efac;
+    }
+    .trade-sell {
+        color: #f87171;
+    }
     .trade-profit {
         font-weight: 800;
     }
@@ -984,6 +990,7 @@ def _trade_cards(rows: pd.DataFrame) -> str:
     cards = []
     for _, row in rows.iterrows():
         action = row.get("구분", "-")
+        action_cls = "trade-buy" if action == "매수" else "trade-sell" if action == "매도" else ""
         profit = row.get("실현 손익", "-")
         profit_cls = "profit-flat"
         try:
@@ -998,7 +1005,7 @@ def _trade_cards(rows: pd.DataFrame) -> str:
             "<div class=\"decision-row\">"
             "<div class=\"decision-row-head\">"
             f"<span class=\"decision-symbol\">{_html(row.get('종목', '-'))}</span>"
-            f"<span class=\"decision-meta trade-action\">{_html(action)}</span>"
+            f"<span class=\"decision-meta trade-action {action_cls}\">{_html(action)}</span>"
             f"<span class=\"decision-meta\">일시: {_html(row.get('일시', '-'))}</span>"
             f"<span class=\"decision-meta\">가격: {_html(row.get('가격', '-'))}</span>"
             f"<span class=\"decision-meta\">수량: {_html(row.get('수량', '-'))}</span>"
@@ -1575,7 +1582,7 @@ with tab_trades:
                 )
                 date_options.extend(date_keys)
 
-            f_col1, f_col2, f_col3 = st.columns([1.2, 1, 1])
+            f_col1, f_col2 = st.columns([1.2, 2.2])
             with f_col1:
                 date_filter = st.selectbox(
                     "거래일",
@@ -1589,36 +1596,40 @@ with tab_trades:
                     horizontal=True,
                     key="trade_history_action_filter",
                 )
-            with f_col3:
-                sort_order = st.selectbox(
-                    "정렬",
-                    ["최근 거래 먼저", "오래된 거래 먼저"],
-                    key="trade_history_sort_order",
-                )
 
-            newest_first = sort_order == "최근 거래 먼저"
             filtered_trades = _filter_trade_history(
                 df,
                 date_filter=date_filter,
                 action_filter=action_filter,
-                newest_first=newest_first,
+                newest_first=True,
             )
-            trade_rows = _trade_table(filtered_trades, newest_first=newest_first)
-            if trade_rows.empty:
+            if filtered_trades.empty:
                 st.info("선택한 조건에 해당하는 거래 기록이 없습니다.")
             else:
                 page_size = 10
-                page_count = max((len(trade_rows) + page_size - 1) // page_size, 1)
-                if page_count > 1:
-                    page_label = st.radio(
-                        "페이지",
-                        [str(i) for i in range(1, page_count + 1)],
-                        horizontal=True,
-                        key="trade_history_page",
+                page_count = max((len(filtered_trades) + page_size - 1) // page_size, 1)
+                p_col1, p_col2 = st.columns([2.2, 1])
+                with p_col1:
+                    if page_count > 1:
+                        page_label = st.radio(
+                            "페이지",
+                            [str(i) for i in range(1, page_count + 1)],
+                            horizontal=True,
+                            key="trade_history_page",
+                        )
+                        page = int(page_label)
+                    else:
+                        st.markdown("**페이지**")
+                        page = 1
+                with p_col2:
+                    sort_order = st.selectbox(
+                        "정렬",
+                        ["최근 거래 먼저", "오래된 거래 먼저"],
+                        key="trade_history_sort_order",
                     )
-                    page = int(page_label)
-                else:
-                    page = 1
+
+                newest_first = sort_order == "최근 거래 먼저"
+                trade_rows = _trade_table(filtered_trades, newest_first=newest_first)
                 page = min(page, page_count)
                 start = (page - 1) * page_size
                 end = start + page_size
