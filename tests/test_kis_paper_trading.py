@@ -190,6 +190,43 @@ def test_t9_tradable_filter_excludes():
             os.remove(tmp_path)
 
 
+def test_t9b_kis_tradable_cache_records_probe_metadata():
+    original_file = config.KIS_SYMBOLS_FILE
+    original_symbols = config.SYMBOLS
+    fd, tmp_path = tempfile.mkstemp(suffix=".json")
+    os.close(fd)
+    os.remove(tmp_path)
+    try:
+        config.KIS_SYMBOLS_FILE = tmp_path
+        config.SYMBOLS = ["aapl", "AAPL", "NVDA", ""]
+        broker = kis_broker.KISBroker(
+            app_key="k", app_secret="s", account_no="12345678-01", paper=True,
+        )
+        broker.connect = lambda: setattr(broker, "_access_token", "token")
+
+        def fake_fetch_price(symbol, excd):
+            if symbol == "AAPL":
+                return 100.0
+            return 0.0
+
+        broker._fetch_price = fake_fetch_price
+
+        assert broker.get_tradable_symbols() == ["AAPL"]
+        with open(tmp_path, encoding="utf-8") as f:
+            payload = json.load(f)
+        assert payload["source"] == "kis_quote_probe"
+        assert payload["confidence"] == "verified_quote"
+        assert payload["scope"] == "configured_symbols"
+        assert payload["checked_symbols"] == ["AAPL", "NVDA"]
+        assert payload["rejected_symbols"] == ["NVDA"]
+        assert payload["tradable"] == ["AAPL"]
+    finally:
+        config.KIS_SYMBOLS_FILE = original_file
+        config.SYMBOLS = original_symbols
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
 def test_t10_parse_kis_fill_record():
     fill = kis_broker.KISBroker._parse_fill_record({
         "ord_dt": "20260623",

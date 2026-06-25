@@ -36,6 +36,7 @@ data/trades.csv
 data/trading.log
 data/heartbeat.json
 data/watchdog_restart_state.json
+data/kis_symbols.json
 data/kis_exchange_map.json
 
 # Runtime caches and generated strategy state

@@ -140,6 +140,7 @@
 ```python
 # signals.generate_signals_for_all() = SIGNAL_ENGINE 디스패처
 0a. 매매가능 필터      _filter_tradable_symbols() — config.SYMBOLS ∩ kis_symbols.json
+                       kis_symbols.json은 운용 종목을 KIS 시세 API로 검증한 캐시
 0b. Provider 선택      signal_provider.get_provider(config.SIGNAL_ENGINE)
                        "finbert"(기본) → _generate_signals_finbert() 위임
 
@@ -426,8 +427,8 @@ python main.py --run-now --source kis   # KIS 잔고 동기화 후 신호 생성
 | `KIS_BASE_URL_PAPER` | `openapivts…:29443` | 모의투자 API 도메인 |
 | `KIS_BASE_URL_REAL` | `openapi…:9443` | 실전 도메인 — FR-20으로 차단 |
 | `KIS_TOKEN_CACHE_FILE` | `data/kis_token.json` | OAuth 토큰 24h 캐시 |
-| `KIS_SYMBOLS_FILE` | `data/kis_symbols.json` | 매매 가능 종목 캐시 |
-| `KIS_SYMBOLS_REFRESH_DAYS` | 7 | 종목 마스터 갱신 주기 (일) |
+| `KIS_SYMBOLS_FILE` | `data/kis_symbols.json` | 매매 가능 종목 캐시. 운용 대상(`config.SYMBOLS`)을 KIS 시세 API로 검증해 `source/confidence` 메타데이터와 함께 저장 |
+| `KIS_SYMBOLS_REFRESH_DAYS` | 7 | 매매 가능 종목 재검증 주기 (일) |
 
 ---
 

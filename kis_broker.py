@@ -163,6 +163,8 @@ class KISBroker:
         # 종목→거래소 판별 캐시 (price API 프로브 결과 영속화 — 일일 재프로브 절감)
         self._exchange_cache_path = self._symbols_cache_path.parent / "kis_exchange_map.json"
         self._exchange_cache: dict[str, tuple[str, str]] = self._load_exchange_cache()
+        self._last_symbols_checked: list[str] = []
+        self._last_symbols_rejected: list[str] = []
 
         # 계좌번호 분해: "12345678-01" → CANO="12345678", ACNT_PRDT_CD="01"
         # 상품코드 누락 시 종합계좌 기본값 "01" 사용
@@ -651,41 +653,79 @@ class KISBroker:
     # -------------------------------------------------------------------------
 
     def get_tradable_symbols(self) -> list[str]:
-        """매매 가능 미국 종목 캐시. KIS_SYMBOLS_REFRESH_DAYS 만료 시에만 마스터 재조회."""
+        """매매 가능 미국 종목 캐시. KIS_SYMBOLS_REFRESH_DAYS 만료 시에만 재검증."""
         cached = self._load_symbols_cache()
         if cached is not None:
             return cached
 
-        # 캐시 만료 또는 미존재 → 마스터 재조회
+        # 캐시 만료 또는 미존재 → KIS 시세 API로 운용 종목 검증
         try:
             symbols = self._fetch_tradable_symbols()
         except Exception as e:
-            logger.warning(f"[KIS] 종목 마스터 조회 실패 — 마지막 캐시로 폴백: {e}")
+            logger.warning(f"[KIS] 매매 가능 종목 검증 실패 — 마지막 캐시로 폴백: {e}")
             stale = self._load_symbols_cache(allow_stale=True)
             if stale is None:
-                # 마스터 미노출 + 캐시 없음 → config.SYMBOLS 전체 허용 (사후 거부 학습)
+                # 검증 실패 + 캐시 없음 → config.SYMBOLS 전체 허용 (사후 거부 학습)
                 logger.warning(
-                    "[KIS] 종목 마스터 미확보 — config.SYMBOLS를 매매 가능으로 가정. "
+                    "[KIS] 매매 가능 종목 검증 미확보 — config.SYMBOLS를 매매 가능으로 가정. "
                     "REJECTED 응답으로 사후 학습 필요"
                 )
-                fallback = list(config.SYMBOLS)
-                self._save_symbols_cache(fallback)
+                fallback = _normalize_symbols(config.SYMBOLS)
+                self._save_symbols_cache(
+                    fallback,
+                    source="config_symbols_fallback",
+                    confidence="assumed",
+                    checked_symbols=fallback,
+                    rejected_symbols=[],
+                )
                 return fallback
             logger.warning("[KIS] 만료된 종목 캐시 강제 사용")
             return stale
 
-        self._save_symbols_cache(symbols)
+        self._save_symbols_cache(
+            symbols,
+            source="kis_quote_probe",
+            confidence="verified_quote",
+            checked_symbols=self._last_symbols_checked,
+            rejected_symbols=self._last_symbols_rejected,
+        )
         return symbols
 
     def _fetch_tradable_symbols(self) -> list[str]:
-        """KIS 종목 마스터 — 공식 OpenAPI는 종목 전체 마스터 직접 제공 안 함.
-        대신 NASDAQ 마스터 파일 다운로드(별도 인프라) 또는 사후 학습 방식 사용.
+        """KIS 운용 대상 종목 검증.
 
-        본 구현은 폴백 전략 — config.SYMBOLS 전체를 매매 가능으로 가정하고
-        place_order가 REJECTED 응답을 받으면 호출자(trader)가 제외 학습.
+        KIS OpenAPI는 현재 프로젝트에서 바로 쓰기 좋은 "전체 미국 종목 마스터"
+        엔드포인트를 제공하지 않는다. 대신 실제 운용 대상(config.SYMBOLS)을 KIS
+        해외주식 시세 API로 조회해, KIS가 인식하는 종목만 매매 후보 캐시에 남긴다.
+        주문 가능성의 최종 판단은 주문 응답이 담당하지만, 기존의 무조건 폴백보다
+        거래소/종목 매핑을 명시적으로 검증할 수 있다.
         """
-        # TODO: NASDAQ 마스터 파일 다운로드 또는 KIS 종목조회 API가 노출되면 교체
-        raise RuntimeError("KIS 종목 마스터 직접 조회 미구현 — 폴백 경로 사용")
+        symbols = _normalize_symbols(config.SYMBOLS)
+        if not symbols:
+            raise RuntimeError("config.SYMBOLS가 비어 있어 KIS 종목 검증 불가")
+        if not self._access_token:
+            self.connect()
+
+        tradable: list[str] = []
+        rejected: list[str] = []
+        for symbol in symbols:
+            try:
+                self.get_quote(symbol)
+                tradable.append(symbol)
+            except Exception as e:  # noqa: BLE001 — 종목별 검증 실패는 전체 실패가 아님
+                rejected.append(symbol)
+                logger.warning(f"[KIS] {symbol} 시세 검증 실패 — 매매 가능 후보 제외: {e}")
+
+        self._last_symbols_checked = symbols
+        self._last_symbols_rejected = rejected
+
+        if not tradable:
+            raise RuntimeError("KIS 시세 검증을 통과한 운용 종목 없음")
+        logger.info(
+            "[KIS] 매매 가능 종목 검증 완료: "
+            f"{len(tradable)}/{len(symbols)}개 통과"
+        )
+        return tradable
 
     def _load_symbols_cache(self, allow_stale: bool = False) -> list[str] | None:
         data = _read_symbols_cache(self._symbols_cache_path)
@@ -703,12 +743,26 @@ class KISBroker:
 
         return list(data.get("tradable", []))
 
-    def _save_symbols_cache(self, symbols: list[str]) -> None:
+    def _save_symbols_cache(
+        self,
+        symbols: list[str],
+        *,
+        source: str = "unknown",
+        confidence: str = "unknown",
+        checked_symbols: list[str] | None = None,
+        rejected_symbols: list[str] | None = None,
+    ) -> None:
         self._symbols_cache_path.parent.mkdir(parents=True, exist_ok=True)
+        tradable = _normalize_symbols(symbols)
         payload = {
             "updated_at": _now_iso(),
             "refresh_days": config.KIS_SYMBOLS_REFRESH_DAYS,
-            "tradable": symbols,
+            "source": source,
+            "confidence": confidence,
+            "scope": "configured_symbols",
+            "checked_symbols": _normalize_symbols(checked_symbols or tradable),
+            "rejected_symbols": _normalize_symbols(rejected_symbols or []),
+            "tradable": tradable,
         }
         self._symbols_cache_path.write_text(
             json.dumps(payload, ensure_ascii=False, indent=2),
@@ -752,6 +806,19 @@ def load_cached_tradable_symbols() -> list[str] | None:
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _normalize_symbols(symbols: list[str] | tuple[str, ...]) -> list[str]:
+    """종목 코드를 대문자/중복 제거 형태로 정규화한다."""
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for raw in symbols:
+        symbol = str(raw).strip().upper()
+        if not symbol or symbol in seen:
+            continue
+        seen.add(symbol)
+        normalized.append(symbol)
+    return normalized
 
 
 def _read_symbols_cache(path: Path) -> dict | None:
