@@ -14,7 +14,7 @@
 |------|------|
 | **Problem** | 스케줄러 로직은 완비됐으나, 서버 상시·자동복구 운영 + 실주문 안전장치가 없었음. 미검증 게이트 완화 상태라 통제 필수. |
 | **Solution** | systemd 서비스(Restart=always·부팅시작) + 외부 워치독(hang 복구) + 4중 안전장치(키스위치/일일·노출 한도/알림/헬스·자가점검). 판단 로직 무수정. |
-| **Function UX Effect** | `systemctl enable --now auto-stock` → 매 거래일 09:35 ET 자동 실주문, crash·hang 양쪽 자동 복구, 이상 시 알림·자동 중단. |
+| **Function UX Effect** | `systemctl enable --now sentiquant.service` → 매 거래일 09:35 ET 자동 실주문, crash·hang 양쪽 자동 복구, 이상 시 알림·자동 중단. |
 | **Core Value** | 무인 상시 운영하되 폭주·침묵 실패를 워치독·키스위치·한도·알림으로 통제. |
 
 ### 1.3 Value Delivered (실제 결과)
@@ -34,7 +34,7 @@
 | M2 | `notifier.py`(Slack no-op·마스킹) |
 | M3 | `scheduler.py` 훅(selfcheck/halt/heartbeat/알림) + `community_live.py` 매수 게이트 |
 | M4 | `tests/test_runtime_guard.py` TC-01~08 |
-| M5 | `deploy/auto-stock.service`·`watchdog.{service,timer}`·`scripts/watchdog_check.py`·requirements(praw)·`.env.example`·`docs/ops/live-scheduler.md` |
+| M5 | `deploy/sentiquant.service`·`watchdog.{service,timer}`·`scripts/watchdog_check.py`·requirements(praw)·`.env.example`·`docs/ops/live-scheduler.md` |
 
 **신규 8파일 + 수정 4(scheduler·community_live·config·requirements). 판단 로직·신호엔진·백테스트 불가침.**
 

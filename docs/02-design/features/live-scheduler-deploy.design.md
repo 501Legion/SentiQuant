@@ -35,7 +35,7 @@
 ## 2. Selected Architecture — Option C
 
 ```
-[systemd] auto-stock.service (Restart=always, enable)
+[systemd] sentiquant.service (Restart=always, enable)
    └─ python main.py → scheduler.start_scheduler()
         └─ order_processing_job (09:35 ET)
              ├─ runtime_guard.selfcheck()      → 실패 시 abort + notifier(헬스실패)   [기동/잡 시작]
@@ -48,7 +48,7 @@
         └─ signal_calculation_job (16:30 ET) → 동일 heartbeat/except 훅
 
 [systemd timer] watchdog.timer (N분) → scripts/watchdog_check.py
-   └─ heartbeat.json stale? → notifier(stale) + systemctl restart auto-stock
+   └─ heartbeat.json stale? → notifier(stale) + systemctl restart sentiquant.service
 ```
 
 **왜 C인가**: 정책(키스위치·한도·자가점검)을 `runtime_guard`의 **순수 함수**로 빼면 단위테스트가 쉽고(SC-04/06), `scheduler`/`community_live`엔 **호출 한 줄씩**만 추가돼 판단 로직 불변·회귀 0(NFR-01/02). A(인라인)는 결합·테스트난, B(레이어 추상화)는 이 규모에 과설계.
@@ -126,7 +126,7 @@ def filter_by_limits(buy_intents, *, equity, positions, today_buy_count,
 - `community_live.run_live` 매수 실행 루프(`:459`) 직전: `buy_intents, blocked = filter_by_limits(buy_intents, ...)`; blocked 사유 로그/리포트. **dry_run/posts 로직 불변.**
 
 ### 6.3 M5 deploy/provision
-- `deploy/auto-stock.service`: `ExecStart=/opt/auto-stock/venv/bin/python main.py`, `Restart=always`, `RestartSec=10`, `EnvironmentFile`, `WorkingDirectory`, `After=network-online.target`, `WantedBy=multi-user.target`.
+- `deploy/sentiquant.service`: `ExecStart=<repo>/venv/bin/python main.py`, `Restart=always`, `RestartSec=10`, `EnvironmentFile`, `WorkingDirectory`, `After=network-online.target`, `WantedBy=multi-user.target`.
 - `deploy/watchdog.service`+`.timer`: `OnUnitActiveSec=WATCHDOG간격`, `ExecStart=python scripts/watchdog_check.py`.
 - `scripts/watchdog_check.py`: heartbeat_stale면 exit 1 + notify + (`--restart` 시 systemctl restart).
 - `requirements.txt`: **praw 추가**. `.env.example` 작성. runbook: 모델 `scp models/finbert-onnx/ →`, py3.11 venv, systemctl 절차.
@@ -184,7 +184,7 @@ def filter_by_limits(buy_intents, *, equity, positions, today_buy_count,
 
 ## 9. 영향 범위 요약
 
-- **신규**: `runtime_guard.py`·`notifier.py`·`scripts/watchdog_check.py`·`deploy/{auto-stock.service,watchdog.service,watchdog.timer}`·`.env.example`·`docs/ops/live-scheduler.md`·`tests/test_runtime_guard.py`
+- **신규**: `runtime_guard.py`·`notifier.py`·`scripts/watchdog_check.py`·`deploy/{sentiquant.service,watchdog.service,watchdog.timer}`·`.env.example`·`docs/ops/live-scheduler.md`·`tests/test_runtime_guard.py`
 - **수정**: `scheduler.py`(훅 ~15 LOC)·`community_live.py`(매수 게이트 ~8 LOC)·`config.py`(상수)·`requirements.txt`(praw)
 - **불가침**: 신호 엔진·agent_gate·사이징·라우터·reddit_backtester·뉴스 경로
 - **예상 변경량**: ~250–350 LOC (대부분 신규 가드/배포)

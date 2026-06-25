@@ -14,7 +14,7 @@
 ## 1. Plan Success Criteria
 | SC | 기준 | 판정 | 근거 |
 |----|------|:----:|------|
-| SC-01 | systemd 자동재시작·부팅시작 | ⚠️ | `deploy/auto-stock.service`(Restart=always·WantedBy) 작성 — **Ubuntu 서버 실동작 미검증** |
+| SC-01 | systemd 자동재시작·부팅시작 | ⚠️ | `deploy/sentiquant.service`(Restart=always·WantedBy) 작성 — **Ubuntu 서버 실동작 미검증** |
 | SC-02 | 09:35 ET 정시(서버 TZ 무관) | ⚠️ | 기존 APScheduler CronTrigger(TIMEZONE) — 서버 미검증 |
 | SC-03 | 키스위치 주문만 스킵 | ✅ | `is_halted()` 파일/env, scheduler 차단, TC-01 |
 | SC-04 | 일일·노출 한도 | ✅ | `filter_by_limits` + community_live 게이트, TC-02/03/04 |

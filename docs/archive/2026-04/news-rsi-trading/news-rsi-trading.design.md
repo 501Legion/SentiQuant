@@ -36,7 +36,7 @@ scheduler → collector → indicators → signals → trader → portfolio
 ### 1.2 디렉토리 구조
 
 ```
-C:\Users\auto_stock\
+C:\Users\SentiQuant\
 ├── main.py              # 진입점 (스케줄러 시작)
 ├── scheduler.py         # APScheduler 잡 정의 및 실행 루프
 ├── collector.py         # 외부 API 데이터 수집 (Polygon.io, NewsAPI)

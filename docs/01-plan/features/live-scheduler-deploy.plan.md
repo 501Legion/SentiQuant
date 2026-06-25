@@ -14,7 +14,7 @@
 |------|------|
 | **Problem** | 스케줄러 로직(`python main.py` → `start_scheduler`, 09:35 ET 실주문)은 완비됐으나, 서버에서 **죽지 않고 상시·자동 복구로 돌릴 운영 체계**와 **실주문 안전장치**가 없다. 게다가 직전 세션에 매수 게이트 7개를 미검증 완화한 상태. |
 | **Solution** | 기존 `start_scheduler`를 **systemd 서비스**(Restart=always, 부팅 자동시작)로 배포 + **4중 안전장치**(키스위치/일일 한도/알림/헬스체크)를 코드와 운영에 추가. |
-| **Function UX Effect** | 서버에서 `systemctl enable --now auto-stock` 한 번 → 매 거래일 자동 실주문, crash·재부팅에도 자동 복구. 이상 시 알림·자동 중단. |
+| **Function UX Effect** | 서버에서 `systemctl enable --now sentiquant.service` 한 번 → 매 거래일 자동 실주문, crash·재부팅에도 자동 복구. 이상 시 알림·자동 중단. |
 | **Core Value** | 사람 개입 없이 안전하게 상시 운영. "조용한 폭주"(미검증 완화 + 무인 실주문) 리스크를 키스위치·한도·알림으로 통제. |
 
 ---
@@ -27,7 +27,7 @@
 | **WHO** | 운영자(본인) — 서버에 띄워두고 매일 결과만 확인. |
 | **RISK** | 실주문 폭주/오류 누적, 자격증명·시간대 오설정, 프로세스 죽음 인지 못함, 미검증 완화로 과매매. |
 | **SUCCESS** | systemd 자동 복구·부팅시작 / 키스위치 즉시 중단 / 일일 주문·노출 한도 / 주문·오류 알림 / 헬스체크·자가점검 / 매매 판단 로직 불변(회귀 0). |
-| **SCOPE** | 신규: `deploy/auto-stock.service`·`notifier.py`·운영 runbook·테스트. 수정: `scheduler.py`(가드/하트비트/자가점검/알림 훅), `config.py`(상수). 불가침: 매매 판단·신호 엔진·백테스트. |
+| **SCOPE** | 신규: `deploy/sentiquant.service`·`notifier.py`·운영 runbook·테스트. 수정: `scheduler.py`(가드/하트비트/자가점검/알림 훅), `config.py`(상수). 불가침: 매매 판단·신호 엔진·백테스트. |
 
 ---
 
@@ -51,7 +51,7 @@
 ### FR — 배포/운영
 | ID | 내용 |
 |----|------|
-| FR-01 | **systemd 유닛** `deploy/auto-stock.service`: `ExecStart=<venv>/bin/python main.py`, `Restart=always`, `RestartSec=10`, `WorkingDirectory`, `EnvironmentFile=.env`, `After=network-online.target`, `WantedBy=multi-user.target`(부팅 자동시작). |
+| FR-01 | **systemd 유닛** `deploy/sentiquant.service`: `ExecStart=<venv>/bin/python main.py`, `Restart=always`, `RestartSec=10`, `WorkingDirectory`, `EnvironmentFile=.env`, `After=network-online.target`, `WantedBy=multi-user.target`(부팅 자동시작). |
 | FR-02 | **운영 runbook** `docs/ops/live-scheduler.md`: 설치/시작/중지/로그확인/키스위치/업데이트 절차. |
 | FR-03 | **로그 회전** — `trading.log` RotatingFileHandler(또는 journald) + 표준출력 journald 수집. |
 | FR-04 | **시간대 독립** — APScheduler `config.TIMEZONE`(ET) 사용. 서버 TZ와 무관하게 09:35 ET 보장(검증 항목). |
@@ -63,7 +63,7 @@
 | FR-06 | **일일 한도**: 하루 최대 신규 매수 건수(`MAX_DAILY_BUYS`) + 총 투자금 대비 노출 상한(`MAX_TOTAL_EXPOSURE_PCT`) + 종목당 비중 상한. 초과 시 추가 매수 차단(기존 포지션·매도 무관). |
 | FR-07 | **알림**: `notifier.py` — Slack incoming webhook(`SLACK_WEBHOOK_URL`, 미설정 시 no-op). 발송 이벤트: 주문 체결 요약, 주문/잡 오류, 키스위치 발동, 헬스체크 실패. |
 | FR-08 | **헬스체크/하트비트**: 각 잡 성공 시 `data/heartbeat.json`에 `{job, last_success_utc}` 기록. 기동 시 **자가점검**(KIS 자격·Reddit/Polygon 키·TIMEZONE·필수 파일) 후 실패 시 알림+로그(주문은 안전상 중단). |
-| FR-09 | **외부 워치독 (Approach B)**: `deploy/watchdog.timer`+`watchdog.service`(systemd timer, N분 주기) 또는 cron이 `heartbeat.json` 신선도 검사 → **stale(=hang 추정)이면 알림 + `systemctl restart auto-stock`**. crash(Restart=always)가 못 잡는 "살아있는데 멈춤"을 복구. 워치독 자체는 주문 안 함(관측·재시작만). |
+| FR-09 | **외부 워치독 (Approach B)**: `deploy/watchdog.timer`+`watchdog.service`(systemd timer, N분 주기) 또는 cron이 `heartbeat.json` 신선도 검사 → **stale(=hang 추정)이면 알림 + `systemctl restart sentiquant.service`**. crash(Restart=always)가 못 잡는 "살아있는데 멈춤"을 복구. 워치독 자체는 주문 안 함(관측·재시작만). |
 
 ### FR — Provisioning (fresh clone 부팅, 2026-06-08 확인된 갭)
 | ID | 내용 |
@@ -87,7 +87,7 @@
 
 | 파일 | 구분 | 변경 |
 |------|------|------|
-| `deploy/auto-stock.service` | 신규 | systemd 유닛 (메인 스케줄러) |
+| `deploy/sentiquant.service` | 신규 | systemd 유닛 (메인 스케줄러) |
 | `deploy/watchdog.service` + `deploy/watchdog.timer` | 신규 | 외부 워치독(heartbeat stale 감지→재시작·알림, FR-09) |
 | `scripts/watchdog_check.py` | 신규 | 워치독 검사 로직(heartbeat 신선도→exit code/restart 트리거) |
 | `docs/ops/live-scheduler.md` | 신규 | 설치·운영 runbook |
@@ -149,7 +149,7 @@
 2. `notifier.py`(Slack webhook, no-op fallback).
 3. `scheduler.py` 배선(주문잡 가드·자가점검·하트비트·알림 훅).
 4. `tests/test_runtime_guard.py` + 전체 회귀.
-5. `deploy/auto-stock.service` + `scripts/watchdog_check.py` + `deploy/watchdog.{service,timer}` + `docs/ops/live-scheduler.md` runbook.
+5. `deploy/sentiquant.service` + `scripts/watchdog_check.py` + `deploy/watchdog.{service,timer}` + `docs/ops/live-scheduler.md` runbook.
 6. 서버 설치·자가점검·강제 kill 복구(crash)·SIGSTOP 후 워치독 복구(hang)·정시 실행(SC-01/02/09) 수동 검증.
 
 ---

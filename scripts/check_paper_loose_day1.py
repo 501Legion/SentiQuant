@@ -4,7 +4,7 @@
 신호/주문 결과를 검증해 data/paper_loose_day1_report.txt + stdout + notifier로 보고한다.
 
 배경: 2026-06-14 config를 LOOSE×OFF로 전환(score52/cons1.3/neut0.96·0.95/min2, LLM veto OFF),
-auto-stock.service 재시작. KIS 모의투자(실돈 아님). 06-12(금)엔 깔때기 TIGHT로 매수후보 0이었음.
+sentiquant.service 재시작. KIS 모의투자(실돈 아님). 06-12(금)엔 깔때기 TIGHT로 매수후보 0이었음.
 이 스크립트는 월 06-15 08:45 ET 신호 + 09:35 ET 주문 후(22:50 KST) 1회 실행해 결과를 본다.
 
 점검: (1) signal heartbeat 2026-06-15 갱신 (2) 신호·주문잡 정상실행(휴장 스킵 아님)

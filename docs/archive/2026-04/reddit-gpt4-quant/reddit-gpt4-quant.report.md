@@ -67,10 +67,10 @@ python main.py --backtest --source reddit \
 
 ```
 # 매일 16:30 ET Reddit 신호 수집 + Forward Testing
-30 16 * * 1-5  cd /path/to/auto_stock && python main.py --reddit-run-now
+30 16 * * 1-5  cd /path/to/SentiQuant && python main.py --reddit-run-now
 
 # 주간 리포트 (금요일 17:00 ET)
-0 17 * * 5  cd /path/to/auto_stock && python main.py --report-reddit
+0 17 * * 5  cd /path/to/SentiQuant && python main.py --report-reddit
 ```
 
 ---
