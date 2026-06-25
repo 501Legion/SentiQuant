@@ -236,7 +236,7 @@ class DecisionRouter:
             if consensus <= 1.0 or is_sell:
                 reasons.append("consensus_break")
                 return self._mk("SELL", 0.75, 0.0, reasons, interp, mem_hits, warnings,
-                                f"{ctx['symbol']} SELL: 합의 붕괴 consensus {consensus:.2f}")
+                                f"{ctx['symbol']} 매도: 매수 의견 약화(합의 {consensus:.2f})")
             if trend == "DOWN" or (hist is not None and hist < 0.4):
                 reasons.append("opinion_weakening")
                 return self._mk("REDUCE", 0.6, 0.5, reasons, interp, mem_hits, warnings,
@@ -300,8 +300,8 @@ class DecisionRouter:
 
         return self._mk(
             "BUY", round(confidence, 3), round(size, 4), reasons, interp, mem_hits, warnings,
-            f"{ctx['symbol']} BUY: consensus {consensus:.2f}, score {score:.0f},"
-            f" persist {persistence}d, size {size:.2f}",
+            f"{ctx['symbol']} 매수: 합의 {consensus:.2f}, 여론 점수 {score:.0f},"
+            f" 지속 {persistence}일, 비중 {size:.2f}",
             stop_loss_pct=config.STOP_LOSS_PCT,
             trailing_stop_pct=config.TRAILING_STOP_PCT,
         )

@@ -20,6 +20,7 @@ ACTION_LABELS = {
     "STRONG_BUY": "강한 매수",
     "SELL": "매도",
     "STRONG_SELL": "강한 매도",
+    "NEUTRAL": "중립",
     "EXIT": "매도",
     "REDUCE": "비중 축소",
     "SKIP": "보류",
@@ -35,8 +36,8 @@ REASON_CODE_LABELS = {
     "weak_consensus": "매수 의견 합의 부족",
     "high_noise": "중립 의견 비율 과다",
     "neutral_spike": "중립 의견 급증",
-    "consensus_break": "컨센서스 붕괴",
-    "no_rule_signal": "룰 신호 없음",
+    "consensus_break": "매수 의견 약화",
+    "no_rule_signal": "매매 신호 없음",
     "bullish_trend": "상승 추세",
     "high_momentum": "강한 모멘텀",
     "trend_up_with_moderate_momentum": "완만한 상승 모멘텀",
@@ -54,9 +55,9 @@ REASON_CODE_LABELS = {
     "buy_approved": "매수 기준 통과",
     "strong_consensus_upsize": "강한 매수 합의 — 비중 확대",
     "llm_assisted": "LLM 보조 판단",
-    "llm_fallback_to_rule_based": "LLM 실패 — 룰 기반 대체",
-    "llm_low_confidence_kept_rule": "LLM 저신뢰 — 룰 판단 유지",
-    "llm_buy_overridden_by_rule_skip": "룰 우선 — LLM 매수 기각",
+    "llm_fallback_to_rule_based": "LLM 실패 — 자동 기준으로 대체",
+    "llm_low_confidence_kept_rule": "LLM 저신뢰 — 자동 기준 유지",
+    "llm_buy_overridden_by_rule_skip": "자동 기준 우선 — LLM 매수 기각",
 }
 
 
@@ -76,6 +77,27 @@ def _fmt_action(value) -> str:
 
 def _code_key(value) -> str:
     return re.sub(r"[\s\-]+", "_", str(value or "").strip()).lower()
+
+
+TREND_LABELS = {"UP": "상승", "DOWN": "하락", "FLAT": "보합"}
+VELOCITY_LABELS = {
+    "SPIKE": "급증",
+    "NEW_SPIKE": "신규 급증",
+    "NORMAL": "보통",
+    "HIGH_MOMENTUM": "강한 모멘텀",
+    "DECLINING": "약화",
+    "FADING": "감소",
+}
+
+
+def _fmt_trend(value) -> str:
+    text = re.sub(r"[\s\-]+", "_", str(value or "-").strip()).upper()
+    return TREND_LABELS.get(text, str(value or "-"))
+
+
+def _fmt_velocity(value) -> str:
+    text = re.sub(r"[\s\-]+", "_", str(value or "-").strip()).upper()
+    return VELOCITY_LABELS.get(text, str(value or "-"))
 
 
 def _fmt_reason_code(code) -> str:
@@ -319,18 +341,18 @@ def _fmt_candidate_block(r: dict) -> list[str]:
     rule = r.get("rule_action")
     llm = r.get("llm_action")
     if rule and llm:
-        route = f"룰 {_fmt_action(rule)} → LLM {_fmt_action(llm)}"
+        route = f"자동 기준: {_fmt_action(rule)} → LLM: {_fmt_action(llm)}"
     elif rule:
-        route = f"룰 {_fmt_action(rule)}"
+        route = f"자동 기준: {_fmt_action(rule)}"
     else:
         route = r.get("router_mode", "")
     metrics = (
         f"여론점수 {_fmt_num(r.get('opinion_score'), 1)} · "
         f"합의 {_fmt_num(r.get('consensus_ratio'))} · "
         f"중립 {_fmt_pct(r.get('neutral_ratio'))} · "
-        f"속도 {r.get('velocity_state') or '-'} · "
-        f"추세 {r.get('opinion_trend') or '-'} · "
-        f"지속 {r.get('persistence_days', 0)}d"
+        f"속도 {_fmt_velocity(r.get('velocity_state'))} · "
+        f"추세 {_fmt_trend(r.get('opinion_trend'))} · "
+        f"지속 {r.get('persistence_days', 0)}일"
     )
     reasoning = _fmt_reason_text(r.get("reasoning") or "").strip() or "_근거 기록 없음_"
     return [
@@ -532,7 +554,7 @@ def _format_markdown(ctx: ReportContext, funnel: dict, commentary: str = None) -
     L += ["## 상세 기록", "", "### 후보 상세 판단 (근거)", ""]
     details = _candidate_details(ctx, funnel)
     if details:
-        L += ["컨센서스를 통과해 최종 판단까지 간 후보의 지표·근거입니다.", ""]
+        L += ["자동 기준으로 상세 검토까지 진행된 후보의 지표와 근거입니다.", ""]
         for r in details:
             L += _fmt_candidate_block(r)
     else:

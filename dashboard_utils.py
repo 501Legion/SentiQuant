@@ -171,11 +171,19 @@ ACTION_KO = {
     "STRONG_BUY": "강한 매수",
     "SELL": "매도",
     "STRONG_SELL": "강한 매도",
+    "NEUTRAL": "중립",
     "SKIP": "보류",
     "HOLD": "관망",
 }
 TREND_KO = {"UP": "상승", "DOWN": "하락", "FLAT": "보합"}
-VELOCITY_KO = {"SPIKE": "급증", "NORMAL": "보통", "FADING": "감소"}
+VELOCITY_KO = {
+    "SPIKE": "급증",
+    "NEW_SPIKE": "신규 급증",
+    "NORMAL": "보통",
+    "HIGH_MOMENTUM": "강한 모멘텀",
+    "DECLINING": "약화",
+    "FADING": "감소",
+}
 SOURCE_KO = {
     "reddit_agent": "여론 에이전트",
     "community_agent": "커뮤니티 여론",
@@ -190,8 +198,8 @@ REASON_KO = {
     "weak_consensus": "매매 합의 부족",
     "high_noise": "중립(노이즈) 비율 과다",
     "neutral_spike": "중립 의견 급증",
-    "consensus_break": "컨센서스 붕괴",
-    "no_rule_signal": "룰 신호 없음",
+    "consensus_break": "매수 의견 약화",
+    "no_rule_signal": "매매 신호 없음",
     "bullish_trend": "상승 추세",
     "high_momentum": "강한 모멘텀",
     "trend_up_with_moderate_momentum": "완만한 상승 모멘텀",
@@ -207,9 +215,9 @@ REASON_KO = {
     "low_persistence_downsize": "신호 지속일 부족 — 비중 축소",
     "new_spike_downsize": "신규 급등 종목 — 비중 축소",
     "llm_assisted": "LLM 보조 판단",
-    "llm_fallback_to_rule_based": "LLM 실패 — 룰 기반 대체",
-    "llm_low_confidence_kept_rule": "LLM 저신뢰 — 룰 판단 유지",
-    "llm_buy_overridden_by_rule_skip": "룰 우선 — LLM 매수 기각",
+    "llm_fallback_to_rule_based": "LLM 실패 — 자동 기준으로 대체",
+    "llm_low_confidence_kept_rule": "LLM 저신뢰 — 자동 기준 유지",
+    "llm_buy_overridden_by_rule_skip": "자동 기준 우선 — LLM 매수 기각",
     "buy_approved": "매수 기준 통과",
     "strong_consensus_upsize": "강한 매수 합의 — 비중 확대",
 }
@@ -320,17 +328,47 @@ def _compact_report_markdown(md: str) -> str:
     for line in md.splitlines():
         line = line.replace("최종 위험/비용 기준에서 보류", "위험/비용 기준에서 보류")
         line = line.replace("매매 합의 기준 미충족", "매수 의견 합의 부족")
+        line = line.replace("컨센서스를 통과해 최종 판단까지 간 후보의 지표·근거입니다.", "자동 기준으로 상세 검토까지 진행된 후보의 지표와 근거입니다.")
+        line = line.replace("컨센서스 붕괴", "매수 의견 약화")
+        line = line.replace("합의 붕괴", "매수 의견 약화")
+        line = line.replace("size_factor", "비중")
         line = line.replace("weak_consensus", "매수 의견 합의 부족")
         line = line.replace("WEAK CONSENSUS", "매수 의견 합의 부족")
         line = line.replace("buy_approved", "매수 기준 통과")
         line = line.replace("strong_consensus_upsize", "강한 매수 합의 — 비중 확대")
         line = line.replace("참고 코드", "참고")
         line = line.replace("최종 기준에서 보류", "최종 판단: 보류/관망")
+        line = line.replace("룰 매수", "자동 기준: 매수")
+        line = line.replace("룰 매도", "자동 기준: 매도")
+        line = line.replace("룰 관망", "자동 기준: 관망")
+        line = line.replace("룰 보류", "자동 기준: 보류")
         line = line.replace("| 수량 | 체결 |", "| 수량 | 주문 상태 |")
         line = line.replace("| ✅ |", "| 체결 |")
         line = line.replace("| ❌ |", "| 미확정 |")
+        line = re.sub(r"속도\s+HIGH_MOMENTUM", "속도 강한 모멘텀", line)
+        line = re.sub(r"속도\s+NEW_SPIKE", "속도 신규 급증", line)
+        line = re.sub(r"속도\s+DECLINING", "속도 약화", line)
+        line = re.sub(r"속도\s+NORMAL", "속도 보통", line)
+        line = re.sub(r"추세\s+UP", "추세 상승", line)
+        line = re.sub(r"추세\s+DOWN", "추세 하락", line)
+        line = re.sub(r"추세\s+FLAT", "추세 보합", line)
+        line = re.sub(r"지속\s+(\d+)d", r"지속 \1일", line)
+        line = re.sub(
+            r"([A-Z.]+) 매수: consensus ([0-9.]+), score ([0-9.]+), persist (\d+)d, size ([0-9.]+)",
+            r"\1 매수: 합의 \2, 여론 점수 \3, 지속 \4일, 비중 \5",
+            line,
+        )
+        line = re.sub(
+            r"([A-Z.]+) SELL: 매수 의견 약화 consensus ([0-9.]+)",
+            r"\1 매도: 매수 의견 약화(합의 \2)",
+            line,
+        )
+        line = re.sub(r"\bscore\s+([0-9.]+)", r"여론 점수 \1", line)
         line = re.sub(r"\bSTRONG_BUY\b", "강한 매수", line)
         line = re.sub(r"\bBUY\b", "매수", line)
+        line = re.sub(r"\bNEUTRAL\b", "중립", line)
+        line = re.sub(r"\bSTRONG_SELL\b", "강한 매도", line)
+        line = re.sub(r"\bSELL\b", "매도", line)
         line = re.sub(r"\bSKIP\b", "보류", line)
         line = re.sub(r"\bHOLD\b", "관망", line)
         line = re.sub(

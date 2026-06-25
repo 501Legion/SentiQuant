@@ -298,7 +298,7 @@ def test_tc14_pending_order_status_is_acceptance_not_failed():
     assert "| 종목 | 여론 점수 | 합의 비율 | 비중 | 수량 | 주문 상태 |" in md
     assert "| 종목 | 판단 | 사유 | 수량 | 주문 상태 |" in md
     assert "| PLTR | 54.8 | 1.60 | 1.00 | 84 | 접수 (0000056615) |" in md
-    assert "| AVGO | 매도 | 컨센서스 붕괴 | 15 | 접수 (0000056608) |" in md
+    assert "| AVGO | 매도 | 매수 의견 약화 | 15 | 접수 (0000056608) |" in md
     assert "❌" not in md
 
 
