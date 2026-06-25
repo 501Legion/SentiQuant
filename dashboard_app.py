@@ -908,17 +908,62 @@ def _format_signed_money_value(value) -> str:
     return _signed_money(amount)
 
 
-def _trade_table(df: pd.DataFrame) -> pd.DataFrame:
+def _trade_action_code(value) -> str:
+    return str(value or "").strip().upper()
+
+
+def _trade_date_key(value) -> str | None:
+    parsed = pd.to_datetime(value, errors="coerce", utc=True)
+    if pd.isna(parsed):
+        return None
+    return (parsed + pd.Timedelta(hours=9)).strftime("%Y-%m-%d")
+
+
+def _filter_trade_history(
+    df: pd.DataFrame,
+    *,
+    date_filter: str,
+    action_filter: str,
+    newest_first: bool,
+) -> pd.DataFrame:
+    if df.empty:
+        return df.copy()
+
+    src = df.copy()
+    if "date" in src.columns:
+        src["_sort_date"] = pd.to_datetime(src["date"], errors="coerce", utc=True)
+        src["_date_key"] = src["date"].apply(_trade_date_key)
+    else:
+        src["_sort_date"] = pd.NaT
+        src["_date_key"] = None
+
+    if date_filter != "전체 기간":
+        src = src[src["_date_key"] == date_filter]
+
+    if action_filter != "전체":
+        target = "BUY" if action_filter == "매수" else "SELL"
+        if "action" not in src.columns:
+            return src.iloc[0:0]
+        src = src[src["action"].apply(_trade_action_code) == target]
+
+    return src.sort_values(
+        "_sort_date",
+        ascending=not newest_first,
+        na_position="last",
+    )
+
+
+def _trade_table(df: pd.DataFrame, *, newest_first: bool = True) -> pd.DataFrame:
     if df.empty:
         return pd.DataFrame()
 
     src = df.copy()
     if "date" in src.columns:
         src["_sort_date"] = pd.to_datetime(src["date"], errors="coerce", utc=True)
-        src = src.sort_values("_sort_date", na_position="first")
+        src = src.sort_values("_sort_date", ascending=not newest_first, na_position="last")
 
     rows = []
-    for _, row in src.tail(200).iloc[::-1].iterrows():
+    for _, row in src.head(200).iterrows():
         display_row = {
             "일시": _trade_date(row.get("date")),
             "종목": row.get("symbol", "-"),
@@ -1516,24 +1561,69 @@ with tab_trades:
                 ]),
                 unsafe_allow_html=True,
             )
-            st.caption("최근 거래부터 표시합니다. 시간은 한국시간 기준이며, 수익 거래 비율은 실현 손익이 있는 거래 기준입니다.")
-            trade_rows = _trade_table(df)
-            page_size = 10
-            page_count = max((len(trade_rows) + page_size - 1) // page_size, 1)
-            if page_count > 1:
-                page_label = st.radio(
-                    "페이지",
-                    [str(i) for i in range(1, page_count + 1)],
-                    horizontal=True,
-                    key="trade_history_page",
+            st.caption("시간은 한국시간 기준이며, 수익 거래 비율은 실현 손익이 있는 거래 기준입니다.")
+
+            date_options = ["전체 기간"]
+            if "date" in df.columns:
+                date_keys = (
+                    df["date"]
+                    .apply(_trade_date_key)
+                    .dropna()
+                    .drop_duplicates()
+                    .sort_values(ascending=False)
+                    .tolist()
                 )
-                page = int(page_label)
+                date_options.extend(date_keys)
+
+            f_col1, f_col2, f_col3 = st.columns([1.2, 1, 1])
+            with f_col1:
+                date_filter = st.selectbox(
+                    "거래일",
+                    date_options,
+                    key="trade_history_date_filter",
+                )
+            with f_col2:
+                action_filter = st.radio(
+                    "구분",
+                    ["전체", "매수", "매도"],
+                    horizontal=True,
+                    key="trade_history_action_filter",
+                )
+            with f_col3:
+                sort_order = st.selectbox(
+                    "정렬",
+                    ["최근 거래 먼저", "오래된 거래 먼저"],
+                    key="trade_history_sort_order",
+                )
+
+            newest_first = sort_order == "최근 거래 먼저"
+            filtered_trades = _filter_trade_history(
+                df,
+                date_filter=date_filter,
+                action_filter=action_filter,
+                newest_first=newest_first,
+            )
+            trade_rows = _trade_table(filtered_trades, newest_first=newest_first)
+            if trade_rows.empty:
+                st.info("선택한 조건에 해당하는 거래 기록이 없습니다.")
             else:
-                page = 1
-            start = (page - 1) * page_size
-            end = start + page_size
-            st.markdown(_trade_cards(trade_rows.iloc[start:end]), unsafe_allow_html=True)
-            st.caption(f"{start + 1}–{min(end, len(trade_rows))} / {len(trade_rows)}건 표시")
+                page_size = 10
+                page_count = max((len(trade_rows) + page_size - 1) // page_size, 1)
+                if page_count > 1:
+                    page_label = st.radio(
+                        "페이지",
+                        [str(i) for i in range(1, page_count + 1)],
+                        horizontal=True,
+                        key="trade_history_page",
+                    )
+                    page = int(page_label)
+                else:
+                    page = 1
+                page = min(page, page_count)
+                start = (page - 1) * page_size
+                end = start + page_size
+                st.markdown(_trade_cards(trade_rows.iloc[start:end]), unsafe_allow_html=True)
+                st.caption(f"{start + 1}–{min(end, len(trade_rows))} / {len(trade_rows)}건 표시")
 
 # ── ③ 일일 결정 ──────────────────────────────────────────────────────────────
 with tab_funnel:
