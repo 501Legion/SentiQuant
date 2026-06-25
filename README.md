@@ -94,8 +94,12 @@ python main.py --order-now --dry-run    # 주문 직전까지 시뮬레이션
 python main.py --reddit-run-now
 
 # 대시보드
-streamlit run dashboard_app.py
+streamlit run dashboard_app.py   # Streamlit Cloud용 읽기 전용 대시보드
+streamlit run app.py             # 로컬/서버용 기존 대시보드(KIS 동기화 버튼 포함)
 ```
+
+> 운영 중인 공개 대시보드는 `dashboard-data` 브랜치의 `dashboard_app.py`를 사용합니다.
+> `app.py`는 로컬 확인이나 KIS 수동 동기화가 필요한 경우에만 실행합니다.
 
 ---
 
@@ -132,7 +136,8 @@ streamlit run dashboard_app.py
 | `kis_broker.py` / `trader.py` / `portfolio.py` | KIS 모의투자 주문·계좌·포지션 |
 | `backtester.py` / `reddit_backtester.py` | 백테스팅 엔진 |
 | `scheduler.py` | APScheduler (수집 08:45 ET / 주문 09:35 ET) |
-| `dashboard_app.py` | Streamlit 대시보드 |
+| `dashboard_app.py` | Streamlit Cloud용 읽기 전용 대시보드 (`dashboard-data` 브랜치 배포) |
+| `app.py` | 로컬/서버용 기존 대시보드 (KIS 수동 동기화 버튼 포함) |
 | `config.py` | 전체 상수 정의 (뉴스·WSB V3·KIS·`COMMUNITY_*` 100+) |
 
 ---
