@@ -820,6 +820,20 @@ def _missing_snapshot_message(summary: dict, date_label: str) -> str:
     return f"{date_label} 실행은 완료됐지만 {detail}"
 
 
+def _snapshot_gap_reason_message(summary: dict, run_date: str, snapshot_date: str) -> str:
+    if not summary:
+        return ""
+
+    snapshot_status = str(summary.get("snapshot_status") or "").strip().lower()
+    snapshot_count = _run_int(summary, "snapshot_count")
+    reason = str(summary.get("no_snapshot_reason") or "").strip()
+    if snapshot_status not in {"missing", "failed"} and snapshot_count > 0 and not reason:
+        return ""
+
+    base_message = _missing_snapshot_message(summary, run_date)
+    return f"{base_message} 따라서 최신 종목별 스냅샷은 {snapshot_date} 기준으로 유지됩니다."
+
+
 def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
     reason = summary.get("no_snapshot_reason") or ""
     message = _missing_snapshot_message(summary, date_label)
@@ -838,7 +852,11 @@ def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
         )
 
 
-def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -> None:
+def _render_opinion_freshness(
+    run_date: str | None,
+    snapshot_date: str | None,
+    run_summary: dict | None = None,
+) -> None:
     st.markdown(
         _stat_grid([
             ("최신 실행일", run_date or "없음", ""),
@@ -854,6 +872,9 @@ def _render_opinion_freshness(run_date: str | None, snapshot_date: str | None) -
             "아래 종목별 흐름은 스냅샷 기준일까지만 반영됩니다.",
             "warn",
         ), unsafe_allow_html=True)
+        gap_reason = _snapshot_gap_reason_message(run_summary or {}, run_date, snapshot_date)
+        if gap_reason:
+            st.markdown(_notice_card("차이 발생 사유", gap_reason), unsafe_allow_html=True)
     elif run_date and not snapshot_date:
         st.markdown(_notice_card(
             "스냅샷 대기",
@@ -1724,7 +1745,7 @@ with tab_opinion:
     run_date = run_summary.get("date")
     df = _normalize_opinion_snapshots(snaps)
     snapshot_latest = df["date"].max() if not df.empty and "date" in df else None
-    _render_opinion_freshness(run_date, snapshot_latest)
+    _render_opinion_freshness(run_date, snapshot_latest, run_summary)
 
     if not snaps:
         if run_date:
