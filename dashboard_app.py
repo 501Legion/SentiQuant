@@ -866,15 +866,18 @@ def _render_opinion_freshness(
     )
 
     if run_date and snapshot_date and run_date != snapshot_date:
-        st.markdown(_notice_card(
-            "기준일 차이",
+        message = (
             f"실행은 {run_date}까지 완료됐지만, 종목별 여론 스냅샷은 {snapshot_date} 기준입니다. "
-            "아래 종목별 흐름은 스냅샷 기준일까지만 반영됩니다.",
-            "warn",
-        ), unsafe_allow_html=True)
+            "아래 종목별 흐름은 스냅샷 기준일까지만 반영됩니다."
+        )
         gap_reason = _snapshot_gap_reason_message(run_summary or {}, run_date, snapshot_date)
         if gap_reason:
-            st.markdown(_notice_card("차이 발생 사유", gap_reason), unsafe_allow_html=True)
+            message = f"{message} {gap_reason}"
+        st.markdown(_notice_card(
+            "기준일 차이",
+            message,
+            "warn",
+        ), unsafe_allow_html=True)
     elif run_date and not snapshot_date:
         st.markdown(_notice_card(
             "스냅샷 대기",
