@@ -125,6 +125,15 @@ st.markdown(
         font-weight: 650;
         line-height: 1.5;
     }
+    .notice-detail {
+        border-top: 1px solid rgba(148, 163, 184, 0.18);
+        color: #9ca3af;
+        font-size: 0.78rem;
+        font-weight: 600;
+        line-height: 1.45;
+        margin-top: 8px;
+        padding-top: 8px;
+    }
     div[data-baseweb="tab-list"] {
         border-bottom: 1px solid #242b36;
         gap: 8px;
@@ -579,12 +588,14 @@ st.markdown(
 )
 
 
-def _notice_card(title: str, message: str, tone: str = "info") -> str:
+def _notice_card(title: str, message: str, tone: str = "info", detail: str = "") -> str:
     tone = tone if tone in {"info", "warn"} else "info"
+    detail_html = f"<div class=\"notice-detail\">{_html(detail)}</div>" if detail else ""
     return f"""
     <div class="notice-card notice-{tone}">
         <div class="notice-title">{_html(title)}</div>
         <div class="notice-message">{_html(message)}</div>
+        {detail_html}
     </div>
     """
 
@@ -830,8 +841,17 @@ def _snapshot_gap_reason_message(summary: dict, run_date: str, snapshot_date: st
     if snapshot_status not in {"missing", "failed"} and snapshot_count > 0 and not reason:
         return ""
 
-    base_message = _missing_snapshot_message(summary, run_date)
-    return f"{base_message} 따라서 최신 종목별 스냅샷은 {snapshot_date} 기준으로 유지됩니다."
+    if reason == "no_candidate_snapshots":
+        return f"사유: {run_date} 실행에서는 표시 가능한 후보가 없어 새 종목별 스냅샷이 생성되지 않았습니다."
+    if reason == "filtered_out_all":
+        return f"사유: {run_date} 실행에서는 점수화 이후 랭킹/필터를 통과한 표시 후보가 없었습니다."
+    if reason == "no_posts":
+        return f"사유: {run_date} 실행에서 수집된 Reddit 입력이 없었습니다."
+    if reason == "no_scored_symbols":
+        return f"사유: {run_date} 실행에서 입력은 있었지만 점수화된 종목이 없었습니다."
+    if reason in {"snapshot_write_failed", "partial_snapshot_write_failure"}:
+        return f"사유: {run_date} 실행 중 종목별 스냅샷 저장을 확인할 필요가 있습니다."
+    return f"사유: {run_date} 실행에서 새 종목별 스냅샷이 생성되지 않았습니다."
 
 
 def _render_missing_snapshot_notice(summary: dict, date_label: str) -> None:
@@ -867,16 +887,15 @@ def _render_opinion_freshness(
 
     if run_date and snapshot_date and run_date != snapshot_date:
         message = (
-            f"실행은 {run_date}까지 완료됐지만, 종목별 여론 스냅샷은 {snapshot_date} 기준입니다. "
-            "아래 종목별 흐름은 스냅샷 기준일까지만 반영됩니다."
+            f"실행 기준일은 {run_date}, 종목별 스냅샷 기준일은 {snapshot_date}입니다. "
+            f"아래 흐름은 {snapshot_date}까지의 데이터만 반영합니다."
         )
         gap_reason = _snapshot_gap_reason_message(run_summary or {}, run_date, snapshot_date)
-        if gap_reason:
-            message = f"{message} {gap_reason}"
         st.markdown(_notice_card(
             "기준일 차이",
             message,
             "warn",
+            detail=gap_reason,
         ), unsafe_allow_html=True)
     elif run_date and not snapshot_date:
         st.markdown(_notice_card(
