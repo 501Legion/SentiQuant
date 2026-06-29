@@ -84,7 +84,7 @@ python main.py --backtest --source reddit \
 
 # 실시간 신호 생성 / KIS 잔고 동기화
 python main.py --run-now
-python main.py --run-now --source kis
+python main.py --report --source kis
 
 # KIS 모의투자 주문 처리
 python main.py --order-now              # 신호 기반 실주문

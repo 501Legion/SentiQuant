@@ -85,7 +85,7 @@
 | `kis_broker.py` | KIS OpenAPI 모의투자 브로커 어댑터 (OAuth 24h / 주문 / 계좌 / 시세 / 매매가능 종목) | `KISBroker`, `place_order()`, `get_account()` |
 | `sentiment_provider.py` | TextBlob/FinBERT/GPT-5.4 Mini Provider ABC | `get_provider(name)` |
 | `community_live.py` | 라이브 여론 에이전트 1일 구동 드라이버. 수집→스냅샷→게이트→주문→보고서→요약까지 묶는 현재 운영 주 경로 | `run_live()` |
-| `runtime_guard.py` | 라이브 주문 안전장치. 킬스위치, 일일 주문 한도, 노출 한도, heartbeat, 주문 접수 기록 | `preflight_check()`, `record_order_acceptance()` |
+| `runtime_guard.py` | 라이브 주문 안전장치. 킬스위치, 일일 주문 한도, 노출 한도, heartbeat, 기동 자가점검 | `is_halted()`, `filter_by_limits()`, `count_today_buy_activity()`, `selfcheck()` |
 | `decision_report.py` | 일일 판단 Markdown 보고서 생성. 주문 상태는 `체결/접수/미접수`로 구분 | `build_daily_report()` |
 | `decision_log.py` | 종목별 판단 원본 jsonl 저장. 대시보드/보고서의 상세 판단 근거로 사용 | `DecisionLog` |
 | `wsb_preprocessor.py` | WSB 슬랭/이모지/반어법 → FinBERT 친화적 변환 | `WSBPreprocessor.preprocess()` |

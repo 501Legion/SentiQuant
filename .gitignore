@@ -17,6 +17,7 @@ data/kis_token.json
 .idea/
 .claude/
 .pytest_cache/
+.bkit/
 .bkit-memory.json
 
 # Temporary files and local backups

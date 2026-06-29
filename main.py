@@ -56,18 +56,46 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def _check_env(require_finnhub: bool = False) -> None:
+def _check_env(required_keys: tuple[str, ...] | None = None) -> None:
     """API 키 설정 여부를 확인한다."""
     import config
+    required_keys = required_keys or ("POLYGON_API_KEY", "FINNHUB_API_KEY")
     missing = []
-    if not config.POLYGON_API_KEY:
-        missing.append("POLYGON_API_KEY")
-    if not config.FINNHUB_API_KEY:
-        missing.append("FINNHUB_API_KEY")
+    for key in required_keys:
+        if not getattr(config, key, ""):
+            missing.append(key)
     if missing:
         logger.error(f".env 파일에 다음 API 키가 없습니다: {', '.join(missing)}")
         logger.error(".env.example을 복사해 .env를 만들고 API 키를 입력하세요.")
         sys.exit(1)
+
+
+def _uses_news_signal_path(args) -> bool:
+    """Finnhub 뉴스 수집이 필요한 실행 경로인지 판정한다."""
+    if args.run_now:
+        return True
+    if args.backtest and args.source != "reddit":
+        return True
+
+    no_cli_mode = not any(
+        (
+            args.agent_run_now,
+            args.reddit_run_now,
+            args.report_reddit,
+            args.backtest,
+            args.run_now,
+            args.report,
+            args.order_now,
+        )
+    )
+    return no_cli_mode and config.LIVE_STRATEGY != "agent"
+
+
+def _required_env_keys(args) -> tuple[str, ...]:
+    required = ["POLYGON_API_KEY"]
+    if _uses_news_signal_path(args):
+        required.append("FINNHUB_API_KEY")
+    return tuple(required)
 
 
 def _run_news_backtest(args) -> None:
@@ -298,7 +326,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    _check_env()
+    _check_env(_required_env_keys(args))
 
     if args.agent_run_now:
         import community_live
