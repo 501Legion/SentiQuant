@@ -15,6 +15,7 @@ import math
 import os
 import sys
 import tempfile
+from datetime import datetime
 
 # 프로젝트 루트 + tests 디렉토리를 sys.path에 추가 (pytest / 단독 실행 양쪽 지원)
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -267,6 +268,51 @@ def test_t11_reconcile_trades_updates_and_adds(tmp_path):
     assert rows[1]["signal"] == "kis_reconcile"
     assert float(rows[1]["net_profit_usd"]) == 70.22
     assert round(float(rows[1]["net_profit_pct"]), 4) == 1.7003
+
+
+def test_t12_scheduler_fetches_kis_fills_in_short_chunks(monkeypatch):
+    import scheduler
+
+    class FixedDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            base = cls(2026, 7, 1, 12, 0, 0)
+            if tz is not None and hasattr(tz, "localize"):
+                return tz.localize(base)
+            if tz is not None:
+                return base.replace(tzinfo=tz)
+            return base
+
+    class FakeBroker:
+        def __init__(self):
+            self.calls = []
+
+        def get_order_history(self, start_date, end_date):
+            self.calls.append((start_date, end_date))
+            if start_date == "20260624":
+                return [
+                    FillRecord("1", "AAA", "BUY", 10.0, 1, "2026-06-24T13:00:00+00:00"),
+                    FillRecord("1", "AAA", "BUY", 10.0, 1, "2026-06-24T13:00:00+00:00"),
+                ]
+            if start_date == "20260630":
+                return [
+                    FillRecord("2", "BBB", "SELL", 11.0, 2, "2026-07-01T13:00:00+00:00"),
+                ]
+            return []
+
+    monkeypatch.setattr(scheduler, "datetime", FixedDateTime)
+    broker = FakeBroker()
+    fills = scheduler._fetch_recent_kis_fills(broker, lookback_days=8, chunk_days=3)
+
+    assert broker.calls == [
+        ("20260624", "20260626"),
+        ("20260627", "20260629"),
+        ("20260630", "20260701"),
+    ]
+    assert [(f.order_no, f.symbol, f.action) for f in fills] == [
+        ("1", "AAA", "BUY"),
+        ("2", "BBB", "SELL"),
+    ]
 
 
 def test_t12_fetch_positions_fails_closed_on_partial_exchange_failure():

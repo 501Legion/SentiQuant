@@ -44,6 +44,39 @@ def is_trading_day(dt: datetime = None) -> bool:
     return not schedule.empty
 
 
+def _fetch_recent_kis_fills(broker, lookback_days: int = 14, chunk_days: int = 3):
+    """KIS 체결내역을 짧은 날짜 구간으로 나눠 조회한다.
+
+    모의투자 체결 조회는 넓은 기간을 한 번에 조회하면 일부 오래된 체결만
+    반환될 수 있어 최신 체결이 누락된다. 스케줄러 정합화는 최근 체결만
+    필요하므로 짧은 구간을 합쳐서 사용한다.
+    """
+    now = datetime.now(ET).date()
+    start = now - timedelta(days=max(lookback_days - 1, 0))
+    chunk_days = max(int(chunk_days or 1), 1)
+
+    fills = []
+    cursor = start
+    while cursor <= now:
+        chunk_end = min(cursor + timedelta(days=chunk_days - 1), now)
+        start_label = cursor.strftime("%Y%m%d")
+        end_label = chunk_end.strftime("%Y%m%d")
+        try:
+            fills.extend(broker.get_order_history(start_label, end_label))
+        except Exception as e:
+            logger.warning(
+                "[KIS] 체결내역 구간 조회 실패 (%s~%s): %s",
+                start_label, end_label, e,
+            )
+        cursor = chunk_end + timedelta(days=1)
+
+    unique = {
+        (f.timestamp[:10], f.order_no, f.symbol, f.action): f
+        for f in fills
+    }
+    return sorted(unique.values(), key=lambda f: f.timestamp)
+
+
 def signal_calculation_job() -> None:
     """
     매일 SIGNAL_JOB_HOUR:MINUTE ET 실행 (timing-fix: 08:45 ET — 장 시작 직전 수집).
@@ -143,9 +176,7 @@ def order_processing_job(dry_run: bool = False) -> None:
                     portfolio = load_portfolio()
                     portfolio = sync_from_kis(portfolio, broker)
                     save_portfolio(portfolio)
-                    end_date = datetime.now(ET).strftime("%Y%m%d")
-                    start_date = (datetime.now(ET) - timedelta(days=90)).strftime("%Y%m%d")
-                    fills = broker.get_order_history(start_date, end_date)
+                    fills = _fetch_recent_kis_fills(broker)
                     reconcile_trades_from_kis(fills)
                     logger.info("[KIS] Agent 라이브 완료 후 sync_from_kis 성공")
                 except Exception as e:
@@ -189,9 +220,7 @@ def order_processing_job(dry_run: bool = False) -> None:
             try:
                 portfolio = sync_from_kis(portfolio, broker)
                 save_portfolio(portfolio)
-                end_date = datetime.now(ET).strftime("%Y%m%d")
-                start_date = (datetime.now(ET) - timedelta(days=90)).strftime("%Y%m%d")
-                fills = broker.get_order_history(start_date, end_date)
+                fills = _fetch_recent_kis_fills(broker)
                 reconcile_trades_from_kis(fills)
             except Exception as e:
                 logger.warning(f"[KIS] sync_from_kis 실패 — 캐시 유지: {e}")
